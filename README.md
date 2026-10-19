@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/safflowers.jpg" width="235" alt="Safflowers by Ono Chikkyō: three stems on a blue ground, two in orange bloom and one in bud">
+  <img src="assets/safflowers.jpg" width="230" alt="Safflowers by Ono Chikkyō: three stems on a blue ground, two in orange bloom and one in bud">
 </p>
 
 <h1 align="center">saffML</h1>
