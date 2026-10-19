@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/safflowers.jpg" width="240" alt="A painting of three safflowers on a blue ground: two stems in orange bloom and one in bud">
+  <img src="assets/safflowers.jpg" width="250" alt="A painting of three safflowers on a blue ground: two stems in orange bloom and one in bud">
 </p>
 
 <h1 align="center">saffml</h1>
