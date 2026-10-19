@@ -108,4 +108,4 @@ bluML covers supervised models that run inside a product: a classifier, a ranker
 
 ## License
 
-[MIT](LICENSE) for the text and code. The painting in `assets/` is not covered by it: it is Ono Chikkyō (小野竹喬, 1889–1979), *For Haiku Poems in Bashō's Narrow Road to a Far Province"*.
+[MIT](LICENSE) for the text and code. The painting in `assets/` is not covered by it: it is Ono Chikkyō (小野竹喬, 1889–1979), *For Haiku Poems in Bashō's Narrow Road to a Far Province*.
