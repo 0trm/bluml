@@ -13,11 +13,11 @@ from pathlib import Path
 
 OUT = Path(__file__).resolve().parent
 
-# blue is the ground of the painting in assets/ (its median pixel); line and ink are lighter and darker shades of it.
-# frame is the neutral for boxes and arrows: black on the light page, near white on the dark one
+# blue is the ground of the painting in assets/ (its median pixel); line is a lighter shade of it for the dark page.
+# frame and ink are the neutrals for boxes, arrows and text: black on the light page, near white on the dark one
 THEMES = {
-    "light": dict(page="#ffffff", frame="#1f1f1f", blue="#556b9d", on_blue="#ffffff", line="#556b9d", ink="#2c3856", fill="#ffffff", decision="#edf0f6", muted="#5f5f5f", loop="#8a8a8a"),
-    "dark": dict(page="#0d1117", frame="#e6e6e6", blue="#556b9d", on_blue="#ffffff", line="#8b9bc6", ink="#e8ebf3", fill="#0d1117", decision="#1c2333", muted="#a6a6a6", loop="#7d7d7d"),
+    "light": dict(page="#ffffff", frame="#1f1f1f", blue="#556b9d", on_blue="#ffffff", line="#556b9d", ink="#1f1f1f", fill="#ffffff", decision="#edf0f6", muted="#5f5f5f", loop="#8a8a8a"),
+    "dark": dict(page="#0d1117", frame="#e6e6e6", blue="#556b9d", on_blue="#ffffff", line="#8b9bc6", ink="#e6e6e6", fill="#0d1117", decision="#1c2333", muted="#a6a6a6", loop="#7d7d7d"),
 }
 
 SANS = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
