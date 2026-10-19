@@ -25,4 +25,46 @@ claude plugin eval . --scaffold --allow-tools Bash Write Edit --model sonnet --j
 
 ## Results
 
-<!-- eval-results -->
+Run on 19 October 2026 with Claude Code 2.1.303. The agent ran as `--model sonnet` or `--model opus`, the judge was Sonnet with three votes per criterion, and each case ran three times per arm. A score is the weighted share of criteria met, averaged over the three runs. A skill fired in every run with saffml. The runs in the table cost about $51, judge included.
+
+| Case | Sonnet with | without | Δ | Opus with | without | Δ |
+|---|---|---|---|---|---|---|
+| `design-doc` | 0.93 | 0.63 | +0.30 | 1.00 | 0.89 | +0.11 |
+| `rule-first` | 0.58 | 0.42 | +0.17 | 0.96 | 0.33 | +0.62 |
+| `churn-leak` | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
+| `fraud-threshold` | 0.89 | 0.56 | +0.33 | 1.00 | 0.63 | +0.37 |
+| `ranker-clicks` | 0.96 | 0.96 | 0.00 | 0.96 | 1.00 | −0.04 |
+| `ship-it` | 1.00 | 0.96 | +0.04 | 1.00 | 1.00 | 0.00 |
+| `ctr-drop` | 0.96 | 0.88 | +0.08 | 1.00 | 0.88 | +0.12 |
+| **Mean** | **0.90** | **0.77** | **+0.13** | **0.99** | **0.82** | **+0.17** |
+
+### Where saffml makes the difference
+
+Runs that met each criterion, with saffml against without:
+
+| Criterion | Sonnet | Opus |
+|---|---|---|
+| `fraud-threshold`: compares the model with the rule slice by slice, new against existing customers | 2/3 vs 0/3 | 3/3 vs 0/3 |
+| `fraud-threshold`: notes that the model separates fraud much worse for new customers | 2/3 vs 0/3 | 3/3 vs 0/3 |
+| `rule-first`: weighs the model's gap over the keyword rule against the cost of running a model | 0/3 vs 0/3 | 3/3 vs 0/3 |
+| `rule-first`: states what each kind of misrouting costs and sets the operating point from it | 1/3 vs 0/3 | 3/3 vs 0/3 |
+| `design-doc`: puts numbers on the requirements and questions the brief's "updated live" | 3/3 vs 0/3 | 3/3 vs 2/3 |
+| `ctr-drop`: proposes a monitor by platform and app version that would have caught the drop | 3/3 vs 1/3 | 3/3 vs 3/3 |
+| `ctr-drop`: does not blame the holiday the day before the drop | 2/3 vs 2/3 | 3/3 vs 0/3 |
+
+### Where it makes none
+
+Without saffml, both models found the backfilled health score, split by time, evaluated churn at 60 calls a month, corrected clicks for position, traced the CTR drop to prices in cents from one Android release instead of retraining, and listed the launch's mismatches between training and serving. `churn-leak`, `ship-it` and `ranker-clicks` score 0.96 to 1.00 in both arms, so they leave no room to show a gain.
+
+### What it still misses
+
+- Sonnet with saffml never weighed the model's small gain over the keyword rule against the cost of running a model (0 of 3), and priced the misrouting in 1 of 3. Settling that is `framing-models`' main job, so it is the next thing to fix.
+- Opus with saffml missed the ranker's feedback loop in one run, the only criterion where the arm without saffml did better, by that one run.
+
+### How to read it
+
+- Three runs per arm is a small sample: one criterion in one run moves a case score by 0.04 to 0.08, so differences that small are noise.
+- The judge sees only the final reply, or the file the case asks for. An agent that did the work and left it out of its reply fails that criterion.
+- An earlier round exposed two graders that penalized correct work, and both were rewritten before this run. A fraud criterion that combined the slice breakdown with the new-customer finding was split in two, and the launch plan is now graded from `LAUNCH_PLAN.md`, where agents write it, instead of the reply.
+- The skills' examples were checked against the scenarios, and any that matched a planted trap was moved to another domain before this run.
+- In trigger tests Haiku did not load the skills, so it is not evaluated here.

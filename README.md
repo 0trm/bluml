@@ -55,7 +55,20 @@ Four skills carry tested Python checks, run by the agent rather than rewritten e
 
 ## Does it help?
 
-<!-- eval-results -->
+Seven requests with traps planted in synthetic data, each run three times with saffml and three times without, and scored by an LLM judge against five or six criteria. A score is the weighted share of criteria met. Method, criteria and caveats: [evals/](evals/README.md).
+
+| Case | Sonnet with | without | Opus with | without |
+|---|---|---|---|---|
+| `design-doc` | 0.93 | 0.63 | 1.00 | 0.89 |
+| `rule-first` | 0.58 | 0.42 | 0.96 | 0.33 |
+| `churn-leak` | 1.00 | 1.00 | 1.00 | 1.00 |
+| `fraud-threshold` | 0.89 | 0.56 | 1.00 | 0.63 |
+| `ranker-clicks` | 0.96 | 0.96 | 0.96 | 1.00 |
+| `ship-it` | 1.00 | 0.96 | 1.00 | 1.00 |
+| `ctr-drop` | 0.96 | 0.88 | 1.00 | 0.88 |
+| **Mean** | **0.90** | **0.77** | **0.99** | **0.82** |
+
+Without saffml, both models already catch the textbook traps: a backfilled column, position bias in clicks, prices sent in cents. What they skip is the product reasoning around the model. Neither compared the fraud model with the rule slice by slice, and neither noticed that it ranks new customers far worse (0 of 6 runs; 5 of 6 with saffml). Opus never weighed a ticket-routing model against the keyword rule that nearly matches it (0 of 3; 3 of 3), and none of Sonnet's design docs both put numbers on the requirements and questioned the brief's "updated live" (0 of 3; 3 of 3). One gap remains: Sonnet with saffml still skips the rule-against-model weighing in every run.
 
 ## Install
 
