@@ -1,5 +1,5 @@
 # %%
-"""Draws the saffml map as a standard flowchart, in a light and a dark SVG.
+"""Draws the bluML map as a standard flowchart, in a light and a dark SVG.
 
     python docs/map.py
 
@@ -185,7 +185,7 @@ for name, colors in THEMES.items():
     body = "\n".join(parts)
     svg = (
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {WIDTH} {HEIGHT}" width="{WIDTH}" height="{HEIGHT}" role="img" aria-labelledby="title desc">\n'
-        f'<title id="title">The saffml map</title>\n<desc id="desc">{DESC}</desc>\n'
+        f'<title id="title">The bluML map</title>\n<desc id="desc">{DESC}</desc>\n'
         f'{DEFS}\n<rect width="100%" height="100%" fill="{{page}}"/>\n{body}\n</svg>\n'
     )
     (OUT / f"map-{name}.svg").write_text(svg.format(**colors))

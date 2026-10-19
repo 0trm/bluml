@@ -1,6 +1,6 @@
 # Evals
 
-Seven scenarios, each a realistic request with traps planted in synthetic data. Every case runs with saffml loaded and without it, and an LLM judge scores the final reply against five or six pass or fail criteria; the difference between the two arms is what the skills add. The skills' examples are deliberately drawn from other domains (moderation, claims, lead scoring, delivery estimates, marketplace search, returns abuse), so the scenarios test whether the method transfers, not whether the answer was memorized.
+Seven scenarios, each a realistic request with traps planted in synthetic data. Every case runs with bluML loaded and without it, and an LLM judge scores the final reply against five or six pass or fail criteria; the difference between the two arms is what the skills add. The skills' examples are deliberately drawn from other domains (moderation, claims, lead scoring, delivery estimates, marketplace search, returns abuse), so the scenarios test whether the method transfers, not whether the answer was memorized.
 
 | Case | The request | What is planted |
 |---|---|---|
@@ -25,7 +25,7 @@ claude plugin eval . --scaffold --allow-tools Bash Write Edit --model sonnet --j
 
 ## Results
 
-Run on 19 October 2026 with Claude Code 2.1.303. The agent ran as `--model sonnet` or `--model opus`, the judge was Sonnet with three votes per criterion, and each case ran three times per arm. A score is the weighted share of criteria met, averaged over the three runs. A skill fired in every run with saffml. The runs in the table cost about $51, judge included.
+Run on 19 October 2026 with Claude Code 2.1.303. The agent ran as `--model sonnet` or `--model opus`, the judge was Sonnet with three votes per criterion, and each case ran three times per arm. A score is the weighted share of criteria met, averaged over the three runs. A skill fired in every run with bluML. The runs in the table cost about $51, judge included.
 
 | Case | Sonnet with | without | Δ | Opus with | without | Δ |
 |---|---|---|---|---|---|---|
@@ -38,9 +38,9 @@ Run on 19 October 2026 with Claude Code 2.1.303. The agent ran as `--model sonne
 | `ctr-drop` | 0.96 | 0.88 | +0.08 | 1.00 | 0.88 | +0.12 |
 | **Mean** | **0.90** | **0.77** | **+0.13** | **0.99** | **0.82** | **+0.17** |
 
-### Where saffml makes the difference
+### Where bluML makes the difference
 
-Runs that met each criterion, with saffml against without:
+Runs that met each criterion, with bluML against without:
 
 | Criterion | Sonnet | Opus |
 |---|---|---|
@@ -54,12 +54,12 @@ Runs that met each criterion, with saffml against without:
 
 ### Where it makes none
 
-Without saffml, both models found the backfilled health score, split by time, evaluated churn at 60 calls a month, corrected clicks for position, traced the CTR drop to prices in cents from one Android release instead of retraining, and listed the launch's mismatches between training and serving. `churn-leak`, `ship-it` and `ranker-clicks` score 0.96 to 1.00 in both arms, so they leave no room to show a gain.
+Without bluML, both models found the backfilled health score, split by time, evaluated churn at 60 calls a month, corrected clicks for position, traced the CTR drop to prices in cents from one Android release instead of retraining, and listed the launch's mismatches between training and serving. `churn-leak`, `ship-it` and `ranker-clicks` score 0.96 to 1.00 in both arms, so they leave no room to show a gain.
 
 ### What it still misses
 
-- Sonnet with saffml never weighed the model's small gain over the keyword rule against the cost of running a model (0 of 3), and priced the misrouting in 1 of 3. Settling that is `framing-models`' main job, so it is the next thing to fix.
-- Opus with saffml missed the ranker's feedback loop in one run, the only criterion where the arm without saffml did better, by that one run.
+- Sonnet with bluML never weighed the model's small gain over the keyword rule against the cost of running a model (0 of 3), and priced the misrouting in 1 of 3. Settling that is `framing-models`' main job, so it is the next thing to fix.
+- Opus with bluML missed the ranker's feedback loop in one run, the only criterion where the arm without bluML did better, by that one run.
 
 ### How to read it
 

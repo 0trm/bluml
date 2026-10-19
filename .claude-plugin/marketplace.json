@@ -1,12 +1,12 @@
 {
-  "name": "saffml",
-  "description": "saffml: skills for product ML engineering",
+  "name": "bluml",
+  "description": "bluML: skills for product ML engineering",
   "owner": {
     "name": "Tomás Ravalli"
   },
   "plugins": [
     {
-      "name": "saffml",
+      "name": "bluml",
       "source": "./",
       "description": "Skills that make your coding agent think like a product ML engineer"
     }

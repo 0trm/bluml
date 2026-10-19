@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 816 462" width="816" height="462" role="img" aria-labelledby="title desc">
-<title id="title">Does saffml help?</title>
-<desc id="desc">Paired bars of the eval scores with saffml and without it, for Sonnet and Opus. Where it helps: rule-first, Sonnet 0.42 without and 0.58 with, Opus 0.33 without and 0.96 with; fraud-threshold, Sonnet 0.56 without and 0.89 with, Opus 0.63 without and 1.00 with; design-doc, Sonnet 0.63 without and 0.93 with, Opus 0.89 without and 1.00 with; ctr-drop, Sonnet 0.88 without and 0.96 with, Opus 0.88 without and 1.00 with. Caught without it: ship-it, Sonnet 0.96 without and 1.00 with, Opus 1.00 without and 1.00 with; churn-leak, Sonnet 1.00 without and 1.00 with, Opus 1.00 without and 1.00 with; ranker-clicks, Sonnet 0.96 without and 0.96 with, Opus 1.00 without and 0.96 with. Mean: Sonnet 0.77 without and 0.90 with, Opus 0.82 without and 0.99 with.</desc>
+<title id="title">Does bluML help?</title>
+<desc id="desc">Paired bars of the eval scores with bluML and without it, for Sonnet and Opus. Where it helps: rule-first, Sonnet 0.42 without and 0.58 with, Opus 0.33 without and 0.96 with; fraud-threshold, Sonnet 0.56 without and 0.89 with, Opus 0.63 without and 1.00 with; design-doc, Sonnet 0.63 without and 0.93 with, Opus 0.89 without and 1.00 with; ctr-drop, Sonnet 0.88 without and 0.96 with, Opus 0.88 without and 1.00 with. Caught without it: ship-it, Sonnet 0.96 without and 1.00 with, Opus 1.00 without and 1.00 with; churn-leak, Sonnet 1.00 without and 1.00 with, Opus 1.00 without and 1.00 with; ranker-clicks, Sonnet 0.96 without and 0.96 with, Opus 1.00 without and 0.96 with. Mean: Sonnet 0.77 without and 0.90 with, Opus 0.82 without and 0.99 with.</desc>
 <rect width="100%" height="100%" fill="#0d1117"/>
 <rect x="8" y="56" width="800" height="158" rx="6" fill="#161b22"/>
 <text x="24" y="76" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#a6a6a6" text-anchor="start" letter-spacing="1.4">WHERE IT HELPS</text>
@@ -122,7 +122,7 @@
 <text x="24" y="333.5" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="normal" fill="#e6e6e6" text-anchor="start">ranker-clicks</text>
 <text x="24" y="388" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#e6e6e6" text-anchor="start">Mean</text>
 <rect x="24" y="18" width="14" height="10" fill="#556b9d"/>
-<text x="44" y="27.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" fill="#e6e6e6" text-anchor="start">with saffml</text>
+<text x="44" y="27.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" fill="#e6e6e6" text-anchor="start">with bluML</text>
 <rect x="24" y="38" width="14" height="10" fill="#0d1117" stroke="#e6e6e6" stroke-width="1"/>
 <text x="44" y="47.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" fill="#e6e6e6" text-anchor="start">without</text>
 <text x="24" y="444" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#a6a6a6" text-anchor="start">Each score is the share of criteria met, averaged over three runs per arm.</text>

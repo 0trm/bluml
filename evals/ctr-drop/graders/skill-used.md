@@ -1,5 +1,5 @@
 ---
 type: tool_used
 tool: Skill
-input_match: '"skill"\s*:\s*"(?:saffml:)?[\w-]+"'
+input_match: '"skill"\s*:\s*"(?:bluml:)?[\w-]+"'
 ---

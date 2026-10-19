@@ -1,6 +1,6 @@
 # Reviewer checklist
 
-The questions a senior reviewer asks of each section. Run them on your own draft first; every "no" is a gap to fill or a risk to name. The structure follows Eugene Yan, [How to Write Design Docs for Machine Learning Systems](https://eugeneyan.com/writing/ml-design-docs/) (2021); the questions are saffml's.
+The questions a senior reviewer asks of each section. Run them on your own draft first; every "no" is a gap to fill or a risk to name. The structure follows Eugene Yan, [How to Write Design Docs for Machine Learning Systems](https://eugeneyan.com/writing/ml-design-docs/) (2021); the questions are bluML's.
 
 ## Contents
 

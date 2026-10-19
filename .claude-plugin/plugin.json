@@ -1,12 +1,12 @@
 {
-  "name": "saffml",
+  "name": "bluml",
   "version": "0.1.0",
   "description": "Skills that make your coding agent think like a product ML engineer: frame the decision, build honest training data, beat the rule, launch safely, and keep the model alive.",
   "author": {
     "name": "Tomás Ravalli",
     "url": "https://github.com/0trm"
   },
-  "repository": "https://github.com/0trm/saffml",
+  "repository": "https://github.com/0trm/bluml",
   "license": "MIT",
   "keywords": ["machine-learning", "mlops", "product", "evaluation", "monitoring"]
 }

@@ -2,7 +2,7 @@
 
 Predicts how long an order will take to arrive, to show "arrives in 25 to 35 minutes" at checkout.
 
-> A worked example: a made-up food delivery startup, written the way the saffml skills fill `MODEL.md`. Every number is illustrative.
+> A worked example: a made-up food delivery startup, written the way the bluML skills fill `MODEL.md`. Every number is illustrative.
 
 | Stage | Owner | Threshold owner | Updated |
 |---|---|---|---|

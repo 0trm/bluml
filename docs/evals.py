@@ -3,9 +3,9 @@
 
     python docs/evals.py
 
-One panel per model and one row per case: a blue bar for the score with saffml over an empty
+One panel per model and one row per case: a blue bar for the score with bluML over an empty
 frame for the score without, in the map's palette (docs/map.py). Grey bands split the cases
-where saffml helps from those both arms already get right. The scores are the table in
+where bluML helps from those both arms already get right. The scores are the table in
 evals/README.md; when the evals run again, update SCORES and run this.
 """
 
@@ -122,11 +122,11 @@ for _, _, _, rows in bands:
 parts.append(text(LABEL_X, MEAN_Y + 5, "Mean", size=14, weight="600"))
 
 # The legend, in the corner above the case names
-for k, (arm, label) in enumerate((("with", "with saffml"), ("without", "without"))):
+for k, (arm, label) in enumerate((("with", "with bluML"), ("without", "without"))):
     parts += [bar(LABEL_X, LABEL_X + 14, 23 + 20 * k, arm), text(LABEL_X + 20, 27.5 + 20 * k, label)]
 parts.append(text(LABEL_X, NOTE_Y, "Each score is the share of criteria met, averaged over three runs per arm.", size=12, fill="muted"))
 
-DESC = "Paired bars of the eval scores with saffml and without it, for Sonnet and Opus. " + " ".join(
+DESC = "Paired bars of the eval scores with bluML and without it, for Sonnet and Opus. " + " ".join(
     f"{name}: " + "; ".join(
         f"{case}, " + ", ".join(f"{m} {score(m, case, 'without'):.2f} without and {score(m, case, 'with'):.2f} with" for m in MODELS)
         for case in cases
@@ -139,7 +139,7 @@ for name, colors in THEMES.items():
     body = "\n".join(parts)
     svg = (
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {HEIGHT}" width="{W}" height="{HEIGHT}" role="img" aria-labelledby="title desc">\n'
-        f'<title id="title">Does saffml help?</title>\n<desc id="desc">{DESC}</desc>\n'
+        f'<title id="title">Does bluML help?</title>\n<desc id="desc">{DESC}</desc>\n'
         f'<rect width="100%" height="100%" fill="{{page}}"/>\n{body}\n</svg>\n'
     )
     (OUT / f"evals-{name}.svg").write_text(svg.format(**colors))
