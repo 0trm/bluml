@@ -2,7 +2,7 @@
   <img src="assets/safflowers.jpg" width="250" alt="A painting of three safflowers on a blue ground: two stems in orange bloom and one in bud">
 </p>
 
-<h1 align="center">saffml</h1>
+<h1 align="center">saffML</h1>
 
 <p align="center">
   <strong>Skills that make your coding agent think like a product ML engineer.</strong><br>
