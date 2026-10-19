@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 728 1082" width="728" height="1082" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 816 1082" width="816" height="1082" role="img" aria-labelledby="title desc">
 <title id="title">The saffml map</title>
 <desc id="desc">A flowchart in three phases. It starts at a request for a model. Design: the model is framed, then a decision: is a model worth it? If not, the rule ships. If so, design and data follow. Development: train and evaluate. Deployment: launch and monitor, then a decision: is the model still paying? If not, it is retired to the rule; if so, monitoring continues. Dashed arrows loop back: a rejected design and a lost online test return to framing, a model that loses to the rule returns to data, and a live model returns to training when the world moves and to data when an input breaks.</desc>
 <defs>
@@ -6,11 +6,11 @@
   <marker id="loop" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8a8a8a"/></marker>
 </defs>
 <rect width="100%" height="100%" fill="#ffffff"/>
-<rect x="8" y="104" width="712" height="372" rx="6" fill="#f4f4f4"/>
+<rect x="8" y="104" width="800" height="372" rx="6" fill="#f4f4f4"/>
 <text x="22" y="126" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" letter-spacing="1.4" fill="#5f5f5f">DESIGN</text>
-<rect x="8" y="500" width="712" height="166" rx="6" fill="#f4f4f4"/>
+<rect x="8" y="500" width="800" height="166" rx="6" fill="#f4f4f4"/>
 <text x="22" y="522" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" letter-spacing="1.4" fill="#5f5f5f">DEVELOPMENT</text>
-<rect x="8" y="690" width="712" height="288" rx="6" fill="#f4f4f4"/>
+<rect x="8" y="690" width="800" height="288" rx="6" fill="#f4f4f4"/>
 <text x="22" y="712" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" letter-spacing="1.4" fill="#5f5f5f">DEPLOYMENT</text>
 <path d="M408,66 L408,118" fill="none" stroke-width="1.5" stroke="#1f1f1f" marker-end="url(#main)"/>
 <path d="M408,172 L408,202" fill="none" stroke-width="1.5" stroke="#1f1f1f" marker-end="url(#main)"/>

@@ -74,7 +74,9 @@ HEIGHT = round(y - GAP + TOP)
 LEFT_IN, LEFT_OUT = X - BOX_W / 2 - LANE, X - BOX_W / 2 - LANE - 30
 RIGHT_IN, RIGHT_OUT = X + BOX_W / 2 + LANE, X + BOX_W / 2 + LANE + 30
 EXIT_X = X + DEC_W / 2 + 52  # left edge of the "Ship the rule" terminator
-WIDTH = round(max(RIGHT_OUT, EXIT_X + EXIT_W) + 24)
+# As wide on the right of the column as the gutter and lanes make it on the left, so the column and the bands are centred
+WIDTH = round(2 * X)
+assert max(RIGHT_OUT, EXIT_X + EXIT_W) + 24 <= WIDTH
 
 
 # %% Drawing
