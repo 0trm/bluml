@@ -5,8 +5,9 @@
 
 The main path runs down one column: a start terminator, a box per stage, a diamond per
 decision, and an end terminator. Exits leave to the right; loops back are dashed and run
-in lanes beside the column, nested so that no two lines cross. Every coordinate is set
-here rather than by an automatic layout, which is what keeps the column straight.
+in lanes beside the column, nested so that no two lines cross. Grey bands behind the
+column group the stages into phases, labelled in a gutter on the left. Every coordinate
+is set here rather than by an automatic layout, which is what keeps the column straight.
 """
 
 from pathlib import Path
@@ -16,8 +17,8 @@ OUT = Path(__file__).resolve().parent
 # blue is the ground of the painting in assets/ (its median pixel); line is a lighter shade of it for the dark page.
 # frame and ink are the neutrals for boxes, arrows and text: black on the light page, near white on the dark one
 THEMES = {
-    "light": dict(page="#ffffff", frame="#1f1f1f", blue="#556b9d", on_blue="#ffffff", line="#556b9d", ink="#1f1f1f", fill="#ffffff", decision="#edf0f6", muted="#5f5f5f", loop="#8a8a8a"),
-    "dark": dict(page="#0d1117", frame="#e6e6e6", blue="#556b9d", on_blue="#ffffff", line="#8b9bc6", ink="#e6e6e6", fill="#0d1117", decision="#1c2333", muted="#a6a6a6", loop="#7d7d7d"),
+    "light": dict(page="#ffffff", band="#f4f4f4", frame="#1f1f1f", blue="#556b9d", on_blue="#ffffff", line="#556b9d", ink="#1f1f1f", fill="#ffffff", decision="#edf0f6", muted="#5f5f5f", loop="#8a8a8a"),
+    "dark": dict(page="#0d1117", band="#161b22", frame="#e6e6e6", blue="#556b9d", on_blue="#ffffff", line="#8b9bc6", ink="#e6e6e6", fill="#0d1117", decision="#1c2333", muted="#a6a6a6", loop="#7d7d7d"),
 }
 
 SANS = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
@@ -38,7 +39,15 @@ PATH = [
     ("retire", "terminator", "Retire to the rule", None),
 ]
 
-X = 280  # the column's centre
+# The phases, after the design, development and deployment parts of the mlkb notes (docs/sources.md)
+PHASES = [
+    ("Design", ["frame", "worth", "design", "data"]),
+    ("Development", ["train", "evaluate"]),
+    ("Deployment", ["launch", "monitor", "paying"]),
+]
+
+GUTTER = 128  # room on the left for the phase labels
+X = GUTTER + 280  # the column's centre
 BOX_W, BOX_H = 220, 54
 DEC_W, DEC_H = 168, 92
 END_W, END_H = 220, 42
@@ -46,13 +55,18 @@ GAP = 30  # arrow length between shapes on the main path
 TOP = 24
 LANE = 112  # from a box's edge to the inner lane; the outer lane is 30 further out
 EXIT_W = 160  # width of a side exit's terminator
+PAD = 14  # from a phase's first and last shape to the edge of its band
+PHASE_GAP = 22  # extra space where one phase ends and the next begins
 
 SIZE = {"terminator": (END_W, END_H), "process": (BOX_W, BOX_H), "decision": (DEC_W, DEC_H)}
 
 # %% Positions
 cy = {}
 y = TOP
-for node, shape, *_ in PATH:
+first, last = {nodes[0] for _, nodes in PHASES}, {nodes[-1] for _, nodes in PHASES}
+for (node, shape, *_), prev in zip(PATH, [None] + [n for n, *_ in PATH]):
+    if node in first or prev in last:
+        y += PHASE_GAP
     h = SIZE[shape][1]
     cy[node] = y + h / 2
     y += h + GAP
@@ -108,6 +122,12 @@ def top(node):
 left, right = X - BOX_W / 2, X + BOX_W / 2
 parts = []
 
+# The phase bands go first, under everything else
+for name, nodes in PHASES:
+    y0, y1 = top(nodes[0]) - PAD, bottom(nodes[-1]) + PAD
+    parts.append(f'<rect x="8" y="{y0:g}" width="{WIDTH - 16:g}" height="{y1 - y0:g}" rx="6" fill="{{band}}"/>')
+    parts.append(f'<text x="22" y="{y0 + 22:g}" font-family="{SANS}" font-size="11.5" font-weight="600" letter-spacing="1.4" fill="{{muted}}">{name.upper()}</text>')
+
 # The main path
 for (a, *_), (b, *_) in zip(PATH, PATH[1:]):
     parts.append(arrow([(X, bottom(a)), (X, top(b))]))
@@ -150,9 +170,10 @@ DEFS = """<defs>
 </defs>"""
 
 DESC = (
-    "A flowchart. It starts at a request for a model, which is framed, then a decision: is a model worth it? "
-    "If not, the rule ships. If so, the work goes through design, data, train, evaluate, launch and monitor, "
-    "then a decision: is the model still paying? If not, it is retired to the rule; if so, monitoring continues. "
+    "A flowchart in three phases. It starts at a request for a model. Design: the model is framed, then a decision: "
+    "is a model worth it? If not, the rule ships. If so, design and data follow. Development: train and evaluate. "
+    "Deployment: launch and monitor, then a decision: is the model still paying? If not, it is retired to the rule; "
+    "if so, monitoring continues. "
     "Dashed arrows loop back: a rejected design and a lost online test return to framing, a model that loses to "
     "the rule returns to data, and a live model returns to training when the world moves and to data when an input breaks."
 )

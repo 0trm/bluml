@@ -1,68 +1,74 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 994" width="600" height="994" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 728 1082" width="728" height="1082" role="img" aria-labelledby="title desc">
 <title id="title">The saffml map</title>
-<desc id="desc">A flowchart. It starts at a request for a model, which is framed, then a decision: is a model worth it? If not, the rule ships. If so, the work goes through design, data, train, evaluate, launch and monitor, then a decision: is the model still paying? If not, it is retired to the rule; if so, monitoring continues. Dashed arrows loop back: a rejected design and a lost online test return to framing, a model that loses to the rule returns to data, and a live model returns to training when the world moves and to data when an input breaks.</desc>
+<desc id="desc">A flowchart in three phases. It starts at a request for a model. Design: the model is framed, then a decision: is a model worth it? If not, the rule ships. If so, design and data follow. Development: train and evaluate. Deployment: launch and monitor, then a decision: is the model still paying? If not, it is retired to the rule; if so, monitoring continues. Dashed arrows loop back: a rejected design and a lost online test return to framing, a model that loses to the rule returns to data, and a live model returns to training when the world moves and to data when an input breaks.</desc>
 <defs>
   <marker id="main" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#e6e6e6"/></marker>
   <marker id="loop" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#7d7d7d"/></marker>
 </defs>
 <rect width="100%" height="100%" fill="#0d1117"/>
-<path d="M280,66 L280,96" fill="none" stroke-width="1.5" stroke="#e6e6e6" marker-end="url(#main)"/>
-<path d="M280,150 L280,180" fill="none" stroke-width="1.5" stroke="#e6e6e6" marker-end="url(#main)"/>
-<path d="M280,272 L280,302" fill="none" stroke-width="1.5" stroke="#e6e6e6" marker-end="url(#main)"/>
-<path d="M280,356 L280,386" fill="none" stroke-width="1.5" stroke="#e6e6e6" marker-end="url(#main)"/>
-<path d="M280,440 L280,470" fill="none" stroke-width="1.5" stroke="#e6e6e6" marker-end="url(#main)"/>
-<path d="M280,524 L280,554" fill="none" stroke-width="1.5" stroke="#e6e6e6" marker-end="url(#main)"/>
-<path d="M280,608 L280,638" fill="none" stroke-width="1.5" stroke="#e6e6e6" marker-end="url(#main)"/>
-<path d="M280,692 L280,722" fill="none" stroke-width="1.5" stroke="#e6e6e6" marker-end="url(#main)"/>
-<path d="M280,776 L280,806" fill="none" stroke-width="1.5" stroke="#e6e6e6" marker-end="url(#main)"/>
-<path d="M280,898 L280,928" fill="none" stroke-width="1.5" stroke="#e6e6e6" marker-end="url(#main)"/>
-<text x="290" y="292" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" fill="#a6a6a6" text-anchor="start">yes</text>
-<text x="290" y="918" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" fill="#a6a6a6" text-anchor="start">no</text>
-<path d="M364,226 L416,226" fill="none" stroke-width="1.5" stroke="#e6e6e6" marker-end="url(#main)"/>
-<text x="390" y="218" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" fill="#a6a6a6" text-anchor="middle">no</text>
-<rect x="416" y="205" width="160" height="42" rx="21" fill="#556b9d"/>
-<text x="496" y="231" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#ffffff" text-anchor="middle">Ship the rule</text>
-<path d="M170,329 L58,329 L58,131 L170,131" fill="none" stroke-width="1.5" stroke="#7d7d7d" stroke-dasharray="5 4" marker-end="url(#loop)"/>
-<text x="162" y="322" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#a6a6a6" text-anchor="end">rejected</text>
-<path d="M170,581 L58,581 L58,413 L170,413" fill="none" stroke-width="1.5" stroke="#7d7d7d" stroke-dasharray="5 4" marker-end="url(#loop)"/>
-<text x="162" y="574" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#a6a6a6" text-anchor="end">loses to the rule</text>
-<path d="M170,665 L28,665 L28,115 L170,115" fill="none" stroke-width="1.5" stroke="#7d7d7d" stroke-dasharray="5 4" marker-end="url(#loop)"/>
-<text x="162" y="658" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#a6a6a6" text-anchor="end">online test lost</text>
-<path d="M196,852 L58,852 L58,749 L170,749" fill="none" stroke-width="1.5" stroke="#7d7d7d" stroke-dasharray="5 4" marker-end="url(#loop)"/>
-<text x="188" y="845" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#a6a6a6" text-anchor="end">yes</text>
-<path d="M390,737 L502,737 L502,497 L390,497" fill="none" stroke-width="1.5" stroke="#7d7d7d" stroke-dasharray="5 4" marker-end="url(#loop)"/>
-<text x="398" y="730" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#a6a6a6" text-anchor="start">world moved</text>
-<path d="M390,761 L532,761 L532,413 L390,413" fill="none" stroke-width="1.5" stroke="#7d7d7d" stroke-dasharray="5 4" marker-end="url(#loop)"/>
-<text x="398" y="778" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#a6a6a6" text-anchor="start">input broke</text>
-<rect x="170" y="24" width="220" height="42" rx="21" fill="#556b9d"/>
-<text x="280" y="50" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#ffffff" text-anchor="middle">Request for a model</text>
-<rect x="170" y="96" width="220" height="54" rx="4" fill="#0d1117" stroke="#e6e6e6" stroke-width="1.5"/>
-<text x="280" y="120" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#e6e6e6" text-anchor="middle">Frame</text>
-<text x="280" y="139" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="normal" fill="#a6a6a6" text-anchor="middle">framing-models</text>
-<polygon points="280,180 364,226 280,272 196,226" fill="#1c2333" stroke="#8b9bc6" stroke-width="1.5"/>
-<text x="280" y="223" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#e6e6e6" text-anchor="middle">Worth a</text>
-<text x="280" y="241" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#e6e6e6" text-anchor="middle">model?</text>
-<rect x="170" y="302" width="220" height="54" rx="4" fill="#0d1117" stroke="#e6e6e6" stroke-width="1.5"/>
-<text x="280" y="326" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#e6e6e6" text-anchor="middle">Design</text>
-<text x="280" y="345" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="normal" fill="#a6a6a6" text-anchor="middle">writing-design-docs</text>
-<rect x="170" y="386" width="220" height="54" rx="4" fill="#0d1117" stroke="#e6e6e6" stroke-width="1.5"/>
-<text x="280" y="410" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#e6e6e6" text-anchor="middle">Data</text>
-<text x="280" y="429" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="normal" fill="#a6a6a6" text-anchor="middle">building-datasets</text>
-<rect x="170" y="470" width="220" height="54" rx="4" fill="#0d1117" stroke="#e6e6e6" stroke-width="1.5"/>
-<text x="280" y="494" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#e6e6e6" text-anchor="middle">Train</text>
-<text x="280" y="513" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="normal" fill="#a6a6a6" text-anchor="middle">training-models</text>
-<rect x="170" y="554" width="220" height="54" rx="4" fill="#0d1117" stroke="#e6e6e6" stroke-width="1.5"/>
-<text x="280" y="578" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#e6e6e6" text-anchor="middle">Evaluate</text>
-<text x="280" y="597" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="normal" fill="#a6a6a6" text-anchor="middle">evaluating-models</text>
-<rect x="170" y="638" width="220" height="54" rx="4" fill="#0d1117" stroke="#e6e6e6" stroke-width="1.5"/>
-<text x="280" y="662" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#e6e6e6" text-anchor="middle">Launch</text>
-<text x="280" y="681" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="normal" fill="#a6a6a6" text-anchor="middle">launching-models</text>
-<rect x="170" y="722" width="220" height="54" rx="4" fill="#0d1117" stroke="#e6e6e6" stroke-width="1.5"/>
-<text x="280" y="746" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#e6e6e6" text-anchor="middle">Monitor</text>
-<text x="280" y="765" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="normal" fill="#a6a6a6" text-anchor="middle">monitoring-models</text>
-<polygon points="280,806 364,852 280,898 196,852" fill="#1c2333" stroke="#8b9bc6" stroke-width="1.5"/>
-<text x="280" y="849" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#e6e6e6" text-anchor="middle">Still</text>
-<text x="280" y="867" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#e6e6e6" text-anchor="middle">paying?</text>
-<rect x="170" y="928" width="220" height="42" rx="21" fill="#556b9d"/>
-<text x="280" y="954" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#ffffff" text-anchor="middle">Retire to the rule</text>
+<rect x="8" y="104" width="712" height="372" rx="6" fill="#161b22"/>
+<text x="22" y="126" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" letter-spacing="1.4" fill="#a6a6a6">DESIGN</text>
+<rect x="8" y="500" width="712" height="166" rx="6" fill="#161b22"/>
+<text x="22" y="522" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" letter-spacing="1.4" fill="#a6a6a6">DEVELOPMENT</text>
+<rect x="8" y="690" width="712" height="288" rx="6" fill="#161b22"/>
+<text x="22" y="712" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" letter-spacing="1.4" fill="#a6a6a6">DEPLOYMENT</text>
+<path d="M408,66 L408,118" fill="none" stroke-width="1.5" stroke="#e6e6e6" marker-end="url(#main)"/>
+<path d="M408,172 L408,202" fill="none" stroke-width="1.5" stroke="#e6e6e6" marker-end="url(#main)"/>
+<path d="M408,294 L408,324" fill="none" stroke-width="1.5" stroke="#e6e6e6" marker-end="url(#main)"/>
+<path d="M408,378 L408,408" fill="none" stroke-width="1.5" stroke="#e6e6e6" marker-end="url(#main)"/>
+<path d="M408,462 L408,514" fill="none" stroke-width="1.5" stroke="#e6e6e6" marker-end="url(#main)"/>
+<path d="M408,568 L408,598" fill="none" stroke-width="1.5" stroke="#e6e6e6" marker-end="url(#main)"/>
+<path d="M408,652 L408,704" fill="none" stroke-width="1.5" stroke="#e6e6e6" marker-end="url(#main)"/>
+<path d="M408,758 L408,788" fill="none" stroke-width="1.5" stroke="#e6e6e6" marker-end="url(#main)"/>
+<path d="M408,842 L408,872" fill="none" stroke-width="1.5" stroke="#e6e6e6" marker-end="url(#main)"/>
+<path d="M408,964 L408,1016" fill="none" stroke-width="1.5" stroke="#e6e6e6" marker-end="url(#main)"/>
+<text x="418" y="314" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" fill="#a6a6a6" text-anchor="start">yes</text>
+<text x="418" y="984" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" fill="#a6a6a6" text-anchor="start">no</text>
+<path d="M492,248 L544,248" fill="none" stroke-width="1.5" stroke="#e6e6e6" marker-end="url(#main)"/>
+<text x="518" y="240" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" fill="#a6a6a6" text-anchor="middle">no</text>
+<rect x="544" y="227" width="160" height="42" rx="21" fill="#556b9d"/>
+<text x="624" y="253" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#ffffff" text-anchor="middle">Ship the rule</text>
+<path d="M298,351 L186,351 L186,153 L298,153" fill="none" stroke-width="1.5" stroke="#7d7d7d" stroke-dasharray="5 4" marker-end="url(#loop)"/>
+<text x="290" y="344" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#a6a6a6" text-anchor="end">rejected</text>
+<path d="M298,625 L186,625 L186,435 L298,435" fill="none" stroke-width="1.5" stroke="#7d7d7d" stroke-dasharray="5 4" marker-end="url(#loop)"/>
+<text x="290" y="618" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#a6a6a6" text-anchor="end">loses to the rule</text>
+<path d="M298,731 L156,731 L156,137 L298,137" fill="none" stroke-width="1.5" stroke="#7d7d7d" stroke-dasharray="5 4" marker-end="url(#loop)"/>
+<text x="290" y="724" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#a6a6a6" text-anchor="end">online test lost</text>
+<path d="M324,918 L186,918 L186,815 L298,815" fill="none" stroke-width="1.5" stroke="#7d7d7d" stroke-dasharray="5 4" marker-end="url(#loop)"/>
+<text x="316" y="911" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#a6a6a6" text-anchor="end">yes</text>
+<path d="M518,803 L630,803 L630,541 L518,541" fill="none" stroke-width="1.5" stroke="#7d7d7d" stroke-dasharray="5 4" marker-end="url(#loop)"/>
+<text x="526" y="796" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#a6a6a6" text-anchor="start">world moved</text>
+<path d="M518,827 L660,827 L660,435 L518,435" fill="none" stroke-width="1.5" stroke="#7d7d7d" stroke-dasharray="5 4" marker-end="url(#loop)"/>
+<text x="526" y="844" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#a6a6a6" text-anchor="start">input broke</text>
+<rect x="298" y="24" width="220" height="42" rx="21" fill="#556b9d"/>
+<text x="408" y="50" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#ffffff" text-anchor="middle">Request for a model</text>
+<rect x="298" y="118" width="220" height="54" rx="4" fill="#0d1117" stroke="#e6e6e6" stroke-width="1.5"/>
+<text x="408" y="142" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#e6e6e6" text-anchor="middle">Frame</text>
+<text x="408" y="161" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="normal" fill="#a6a6a6" text-anchor="middle">framing-models</text>
+<polygon points="408,202 492,248 408,294 324,248" fill="#1c2333" stroke="#8b9bc6" stroke-width="1.5"/>
+<text x="408" y="245" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#e6e6e6" text-anchor="middle">Worth a</text>
+<text x="408" y="263" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#e6e6e6" text-anchor="middle">model?</text>
+<rect x="298" y="324" width="220" height="54" rx="4" fill="#0d1117" stroke="#e6e6e6" stroke-width="1.5"/>
+<text x="408" y="348" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#e6e6e6" text-anchor="middle">Design</text>
+<text x="408" y="367" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="normal" fill="#a6a6a6" text-anchor="middle">writing-design-docs</text>
+<rect x="298" y="408" width="220" height="54" rx="4" fill="#0d1117" stroke="#e6e6e6" stroke-width="1.5"/>
+<text x="408" y="432" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#e6e6e6" text-anchor="middle">Data</text>
+<text x="408" y="451" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="normal" fill="#a6a6a6" text-anchor="middle">building-datasets</text>
+<rect x="298" y="514" width="220" height="54" rx="4" fill="#0d1117" stroke="#e6e6e6" stroke-width="1.5"/>
+<text x="408" y="538" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#e6e6e6" text-anchor="middle">Train</text>
+<text x="408" y="557" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="normal" fill="#a6a6a6" text-anchor="middle">training-models</text>
+<rect x="298" y="598" width="220" height="54" rx="4" fill="#0d1117" stroke="#e6e6e6" stroke-width="1.5"/>
+<text x="408" y="622" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#e6e6e6" text-anchor="middle">Evaluate</text>
+<text x="408" y="641" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="normal" fill="#a6a6a6" text-anchor="middle">evaluating-models</text>
+<rect x="298" y="704" width="220" height="54" rx="4" fill="#0d1117" stroke="#e6e6e6" stroke-width="1.5"/>
+<text x="408" y="728" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#e6e6e6" text-anchor="middle">Launch</text>
+<text x="408" y="747" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="normal" fill="#a6a6a6" text-anchor="middle">launching-models</text>
+<rect x="298" y="788" width="220" height="54" rx="4" fill="#0d1117" stroke="#e6e6e6" stroke-width="1.5"/>
+<text x="408" y="812" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#e6e6e6" text-anchor="middle">Monitor</text>
+<text x="408" y="831" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="normal" fill="#a6a6a6" text-anchor="middle">monitoring-models</text>
+<polygon points="408,872 492,918 408,964 324,918" fill="#1c2333" stroke="#8b9bc6" stroke-width="1.5"/>
+<text x="408" y="915" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#e6e6e6" text-anchor="middle">Still</text>
+<text x="408" y="933" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#e6e6e6" text-anchor="middle">paying?</text>
+<rect x="298" y="1016" width="220" height="42" rx="21" fill="#556b9d"/>
+<text x="408" y="1042" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#ffffff" text-anchor="middle">Retire to the rule</text>
 </svg>
