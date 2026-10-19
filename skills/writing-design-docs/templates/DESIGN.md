@@ -16,7 +16,7 @@
 
 ## 3. Success criteria
 
-- **Decides the online test:** {the product metric, and the smallest change worth shipping}
+- **Decides the online test:** {the product metric, and the smallest change worth shipping: the break-even gain from the case in MODEL.md}
 - **Guardrails:** {metrics that must not get worse, with their margins}
 - **Operational:** {rollback without a deploy, a fallback, a latency budget, freshness}
 
@@ -70,7 +70,7 @@
 
 ### 6.5 Cost
 
-{Build and run cost per month, against the value expected.}
+{From the case in MODEL.md, updated for this design: build cost; every month, upkeep, pipelines, training compute and serving compute (online is sized for peak); the latency the model adds and what it costs the product metric; against the value expected. The break-even gain, payback, and the input that flips the answer.}
 
 ### 6.6 Integration points
 

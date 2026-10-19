@@ -1,6 +1,6 @@
 ---
 name: monitoring-models
-description: Keeps a live model honest. Sets monitors on system health, inputs, outputs and outcomes, decides how fresh the model must stay, and when a live number moves, finds the cause before choosing the fix (leave it, repair the input, align training and serving, retrain on clean data, or roll back), then writes the incident down. Use when a live model's metric, click rate, flag rate or scores change, when someone asks to retrain or redeploy because results got worse, when inputs or predictions drift, when serving and training scores disagree, when setting up monitoring or alerts for a model, or when deciding how often to retrain.
+description: Keeps a live model honest. Sets monitors on system health, inputs, outputs and outcomes, decides how fresh the model must stay, and when a live number moves, finds the cause before choosing the fix (leave it, repair the input, align training and serving, retrain on clean data, or roll back), then writes the incident down. Use when a live model's metric, click rate, flag rate or scores change, when someone asks to retrain or redeploy because results got worse, when inputs or predictions drift, when serving and training scores disagree, when setting up monitoring or alerts for a model, when deciding how often to retrain, or when asking whether a live model still pays for itself or should be retired.
 ---
 
 # Monitoring models
@@ -30,7 +30,7 @@ python scripts/drift.py training_sample.csv live.csv --by platform app_version -
 
 ## 2. Decide how fresh the model must stay
 
-Measure how quality decays with the model's age: train on data up to a date, score each following week, and plot the metric against weeks since training (Rules of ML #8). The retrain schedule comes from that curve, not from habit. Every retrained version passes the same validation and launch checks before it replaces the live one.
+Measure how quality decays with the model's age: train on data up to a date, score each following week, and plot the metric against weeks since training (Rules of ML #8). The retrain schedule comes from that curve, not from habit: retrain when the value lost to decay since the last version exceeds what a retrain costs in compute and review time. Every retrained version passes the same validation and launch checks before it replaces the live one.
 
 ## 3. When a number moves, find the cause first
 
@@ -63,7 +63,11 @@ When a request asks to retrain and the diagnosis points elsewhere, say so plainl
 
 When the model's actions shape its next training data (rankings decide what gets clicked, calls decide who stays), keep a small random or untreated slice, and watch the diversity of what the model shows and acts on. A loop shows as fewer distinct items on top, fresh items never rising, or a positive rate that drifts with no outside cause.
 
-## 6. Write the incident down
+## 6. Keep the case current
+
+A model that paid at launch can stop paying: traffic falls, the bill grows, the rule gets better, the gain decays. Rerun the case in `MODEL.md` every quarter, and whenever the serving bill, the traffic or the rule changes, with live numbers: the online test's effect or a small holdout kept on the rule for the gain, the actual bill for compute, the latency measured on the serving path. Record the date and the result in the Live section. When net value turns negative (the live gain has fallen below the break-even gain), propose retiring the model to the rule: say so with the numbers, and on the owner's agreement set the stage to retired and write why in the log.
+
+## 7. Write the incident down
 
 For every incident, add one line to the Live section of `MODEL.md`: when it started, when it was detected, the cause, the fix, and the monitor added so it is caught sooner next time. For larger incidents, write a short review: timeline, cause, what detection missed, actions with owners.
 

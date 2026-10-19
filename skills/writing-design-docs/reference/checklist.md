@@ -15,7 +15,7 @@ The questions a senior reviewer asks of each section. Run them on your own draft
 
 - Can a reader say, after the overview, what will be different for users?
 - Is it clear why improving the current system is not enough?
-- Is the metric that decides the online test a product metric, with the smallest change worth shipping stated?
+- Is the metric that decides the online test a product metric, with the smallest change worth shipping stated and tied to the break-even gain?
 - Are there guardrails for what the model could make worse while improving its metric?
 
 ## Requirements and constraints
@@ -43,7 +43,8 @@ The questions a senior reviewer asks of each section. Run them on your own draft
 - Is serving batch unless something requires online?
 - Are monitors defined for inputs, outputs and outcomes, with someone paged?
 - Is the rollback a configuration change, rehearsed before launch?
-- Does the cost compare with the value expected?
+- Does the cost count build, upkeep, training and serving compute, and the latency's cost to the product metric, against the value expected, with the break-even gain and payback?
+- Would a cheaper shape (batch, a smaller model, calling the model only where it changes the decision) keep most of the value?
 
 ## Risks and alternatives
 

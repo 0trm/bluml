@@ -16,11 +16,12 @@ Stages run framing, design, data, training, evaluation, launch, live, retired. E
 - **The rule to beat:** {the rule or current system, and its number on recent data, in the product's unit}
 - **The metric ladder:** {business metric} → {product metric} → {online proxy} → {offline metric}
 - **Why a model:** {what the rule cannot do, or "the rule ships" and why}
+- **The case:** {decisions per month, the expected gain over the rule (a range) and what one unit is worth; build cost; monthly cost: upkeep, pipelines, training compute, serving compute, paid calls, latency; net value per month, break-even gain, payback in months; the input that flips the answer}
 
 Gate:
 - [ ] The threshold owner agreed the decision and the error costs
 - [ ] The rule's number is measured on recent data
-- [ ] A model is worth building, or the rule ships and this file stops here
+- [ ] The expected gain clears the break-even gain, or the rule ships and this file stops here
 
 ## 2. Design
 
@@ -69,21 +70,23 @@ Gate:
 
 - **Operating point:** {threshold, top-k or quantile, and how the costs set it}
 - **Against the rule:** {difference in the product's unit, with its interval, on the test window}
+- **The case at the measured gain:** {net value per month at the gain and at both ends of its interval, against the break-even gain; any cost the build changed}
 - **Slices:** {where the model loses to the rule, and the slices too small to judge}
 - **Errors left:** {the largest groups of errors, and whether data or the model fixes them}
 - **Test set:** {used on YYYY-MM-DD; times used}
 
 Gate:
 - [ ] The model beats the rule at the operating point, and the interval excludes no gain
+- [ ] The measured gain clears the break-even gain
 - [ ] No slice that matters does worse than the rule, or it has its own policy
 - [ ] The test window was used once, after every choice was made
 
 ## 6. Launch
 
-- **Serving:** {batch or online, latency budget, the fallback when the model or a feature fails}
+- **Serving:** {batch or online, latency budget and the latency measured on the serving path, compute cost per month, the fallback when the model or a feature fails}
 - **Input contract:** {each input with its unit and range, checked at the service}
 - **Rollout:** {shadow, then canary, then the online test, then everyone; each step's pass and stop conditions, and its result}
-- **Online test:** {primary metric, guardrails, duration, decision rule, written before it starts}
+- **Online test:** {primary metric, guardrails, duration, decision rule against the break-even gain, written before it starts}
 - **Rollback:** {how to switch back without a code change, what triggers it, when it was rehearsed}
 
 Gate:
@@ -98,6 +101,7 @@ Gate:
 | {name} | {system, inputs, outputs or outcomes} | {condition} | {who is paged} |
 
 - **Freshness:** {how fast performance decays with model age, and the retrain schedule it sets}
+- **The case, live:** {net value per month from the online effect and the actual bill; date checked and next check; retire to the rule when it turns negative}
 - **Incidents:** {date, cause, fix, the monitor added; one line each}
 
 ## Log

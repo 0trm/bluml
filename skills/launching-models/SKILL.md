@@ -26,6 +26,8 @@ Read `MODEL.md` first. The Evaluation section must show the model beats the rule
 - **Online** (score per request): when the input exists only at request time (the basket at checkout, the current session). It brings a latency budget, a feature service, and failure modes per request.
 - **Fallback:** what the product does when the model, a feature or the service fails. Usually the rule it replaced. Write it down and test it.
 
+The shape changes the case in the Decision section of `MODEL.md`. Batch pays per scheduled run and adds no latency to the request. Online is sized for peak traffic, paid around the clock, and adds its latency to every request it serves. Set the latency budget from what latency costs the product metric, not only from the page's timeout. If the shape, the model's size or the measured latency differ from what the case assumed, recompute it before the rollout.
+
 [reference/serving.md](reference/serving.md) compares the options with the Crash Course's static and dynamic inference.
 
 ## 2. Write the input contract
@@ -62,8 +64,8 @@ Write down, before the first user sees the model:
 - **Primary metric:** the product rung of the metric ladder (the Decision section), not the offline metric.
 - **Guardrails:** latency, errors, revenue, complaints, and anything the model could make worse while improving the primary metric.
 - **Randomization unit:** usually the user, so one person sees one variant.
-- **Size and duration:** the smallest effect worth shipping, the sample that detects it, rounded up to whole weeks.
-- **Decision rule:** ship, stop or extend, as a function of the primary metric's interval and the guardrails.
+- **Size and duration:** the smallest effect worth shipping, the sample that detects it, rounded up to whole weeks. The smallest effect worth shipping is the break-even gain from the case, on the primary metric, without the latency line: the test arm runs at the real latency, so its effect already includes that cost. When detecting the break-even would take too long, say what the test can detect and what stays unknown.
+- **Decision rule:** ship, stop or extend, as a function of the primary metric's interval against the break-even gain, and the guardrails.
 - **Checks:** the sample ratio matches the planned split; no peeking that changes the decision.
 
 For rankers, interleaving finds a preference with far less traffic than an A/B test; follow it with an A/B test when the business metric must be measured. [reference/online-tests.md](reference/online-tests.md) has the sizing formula and the checks.
@@ -74,7 +76,7 @@ The current model or rule stays deployed and selectable by configuration, a feat
 
 ## 8. Write it down
 
-Fill the Launch section of `MODEL.md`: serving shape and fallback, input contract, parity evidence, rollout steps with dates and results, the online test design and its result, the rollback and its rehearsal. Tick the gate items that hold. When the decision rule says ship and rollout completes, set the stage to live.
+Fill the Launch section of `MODEL.md`: serving shape and fallback, the latency measured on the serving path and the compute bill, input contract, parity evidence, rollout steps with dates and results, the online test design and its result, the rollback and its rehearsal. Tick the gate items that hold. When the decision rule says ship and rollout completes, write the case with the online effect in the Live section (replacing the latency estimate, which the effect now contains) and set the stage to live.
 
 ## Report
 

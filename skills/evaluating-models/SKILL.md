@@ -1,6 +1,6 @@
 ---
 name: evaluating-models
-description: Decides whether a trained model is better than what the product does today, judged the way the product will use it. Sets the operating point from error costs or capacity (never a default 0.5), compares the model with the rule on the same rows in the decision's unit with intervals, checks every slice that matters, runs error analysis to pick the next fix, and uses the test window once. Use when choosing a threshold or cutoff, comparing a model with a rule or another model, deciding whether a model is good enough or ready, or when a single metric such as accuracy or AUC is offered as the verdict.
+description: Decides whether a trained model is better than what the product does today, judged the way the product will use it. Sets the operating point from error costs or capacity (never a default 0.5), compares the model with the rule on the same rows in the decision's unit with intervals, checks every slice that matters, runs error analysis to pick the next fix, uses the test window once, and checks that the measured gain pays for the model. Use when choosing a threshold or cutoff, comparing a model with a rule or another model, deciding whether a model is good enough or ready, or when a single metric such as accuracy or AUC is offered as the verdict.
 ---
 
 # Evaluating models
@@ -15,7 +15,7 @@ Read `MODEL.md` first: the Decision section has the decision, the costs and the 
 - [ ] 3. Slices checked; losers and too-small slices named
 - [ ] 4. Errors analysed; next fix chosen
 - [ ] 5. Test window used once
-- [ ] 6. MODEL.md Evaluation section and the verdict written
+- [ ] 6. The case rerun at the measured gain; MODEL.md Evaluation section and the verdict written
 ```
 
 ## 1. Set the operating point
@@ -75,11 +75,12 @@ Write the Evaluation section of `MODEL.md` and its gate. The model is ready for 
 
 - it beats the rule at the operating point on the test window, and the interval of the difference excludes no gain;
 - no slice that matters does worse than the rule without its own policy;
-- the errors left are listed with their next fix.
+- the errors left are listed with their next fix;
+- the measured gain clears the break-even gain from the case in the Decision section.
 
-Then weigh the gain against what the model costs to build, run and maintain. A gain of a few points in the decision's unit (one more deal a month, two points of precision on a review queue) often does not pay for a model: say so, and recommend shipping the rule first while labels accumulate, or show with numbers why the model is worth it.
+Rerun the case with the measured gain: net value per month at the gain and at both ends of its interval, against the break-even gain. Update any cost the build changed: the model's size and serving shape set its compute, and the latency measured on the serving path sets its latency cost. Offline evaluation sees neither, so take both from the case. A gain that is real but below break-even (one more deal a month, two points of precision on a review queue) does not pay for a model: say so, and recommend shipping the rule while labels accumulate. If the Decision section has no case, make it now with `framing-models` step 5 before giving a verdict.
 
-Otherwise say which condition fails and what would change it. In the reply, lead with the verdict and the comparison in the decision's unit; then the operating point and who must agree to it, the slices, and the uncertainty. An offline win is a hypothesis about the product; the launch tests it.
+Otherwise say which condition fails and what would change it. In the reply, lead with the verdict and the comparison in the decision's unit; then the case (net value per month, break-even gain, payback), the operating point and who must agree to it, the slices, and the uncertainty. An offline win is a hypothesis about the product; the launch tests it.
 
 ## Stop signs
 
@@ -88,3 +89,4 @@ Otherwise say which condition fails and what would change it. In the reply, lead
 - A comparison where the model and the rule were scored on different rows or at different operating points.
 - A slice with the model behind the rule, averaged away.
 - Test numbers that were looked at more than once.
+- A verdict of "ready" with no money on either side: a gain nobody priced against the model's cost.

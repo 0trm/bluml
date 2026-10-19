@@ -18,7 +18,7 @@ Late deliveries are the top reason for support tickets (38% of them in Q1) and f
 
 ## 3. Success criteria
 
-- **Decides the online test:** repeat orders within 30 days, per customer; the smallest change worth shipping is +1%.
+- **Decides the online test:** repeat orders within 30 days, per customer. Tickets avoided already cover the model's monthly cost at 1 point of on-time rate (the case in [MODEL.md](MODEL.md#1-decision)), so the smallest change worth shipping is no loss in repeat orders; four weeks detect a change of 1%.
 - **Guardrails:** checkout conversion (no worse than -1%), cancellations, "where is my order" tickets per thousand orders.
 - **Operational:** the formula takes over within one request when a feature or the model fails; switching back to the formula is a config change.
 
@@ -72,7 +72,7 @@ Inputs by city (ranges, missing rates, drift against training), outputs (promise
 
 ### 6.5 Cost
 
-About €1,400 a month for serving and the feature cache, against an expected €60,000 a month from fewer tickets and more repeat orders if the offline gain holds.
+From the case in [MODEL.md](MODEL.md#1-decision). Build: 14 engineer weeks, about €35,000. Every month: €1,400 to serve and cache features, sized for 300 checkouts a second at peak; €150 of training compute for a monthly retrain and its search; €600 to log live features; €2,700 of upkeep, a quarter of an engineer; and about €1,200 of checkouts lost to the 20 ms the service adds. Total €6,050 a month, against €48,000 a month of tickets avoided at +8 points on time; repeat orders are upside the online test measures. Break-even is 1 point of on-time rate, and the build pays back in under a month. A five-minute table would avoid most of the latency, but loses the live queue signal the gain comes from (see alternatives).
 
 ### 6.6 Integration points
 

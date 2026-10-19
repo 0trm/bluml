@@ -1,6 +1,6 @@
 ---
 name: framing-models
-description: Starts any product ML task. Frames the prediction problem before data or training work and decides whether a model should be built at all: what the product does with each prediction, when it predicts, what each kind of error costs and who owns the threshold, and the rule or current system a model must beat, measured. Creates the model's MODEL.md, which the other saffml skills read and update. Use first whenever asked to build, train or ship a model (classifier, ranker, recommender, scoring, churn, fraud, forecast or "some ML") and whenever a request names a model before the decision it serves.
+description: Starts any product ML task. Frames the prediction problem before data or training work and decides whether a model should be built at all: what the product does with each prediction, when it predicts, what each kind of error costs and who owns the threshold, the rule or current system a model must beat, measured, and the business case: whether the gain over the rule pays for building and running the model, compute and latency included, with its break-even gain and payback. Creates the model's MODEL.md, which the other saffml skills read and update. Use first whenever asked to build, train or ship a model (classifier, ranker, recommender, scoring, churn, fraud, forecast or "some ML"), whenever a request names a model before the decision it serves, and when asked whether a model is worth it, its ROI or what it costs to run.
 ---
 
 # Framing models
@@ -53,7 +53,21 @@ Connect the number training will move to the number the business cares about:
 
 For example: retention → share of orders arriving within the promised window → "where is my order" tickets → pinball loss at the 80th percentile on held-out orders. Training moves the bottom rung. If moving it cannot move the top, the objective is wrong; fix it here, not after launch.
 
-## 5. Decide
+## 5. Make the case
+
+A gain over the rule is worth building only if it pays for the model, every month. Put numbers on both sides, in money:
+
+- **Value:** decisions per month × the gain over the rule per decision × what one unit of the decision is worth. The gain is an assumption until evaluation: give a range. For a classifier, the ceiling is the rule's error cost per month; a perfect model saves no more.
+- **Build, once:** engineer weeks at the team's loaded cost, labels, the data pipeline, the launch.
+- **Run, every month:** upkeep (a share of an engineer for on-call, monitors and retrain reviews), pipelines and feature storage, and training compute (cost per run, searches included, times runs per month).
+- **Per decision:** serving compute (online serving is sized for peak traffic), paid calls, and human work each prediction triggers that the error costs do not already count.
+- **Latency:** a model inside a user-facing request slows every request, and slower pages lose users, including on requests the model gets right. Price it as the product metric lost per 100 ms (from a slowdown test, or an assumption marked as one) times the delay the model adds. Batch serving adds none.
+
+Then write three numbers: net value per month, the **break-even gain** (monthly cost ÷ (decisions per month × value of one unit): the smallest gain over the rule that pays), and **payback** (build cost ÷ net value per month). Show how they move when the gain halves, and name the input that flips the answer. When the ceiling is below the monthly cost, no model can pay: the rule ships, and nothing needs building.
+
+Take prices from the team's own bill and history; when a number is unknown, assume it, mark it, and list it as a question for its owner. [reference/business-case.md](reference/business-case.md) lists the costs teams forget, how to measure latency and compute, a worked case, and how the case is updated at each stage.
+
+## 6. Decide
 
 Build a model when all of these hold:
 
@@ -61,12 +75,12 @@ Build a model when all of these hold:
 - The patterns shift, so a hand-written rule goes stale.
 - Mistakes are tolerable or caught downstream.
 - Labels exist, or the product can start collecting them.
-- The gap the model could close over the rule is worth more than building and running it.
+- The expected gain clears the break-even gain, and the build pays back well before the product stops making this decision this way.
 
 Then write one of three outcomes:
 
-- **The rule ships.** The rule is good enough, or a model's likely gain is a few points the costs don't justify. Write the rule's expected performance and stop. Revisit when labels accumulate or the rule needs exceptions.
-- **Build a model.** Name the gap it must close over the rule, in the decision's unit. Unless the model is small, the next step is a design doc reviewed before building (`writing-design-docs`).
+- **The rule ships.** The rule is good enough, or the expected gain sits below the break-even gain or only clears it at the top of its range. Write the rule's expected performance and the case, and stop. Revisit when labels accumulate, costs fall, or the rule needs exceptions.
+- **Build a model.** Name the break-even gain it must clear over the rule, in the decision's unit. Unless the model is small, the next step is a design doc reviewed before building (`writing-design-docs`).
 - **Not now.** There is no label and no way to collect one, or the data holds no signal. Say what would change that.
 
 ## Write it down
@@ -75,7 +89,7 @@ Fill the Decision section of `MODEL.md`, tick the gate items that hold, and add 
 
 ## Report
 
-Lead with the outcome in one line: the rule ships, build a model, or not now, and why. Then give the decision, the costs and their owner, the rule's number, and the open questions for the owner. Keep assumptions visible: list each one next to the number it affects.
+Lead with the outcome in one line: the rule ships, build a model, or not now, and why. Then give the decision, the costs and their owner, the rule's number, the case (net value per month, break-even gain, payback), and the open questions for the owner. Keep assumptions visible: list each one next to the number it affects.
 
 ## Stop signs
 
@@ -83,5 +97,6 @@ Lead with the outcome in one line: the rule ships, build a model, or not now, an
 - A label nobody can observe, or one that arrives after the decision stops mattering.
 - A rule that already meets the need.
 - A request to "just train something" on a table before anyone has said what the prediction will change.
+- A model on a busy user-facing path, with nobody able to say what its latency costs.
 
 For worked framings of common product models (content moderation, claims investigation, lead scoring, delivery estimates, search ranking) and the questions to ask the threshold owner, read [reference/framings.md](reference/framings.md).

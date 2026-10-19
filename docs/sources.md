@@ -1,6 +1,6 @@
 # Sources
 
-The skills are written from nine sources, read in full in October 2026, and tested against the scenarios in [`evals/`](../evals). This page says which sections each skill draws on, where the sources disagree and how the skills settle it, and what was left out. Rules are cited as *Rules of ML #n*.
+The skills are written from nine sources, read in full in October 2026, and two papers consulted for the business case in `framing-models`, and tested against the scenarios in [`evals/`](../evals). This page says which sections each skill draws on, where the sources disagree and how the skills settle it, and what was left out. Rules are cited as *Rules of ML #n*.
 
 | Source | Author | Version read | License |
 |---|---|---|---|
@@ -13,6 +13,8 @@ The skills are written from nine sources, read in full in October 2026, and test
 | [How to Write Design Docs for Machine Learning Systems](https://eugeneyan.com/writing/ml-design-docs/), with its [template](https://github.com/eugeneyan/ml-design-docs) | Eugene Yan | March 2021; template updated 2023-03-16 | © Eugene Yan; the template repo has no license, so it is linked, not copied |
 | [MLFlow Crash Course: MLOps in Python](https://www.youtube.com/watch?v=4FgAKzM_uYM) | NeuralNine | 2026-05-25, 42 min | YouTube |
 | [MLflow-crash-course](https://github.com/Morikashi/MLflow-crash-course) | Morikashi | last commit 2025-06-01, written for MLflow 2.x | Apache 2.0 |
+| [Hidden Technical Debt in Machine Learning Systems](https://papers.nips.cc/paper_files/paper/2015/hash/86df7dcfd896fcaf2674f757a2463eba-Abstract.html) | D. Sculley et al. | NeurIPS 2015 | © the authors; linked, not copied |
+| [Seven Rules of Thumb for Web Site Experimenters](https://exp-platform.com/Documents/2014%20experimentersRulesOfThumb.pdf) | Ron Kohavi et al. | KDD 2014 | © the authors; linked, not copied |
 
 The MLflow material is checked against the [MLflow 3 documentation](https://mlflow.org/docs/latest/). The skills name MLflow only as a worked example. The skill format follows Anthropic's [skill authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices), and the evals run on [`claude plugin eval`](https://code.claude.com/docs/en/plugin-evals).
 
@@ -25,6 +27,7 @@ The MLflow material is checked against the [MLflow 3 documentation](https://mlfl
 - mlkb [2.1 Scoping](https://0trm.dev/mlkb/design/scoping.html): the business problem before the AI problem; feasibility; the bridge from the ML metric to the business metric.
 - Huyen, systems design, [project setup](https://huyenchip.com/machine-learning-systems-design/design-a-machine-learning-system.html#project-setup-zlkQIG9): goals, how users meet the prediction, which error costs more.
 - Crash Course [AutoML: benefits and limitations](https://developers.google.com/machine-learning/crash-course/automl/benefits-limitations): a tool that cannot build even a mediocre model signals little predictive signal.
+- The business case (step 5 and [reference/business-case.md](../skills/framing-models/reference/business-case.md)): mlkb 2.1 for estimating value by relating ML gains to business outcomes, and for the resources and timeline a project needs; Rules of ML #1 and #39 for keeping the heuristic when it does as well, #3 for the upkeep a complex heuristic carries too, and #41 for weighing a gain against the complexity it adds; Sculley et al. (2015) for ongoing upkeep as the larger cost, with the model's code a small part of the system; Kohavi et al. (2014), rule #4 ("Speed matters a lot"), for pricing latency with a slowdown experiment, Bing's 0.6% of revenue per 100 ms, and the warning that the figure holds for one site at one time; Crash Course [static vs dynamic inference](https://developers.google.com/machine-learning/crash-course/production-ml-systems/static-vs-dynamic-inference) for online inference as compute intensive and latency sensitive; Huyen's project setup for time, compute and people as constraints.
 
 ### writing-design-docs
 
