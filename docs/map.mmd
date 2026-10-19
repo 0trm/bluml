@@ -1,0 +1,23 @@
+%% The saffml map, rendered with Pele (https://pele.run/) into a light and a dark SVG:
+%%   pele-render map.mmd map-light.svg
+%%   sed 's/style="max-width/style="--pele-bg:#1f2d5c;--pele-fg:#f3efe2;--pele-muted:#b9c3e6;--pele-line:#d5dcf2;--pele-surface:#2a3b74;--pele-surface-alt:#24346a;--pele-border:#6f80bf;--pele-accent:#f29b38;max-width/' map-light.svg > map-dark.svg
+flowchart TB
+  DOUBT["<b>doubting-results</b>: every number is checked before anyone acts on it"]
+  subgraph path[" "]
+    direction LR
+    REQ(["a request<br/>for a model"]) --> F["<b>frame</b><br/>model or rule?<br/><i>framing-models</i>"]
+    F -- "gate" --> G["<b>design</b><br/>the doc reviewers<br/>challenge and sign<br/><i>writing-design-docs</i>"]
+    G -- "gate" --> D["<b>data</b><br/>rows that could<br/>have existed<br/><i>building-datasets</i>"]
+    D -- "gate" --> T["<b>train</b><br/>beat the baselines<br/><i>training-models</i>"]
+    T -- "gate" --> E["<b>evaluate</b><br/>at the operating<br/>point, by slice<br/><i>evaluating-models</i>"]
+    E -- "gate" --> L["<b>launch</b><br/>parity, shadow,<br/>canary, online test<br/><i>launching-models</i>"]
+    L -- "gate" --> M["<b>live</b><br/>cause before fix<br/><i>monitoring-models</i>"]
+    F -- "the rule is enough" --> RULE(["the rule ships"])
+    G -. "review rejects: reframe" .-> F
+    E -. "errors point at data" .-> D
+    M -. "the world moved: retrain" .-> T
+    M -. "an input broke: fix it" .-> D
+  end
+  REC[("<b>MODEL.md</b>: the decision, the design review, the data, the runs, the verdict, the launch and every incident, read first and written last by each skill")]
+  DOUBT -.- path
+  path --- REC

@@ -1,78 +1,84 @@
-# {name}
-
-<!-- Draft. {name} and the mark are placeholders until picked. What each skill is written from: docs/sources.md. -->
-
-<br>
 <p align="center">
-  <img src="site/assets/mark.svg" width="300" alt="Placeholder for the {name} mark">
+  <img src="assets/safflowers.jpg" width="640" alt="A painting of three safflowers on a blue ground: two stems in orange bloom and one in bud">
 </p>
 
-<p align="center">
-  <a href="#map">map</a> &middot; <a href="#skills">skills</a> &middot; <a href="#install">install</a> &middot; <a href="https://0trm.dev/{name}/">docs</a>
-</p>
-
-<p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-999999?labelColor=555555" alt="MIT license" /></a>
-  <a href="https://agentskills.io/specification"><img src="https://img.shields.io/badge/format-agent%20skills-999999?labelColor=555555" alt="Agent Skills format" /></a>
-  <a href="https://0trm.dev/{name}/"><img src="https://img.shields.io/badge/docs-github%20pages-999999?labelColor=555555&logo=github&logoColor=white" alt="documentation site on GitHub Pages" /></a>
-</p>
+<h1 align="center">saffml</h1>
 
 <p align="center">
   <strong>Skills that make your coding agent think like a product ML engineer.</strong><br>
-  A framework for building a model, shipping it, and keeping it alive after launch.
+  From the decision a model serves to the day it needs replacing.
+</p>
+
+<p align="center">
+  <a href="#how-it-works">how it works</a> &middot; <a href="#skills">skills</a> &middot; <a href="#does-it-help">evals</a> &middot; <a href="#install">install</a>
 </p>
 
 ## Why
 
-Training libraries assume the model is already the right answer, and MLOps tools run whatever pipeline they are given. Neither says that a rule should ship first, that the labels record only what the last model showed, or that a model which beats its baseline offline can still lose the launch. The model code is a small part of the system around it, and most of what breaks a product model is the data and the engineering. With **{name}**, every request passes routing first, before any training run, and goes to one of three stages, on a data floor and under a tracking ceiling.
+Ask a coding agent for a model and it will train one. The code runs, a metric prints, and nothing in the output says that the split shuffled time, that a column was backfilled from the future, that the threshold was left at 0.5, or that the service sends prices in cents. In product ML these are the failures that decide whether a feature works, and none of them raises an error.
 
-| Stage | Asks | Hands back |
-|---|---|---|
-| Develop | Does it beat the baseline at the threshold the product will use, on every slice that matters? | A model, the baseline it beats, its threshold, the errors left, and the audit it passed |
-| Launch | How does it reach users, and how is it taken back? | A serving design, the tests every version passes, a rollout with a rollback, and the A/B test that decides if it stays |
-| Operate | Is it still the model that was launched? | The cause of the change and its fix: leave it, retrain, fix the pipeline, or roll back |
+saffml gives the agent the habits of an engineer who has shipped models into products: ask what the prediction will decide before training anything, beat the rule before beating a model, distrust a good number until the split and the features are checked, launch in steps that can be taken back, and find the cause before retraining.
 
-{name} covers supervised models that run inside a product: a classifier, a ranker or a regressor whose output the product acts on. Research, ML platform work, unsupervised models and LLM applications are out of scope.
+## Five laws
 
-**{name}** sits next to [gallop](https://github.com/0trm/gallop). gallop decides whether a decision deserves a model and whether the model moved the metric. {name} decides how the model is built, shipped and kept alive. Every keep-or-kill call goes back to gallop's [`designing-experiments`](https://github.com/0trm/gallop/blob/main/skills/designing-experiments/SKILL.md), and the out-of-time split and leakage screen are the same checks gallop's [`building-models`](https://github.com/0trm/gallop/blob/main/skills/building-models/SKILL.md) runs.
+1. **Ship a rule first.** It is the baseline to beat and the pipeline that collects the labels.
+2. **Write the metric ladder down before training anything.** The number the model moves has to move the number the business cares about.
+3. **Better data beats a cleverer model,** and a leak makes any model look better than it is.
+4. **A threshold is a product decision.** Set it with the people who pay for each kind of error.
+5. **Assume the live model is getting worse right now,** and keep the instruments that would show it.
 
-## Map
+## How it works
 
-A request enters at the left and leaves as a model in production. Data is a floor because a model learns only what its labels record, and in a product the labels record what the last model showed. Tracking is a ceiling because no model is the last one: a model can be compared, promoted or rolled back only as far as its record allows, and the next one starts from it. The path does not end. Error analysis sends work down to the floor, Operate hands back to Develop, a refused launch sends the objective back to routing, and routing can send a request straight to any stage.
+Every model gets one file, `MODEL.md`, next to its code. Each skill reads it first and writes its section last: the decision and what each error costs, the design review, the data, the runs, the verdict, the launch, the incidents. Each section ends at a gate, a short checklist that needs evidence, and a stage starts only when the gate before it is ticked. The file is how a model's reasoning survives between sessions, between people and between versions. A filled example follows a delivery-time model from framing to its first incident: its [MODEL.md](examples/delivery-eta/MODEL.md) and its [design doc](examples/delivery-eta/DESIGN.md).
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="site/figures/skills-map-dark.svg">
-  <img src="site/figures/skills-map-light.svg" width="100%" alt="The seven skills on the map: routing at the entry, with exits for a rule and for gallop; develop, launch and operate along the path, with a retrain loop from operate to develop and a refused launch back to routing; the training data as the floor and tracking as the ceiling">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/map-dark.svg">
+  <img src="docs/map-light.svg" width="100%" alt="The saffml map: a request goes to frame, which either ships the rule or passes a gate to design, where a design doc is reviewed, then data, train, evaluate, launch and live, each step behind a gate. A rejected design goes back to framing; errors loop from evaluate back to data; a live model loops back to training when the world moves and to data when an input breaks. doubting-results sits above the whole path and MODEL.md below it.">
 </picture>
 
-> [Read the full map](https://0trm.dev/{name}/map/)
+Before anything is built, a design doc goes through a rough pre-review and then a formal review, where design flaws are cheapest to fix. Work loops back: a rejected design returns to framing, errors point at the data, a live model goes back to training when the world moves and to the pipeline when an input breaks; a launch that loses its online test sends the objective back to framing. `doubting-results` runs across all of it, wherever a number is about to be reported.
 
 ## Skills
 
-<!-- skills-table:begin (generated by site/build.py; do not edit) -->
 | Skill | What it decides | Reach for it when |
 |---|---|---|
-| [`routing-requests`](skills/routing-requests/SKILL.md) | What the product does with the prediction and who owns its threshold, whether a rule ships before any model, and which stage the request belongs to | someone asks for a model, a retrain or a launch, when a live model's numbers move, when a model that tested well never worked live, or before any training run starts |
-| [`building-training-data`](skills/building-training-data/SKILL.md) | The label, the features as they stand at prediction time, a split that mirrors serving, and a training table built by the same code as serving | choosing what a model predicts, when labels arrive late or exist only for what the system showed, when labelers disagree, when a feature may leak the answer, when classes are imbalanced, or when the training table is built differently from live inputs |
-| [`training-models`](skills/training-models/SKILL.md) | The baseline to beat, the metric and threshold set from what each kind of error costs, and the simplest model that clears them, tuned without touching the test set | picking a baseline, a metric, a threshold or a model, when the loss will not settle, before tuning starts, or when an offline number is offered as proof the model is ready |
-| [`analyzing-errors`](skills/analyzing-errors/SKILL.md) | Which errors to fix next and whether the fix is in the data or the model, and the audit by slice, fairness included, that a model passes before it faces users | accuracy plateaus, when a low average error hides a slice that fails, when deciding whether to collect more data, or before a model faces users |
-| [`launching-models`](skills/launching-models/SKILL.md) | Batch or online serving, how often it retrains, the tests every version passes, the rollout (shadow, canary, blue-green) with its rollback, and how much to automate | a model is about to replace a rule or an older model, when choosing batch or online serving, when choosing between shadow, canary and full rollout, or when an offline win is offered as the reason to ship |
-| [`monitoring-models`](skills/monitoring-models/SKILL.md) | How fresh the model must stay, the input, output and outcome metrics with their alerts, and the cause of a change named before the fix: retrain, fix the pipeline, roll back, or leave it | a live model has no alert, when inputs or predictions drift, when serving and training scores disagree, when a live metric drops, or when deciding how often to retrain |
-| [`tracking-models`](skills/tracking-models/SKILL.md) | What each run records, what a promotion needs and which version a rollback returns to, and the review every launch and incident closes with | a run has to be reproduced, when a model version is promoted or rolled back, when an incident closes, or when the next model should start from what this one learned |
-<!-- skills-table:end -->
+| [`framing-models`](skills/framing-models/SKILL.md) | What the product does with each prediction, what each error costs and who owns the threshold, the rule to beat and its number, and whether a model is worth building | someone asks for a model, or a request names a model before the decision it serves |
+| [`writing-design-docs`](skills/writing-design-docs/SKILL.md) | Why now and how success is measured, quantified requirements, the methodology and the implementation, the risks, the alternatives rejected, and what the reviewers must decide | a framed model is ambiguous, high impact or more than a few days of work, or someone asks for a design doc, spec or proposal |
+| [`building-datasets`](skills/building-datasets/SKILL.md) | The prediction time, the label and when it is known, features as they stood then, a split that mirrors serving, and the bias the product put in its own labels | assembling training data, choosing a label or a split, or when one column predicts suspiciously well |
+| [`training-models`](skills/training-models/SKILL.md) | The baselines, the simplest model that beats them, how it is debugged and tuned without the test set, and the record that rebuilds it | fitting, comparing or tuning models, or when a model will not beat a simple baseline |
+| [`evaluating-models`](skills/evaluating-models/SKILL.md) | The operating point from costs or capacity, the gain over the rule in the product's unit with its interval, the slices where it loses, and the next fix | choosing a threshold, comparing with the rule, or deciding whether a model is ready |
+| [`launching-models`](skills/launching-models/SKILL.md) | Batch or online, the input contract, proof that serving computes what training did, the rollout ladder, the online test's decision rule, and the rollback | a model is about to replace a rule or an older model, or an offline gain is offered as the reason to ship |
+| [`monitoring-models`](skills/monitoring-models/SKILL.md) | What to watch on inputs, outputs and outcomes, how fresh the model must stay, and the cause of a change named before the fix | a live number moves, someone asks to retrain, or a model has no alerts |
+| [`doubting-results`](skills/doubting-results/SKILL.md) | Whether a number can be trusted: leaks, splits, reused test sets, training-data metrics, the wrong comparison, missing intervals | before any model number is reported, and whenever a result beats expectations |
+
+Four skills carry tested Python checks, run by the agent rather than rewritten each time: a [leak screen](skills/building-datasets/scripts/leakage_screen.py), a [cost and capacity threshold](skills/evaluating-models/scripts/threshold.py), a [slice comparison with paired intervals](skills/evaluating-models/scripts/slices.py) and a [drift report](skills/monitoring-models/scripts/drift.py).
+
+## Does it help?
+
+<!-- eval-results -->
 
 ## Install
 
-Each skill is a directory of markdown: `SKILL.md` is the procedure, the `reference/` files one level down are the depth. Read them as prose, or copy them into your agent's skills folder:
+As a Claude Code plugin:
 
-```bash
-git clone https://github.com/0trm/{name}
-mkdir -p .claude/skills
-cp -r {name}/skills/* .claude/skills/
+```text
+/plugin install saffml --marketplace 0trm/saffml
 ```
 
-How the skills hand off to each other, and the loop they run in: [docs/orchestration.md](docs/orchestration.md). What each skill is written from, and where its sources disagree: [docs/sources.md](docs/sources.md).
+Or copy the skills into a project:
+
+```bash
+git clone https://github.com/0trm/saffml
+mkdir -p .claude/skills
+cp -r saffml/skills/* .claude/skills/
+```
+
+The scripts need Python 3.10 or later with numpy and pandas; `uv run <script>` installs them. Run their tests with `uv run --with numpy,pandas,pytest pytest tests`.
+
+## Scope
+
+saffml covers supervised models that run inside a product: a classifier, a ranker or a forecast whose output the product acts on. LLM applications, research, ML platform work and unsupervised models are out of scope. What each skill is written from, and where its sources disagree: [docs/sources.md](docs/sources.md).
 
 ## License
 
-[MIT](LICENSE). What it covers and how to contribute: [docs/model.md](docs/model.md).
+[MIT](LICENSE) for the text and code. The painting in `assets/` is not covered by it.

@@ -1,0 +1,5 @@
+evals/*/files/data/*.csv
+evals/results/
+__pycache__/
+.pytest_cache/
+.DS_Store

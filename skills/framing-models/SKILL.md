@@ -1,0 +1,87 @@
+---
+name: framing-models
+description: Starts any product ML task. Frames the prediction problem before data or training work and decides whether a model should be built at all: what the product does with each prediction, when it predicts, what each kind of error costs and who owns the threshold, and the rule or current system a model must beat, measured. Creates the model's MODEL.md, which the other saffml skills read and update. Use first whenever asked to build, train or ship a model (classifier, ranker, recommender, scoring, churn, fraud, forecast or "some ML") and whenever a request names a model before the decision it serves.
+---
+
+# Framing models
+
+A model earns its place only when it improves a decision the product already makes, by more than a rule would, at a cost someone has agreed to pay. Settle that before touching data, and write the answer down.
+
+## Start from the record
+
+Look for the model's `MODEL.md`: beside its code, or under `models/<name>/`. If it exists, read it and continue with the skill for its stage (design: `writing-design-docs`, data: `building-datasets`, training: `training-models`, evaluation: `evaluating-models`, launch: `launching-models`, live: `monitoring-models`). If it doesn't, copy [templates/MODEL.md](templates/MODEL.md) next to the model's code and fill its Decision section as you work through the steps below.
+
+## 1. Name the decision
+
+Write down, in the product's words:
+
+- **The action:** what the product does when the prediction says yes, or how it uses the score (hide the post, investigate the claim, book the demo, order the search results), and who or what takes the action.
+- **The moment:** when the prediction is made, and what is known at that moment. This fixes which data the model may use, so be exact: "at checkout", "at 06:00 on the first of the month", "when the page is requested".
+- **The unit:** what the decision is judged in. Euros, minutes late, demos booked, posts wrongly removed, purchases per search.
+- **Whether acting changes the outcome:** when the action is meant to change what the model predicts (a call to keep a customer, a discount to convert a lead), the model predicts risk, not the effect of acting. Plan a group that is flagged but left alone, so the action itself can be judged.
+
+If nobody can say what the product does with the prediction, stop and ask. A model that serves no decision cannot be judged.
+
+## 2. Price the errors
+
+A model is wrong in two directions, and they rarely cost the same.
+
+- **Classifiers:** what a false positive costs and what a false negative costs, each in the decision's unit. A harmful post left up costs harm and a complaint; a harmless post sent to review costs a moderator a minute. A fraudulent claim paid costs its amount; an investigation costs a fixed fee.
+- **Rankers:** what a poor item at the top costs, compared with a good item buried.
+- **Forecasts:** whether over- and under-prediction cost the same. A late delivery estimate costs more than an early one, which points at a quantile, not the mean.
+- **Capacity:** a sales team that can run 40 demos a week needs the best 40 leads, not a probability threshold. Write the limit down.
+- **The threshold owner:** the person who answers for the cost of each error, such as the trust and safety lead, the claims manager or the head of sales. The model proposes an operating point; the owner sets it.
+
+When the costs are unknown, assume a ratio, set the operating point from it, show how the answer moves if the ratio is off by a factor of two, and list each assumption as a question for the owner. Do not leave the costs out because nobody gave them, and do not let a default threshold of 0.5 stand in for a cost ratio nobody chose.
+
+## 3. Measure the rule to beat
+
+Every product already decides somehow: by hand, with a rule, with a formula, or with an older model. That is the baseline, and its number is the bar.
+
+1. If a rule or system exists, score it on recent data, in the decision's unit.
+2. If people decide by hand, write the simplest rule a person would use (a cutoff on one field, a lookup table, most popular first) and score that.
+3. Add the trivial baselines at the same operating point: the majority class, and random choice at the same capacity.
+4. Score every baseline on the same rows, held out by time, that the model will later be scored on.
+
+A rule that ships today is also the fallback when the model fails, and the logging that collects the labels the model will need.
+
+## 4. Write the metric ladder
+
+Connect the number training will move to the number the business cares about:
+
+`business metric → product metric → online proxy → offline metric`
+
+For example: retention → share of orders arriving within the promised window → "where is my order" tickets → pinball loss at the 80th percentile on held-out orders. Training moves the bottom rung. If moving it cannot move the top, the objective is wrong; fix it here, not after launch.
+
+## 5. Decide
+
+Build a model when all of these hold:
+
+- The rule would need too many cases, or cases too fuzzy, to write by hand.
+- The patterns shift, so a hand-written rule goes stale.
+- Mistakes are tolerable or caught downstream.
+- Labels exist, or the product can start collecting them.
+- The gap the model could close over the rule is worth more than building and running it.
+
+Then write one of three outcomes:
+
+- **The rule ships.** The rule is good enough, or a model's likely gain is a few points the costs don't justify. Write the rule's expected performance and stop. Revisit when labels accumulate or the rule needs exceptions.
+- **Build a model.** Name the gap it must close over the rule, in the decision's unit. Unless the model is small, the next step is a design doc reviewed before building (`writing-design-docs`).
+- **Not now.** There is no label and no way to collect one, or the data holds no signal. Say what would change that.
+
+## Write it down
+
+Fill the Decision section of `MODEL.md`, tick the gate items that hold, and add a dated line to the log. Leave unticked items unticked and say why.
+
+## Report
+
+Lead with the outcome in one line: the rule ships, build a model, or not now, and why. Then give the decision, the costs and their owner, the rule's number, and the open questions for the owner. Keep assumptions visible: list each one next to the number it affects.
+
+## Stop signs
+
+- A request for "a model" with no decision behind it.
+- A label nobody can observe, or one that arrives after the decision stops mattering.
+- A rule that already meets the need.
+- A request to "just train something" on a table before anyone has said what the prediction will change.
+
+For worked framings of common product models (content moderation, claims investigation, lead scoring, delivery estimates, search ranking) and the questions to ask the threshold owner, read [reference/framings.md](reference/framings.md).
