@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/safflowers.jpg" width="235" alt="A painting of three safflowers on a blue ground: two stems in orange bloom and one in bud">
+  <img src="assets/safflowers.jpg" width="235" alt="Safflowers by Ono Chikkyō: three stems on a blue ground, two in orange bloom and one in bud">
 </p>
 
 <h1 align="center">saffML</h1>
@@ -31,12 +31,14 @@ saffml gives the agent the habits of an engineer who has shipped models into pro
 
 Every model gets one file, `MODEL.md`, next to its code. Each skill reads it first and writes its section last: the decision and what each error costs, the design review, the data, the runs, the verdict, the launch, the incidents. Each section ends at a gate, a short checklist that needs evidence, and a stage starts only when the gate before it is ticked. The file is how a model's reasoning survives between sessions, between people and between versions. A filled example follows a delivery-time model from framing to its first incident: its [MODEL.md](examples/delivery-eta/MODEL.md) and its [design doc](examples/delivery-eta/DESIGN.md).
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/map-dark.svg">
-  <img src="docs/map-light.svg" width="100%" alt="The saffml map: a request goes to frame, which either ships the rule or passes a gate to design, where a design doc is reviewed, then data, train, evaluate, launch and live, each step behind a gate. A rejected design goes back to framing; errors loop from evaluate back to data; a live model loops back to training when the world moves and to data when an input breaks. doubting-results sits above the whole path and MODEL.md below it.">
-</picture>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/map-dark.svg">
+    <img src="docs/map-light.svg" width="600" alt="The saffml map, a flowchart. It starts at a request for a model, which is framed, then a decision: is a model worth it? If not, the rule ships. If so, the work goes through design, data, train, evaluate, launch and monitor, then a decision: is the model still paying? If not, it is retired to the rule; if so, monitoring continues. Dashed arrows loop back: a rejected design and a lost online test return to framing, a model that loses to the rule returns to data, and a live model returns to training when the world moves and to data when an input breaks.">
+  </picture>
+</p>
 
-Before anything is built, a design doc goes through a rough pre-review and then a formal review, where design flaws are cheapest to fix. Work loops back: a rejected design returns to framing, errors point at the data, a live model goes back to training when the world moves and to the pipeline when an input breaks; a launch that loses its online test sends the objective back to framing. `doubting-results` runs across all of it, wherever a number is about to be reported.
+Solid arrows are the main path, and each step on it ends at a gate; dashed arrows are the ways work loops back. Before anything is built, a design doc goes through a rough pre-review and then a formal review, where design flaws are cheapest to fix. Work loops back: a rejected design returns to framing, errors point at the data, a live model goes back to training when the world moves and to the pipeline when an input breaks; a launch that loses its online test sends the objective back to framing, and a live model that stops paying for itself is retired to the rule. `doubting-results` runs across all of it, wherever a number is about to be reported.
 
 ## Skills
 
@@ -94,4 +96,4 @@ saffml covers supervised models that run inside a product: a classifier, a ranke
 
 ## License
 
-[MIT](LICENSE) for the text and code. The painting in `assets/` is not covered by it.
+[MIT](LICENSE) for the text and code. The painting in `assets/` is not covered by it: it is Ono Chikkyō (小野竹喬, 1889–1979), *For Haiku Poems in Bashō's Narrow Road to a Far Province: "A lady's eyebrow brush / came to mind when I saw / safflowers in bloom"* (奥の細道句抄絵 まゆはきを俤にして紅粉の花), 1976, color on paper, The National Museum of Modern Art, Kyoto ([collection record](https://artplatform.go.jp/collections/W316214)).
