@@ -1,6 +1,6 @@
 # {name}
 
-<!-- Draft. {name}, the mark and the skill names are placeholders until picked. -->
+<!-- Draft. {name} and the mark are placeholders until picked. What each skill is written from: docs/sources.md. -->
 
 <br>
 <p align="center">
@@ -24,30 +24,26 @@
 
 ## Why
 
-Training libraries assume the model is already the right answer. Pipeline tools run the steps and do not say which step a model needs next. With **{name}**, every request passes routing first, before any training run, and goes to one of three stages, on a data floor and under a tracking ceiling.
+Training libraries assume the model is already the right answer, and MLOps tools run whatever pipeline they are given. Neither says that a rule should ship first, that the labels record only what the last model showed, or that a model which beats its baseline offline can still lose the launch. The model code is a small part of the system around it, and most of what breaks a product model is the data and the engineering. With **{name}**, every request passes routing first, before any training run, and goes to one of three stages, on a data floor and under a tracking ceiling.
 
 | Stage | Asks | Hands back |
 |---|---|---|
-| Develop | Is it good enough to ship? | A model, the baseline it beats, an error analysis |
-| Launch | Is it safe in front of users? | A rollout plan, and the A/B test that decides if it stays |
-| Operate | Is it still working? | An alert, a retrain, or a rollback |
+| Develop | Does it beat the baseline at the threshold the product will use, on every slice that matters? | A model, the baseline it beats, its threshold, the errors left, and the audit it passed |
+| Launch | How does it reach users, and how is it taken back? | A serving design, the tests every version passes, a rollout with a rollback, and the A/B test that decides if it stays |
+| Operate | Is it still the model that was launched? | The cause of the change and its fix: leave it, retrain, fix the pipeline, or roll back |
 
-**{name}** sits next to [gallop](https://github.com/0trm/gallop). gallop decides whether a model is worth building and whether it worked. {name} decides how it is built, shipped and kept alive. Every impact claim goes back to gallop's [`designing-experiments`](https://github.com/0trm/gallop/blob/main/skills/designing-experiments/SKILL.md).
+{name} covers supervised models that run inside a product: a classifier, a ranker or a regressor whose output the product acts on. Research, ML platform work, unsupervised models and LLM applications are out of scope.
+
+**{name}** sits next to [gallop](https://github.com/0trm/gallop). gallop decides whether a decision deserves a model and whether the model moved the metric. {name} decides how the model is built, shipped and kept alive. Every keep-or-kill call goes back to gallop's [`designing-experiments`](https://github.com/0trm/gallop/blob/main/skills/designing-experiments/SKILL.md), and the out-of-time split and leakage screen are the same checks gallop's [`building-models`](https://github.com/0trm/gallop/blob/main/skills/building-models/SKILL.md) runs.
 
 ## Map
 
-A request enters at the left and leaves as a model in production. Data is a floor because a model learns only what its labels record. Tracking is a ceiling because each model has to start from what the last one learned. Unlike gallop's map, the path does not end: Operate hands back to Develop, and routing can send a request straight to any stage.
+A request enters at the left and leaves as a model in production. Data is a floor because a model learns only what its labels record, and in a product the labels record what the last model showed. Tracking is a ceiling because no model is the last one: a model can be compared, promoted or rolled back only as far as its record allows, and the next one starts from it. The path does not end. Error analysis sends work down to the floor, Operate hands back to Develop, a refused launch sends the objective back to routing, and routing can send a request straight to any stage.
 
-<!-- Placeholder: the light and dark map figures replace this block. -->
-```text
-        ceiling: tracking and after-action review
-  ───────────────────────────────────────────────────────────
-  request → routing → develop → launch → operate → live model
-                         ↑                  │
-                         └──── retrain ─────┘
-  ───────────────────────────────────────────────────────────
-        floor: data and labels
-```
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="site/figures/skills-map-dark.svg">
+  <img src="site/figures/skills-map-light.svg" width="100%" alt="The seven skills on the map: routing at the entry, with exits for a rule and for gallop; develop, launch and operate along the path, with a retrain loop from operate to develop and a refused launch back to routing; the training data as the floor and tracking as the ceiling">
+</picture>
 
 > [Read the full map](https://0trm.dev/{name}/map/)
 
@@ -56,12 +52,13 @@ A request enters at the left and leaves as a model in production. Data is a floo
 <!-- skills-table:begin (generated by site/build.py; do not edit) -->
 | Skill | What it decides | Reach for it when |
 |---|---|---|
-| [`routing-requests`](skills/routing-requests/SKILL.md) | Which stage a model request belongs to, and whether a rule ships before any model | someone asks for a model, a retrain or a launch, when a live model's numbers move, or before any training run starts |
-| [`defining-labels`](skills/defining-labels/SKILL.md) | Inputs, outputs and labels pinned down, and training data built the same way as what the model sees live | choosing what a model predicts, when labels arrive weeks late or exist only for what the system already showed, when labelers disagree, or when the training table is built differently from live inputs |
-| [`training-models`](skills/training-models/SKILL.md) | The baseline to beat, the split, and whether the next fix is in the data or the model | picking a baseline or a split, deciding if a model is good enough to ship, or when a low average error hides a slice that fails |
-| [`launching-models`](skills/launching-models/SKILL.md) | The audit, the rollout (shadow, canary, full), how much to automate, and the A/B test that decides if it stays | a model is about to replace a rule or an older model, when choosing between shadow, canary and full rollout, or when an offline win is offered as the reason to ship |
-| [`monitoring-models`](skills/monitoring-models/SKILL.md) | The metric and alert every live model carries, and when drift means retrain, roll back or leave it | a live model has no alert, when inputs or predictions drift, when accuracy drops, or when deciding whether to retrain |
-| [`tracking-models`](skills/tracking-models/SKILL.md) | Which data, code and window each version ran on, and the review every incident closes with | a run has to be reproduced, when a model version is promoted, when an incident closes, or when the next model should start from what this one learned |
+| [`routing-requests`](skills/routing-requests/SKILL.md) | What the product does with the prediction and who owns its threshold, whether a rule ships before any model, and which stage the request belongs to | someone asks for a model, a retrain or a launch, when a live model's numbers move, when a model that tested well never worked live, or before any training run starts |
+| [`building-training-data`](skills/building-training-data/SKILL.md) | The label, the features as they stand at prediction time, a split that mirrors serving, and a training table built by the same code as serving | choosing what a model predicts, when labels arrive late or exist only for what the system showed, when labelers disagree, when a feature may leak the answer, when classes are imbalanced, or when the training table is built differently from live inputs |
+| [`training-models`](skills/training-models/SKILL.md) | The baseline to beat, the metric and threshold set from what each kind of error costs, and the simplest model that clears them, tuned without touching the test set | picking a baseline, a metric, a threshold or a model, when the loss will not settle, before tuning starts, or when an offline number is offered as proof the model is ready |
+| [`analyzing-errors`](skills/analyzing-errors/SKILL.md) | Which errors to fix next and whether the fix is in the data or the model, and the audit by slice, fairness included, that a model passes before it faces users | accuracy plateaus, when a low average error hides a slice that fails, when deciding whether to collect more data, or before a model faces users |
+| [`launching-models`](skills/launching-models/SKILL.md) | Batch or online serving, how often it retrains, the tests every version passes, the rollout (shadow, canary, blue-green) with its rollback, and how much to automate | a model is about to replace a rule or an older model, when choosing batch or online serving, when choosing between shadow, canary and full rollout, or when an offline win is offered as the reason to ship |
+| [`monitoring-models`](skills/monitoring-models/SKILL.md) | How fresh the model must stay, the input, output and outcome metrics with their alerts, and the cause of a change named before the fix: retrain, fix the pipeline, roll back, or leave it | a live model has no alert, when inputs or predictions drift, when serving and training scores disagree, when a live metric drops, or when deciding how often to retrain |
+| [`tracking-models`](skills/tracking-models/SKILL.md) | What each run records, what a promotion needs and which version a rollback returns to, and the review every launch and incident closes with | a run has to be reproduced, when a model version is promoted or rolled back, when an incident closes, or when the next model should start from what this one learned |
 <!-- skills-table:end -->
 
 ## Install
@@ -74,7 +71,7 @@ mkdir -p .claude/skills
 cp -r {name}/skills/* .claude/skills/
 ```
 
-How the skills hand off to each other, and the loop they run in: [docs/orchestration.md](docs/orchestration.md).
+How the skills hand off to each other, and the loop they run in: [docs/orchestration.md](docs/orchestration.md). What each skill is written from, and where its sources disagree: [docs/sources.md](docs/sources.md).
 
 ## License
 

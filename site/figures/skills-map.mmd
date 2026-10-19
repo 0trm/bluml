@@ -1,0 +1,21 @@
+%% The skills map. Rendered with Pele (https://pele.run/) into a light and a dark SVG:
+%%   pele-render skills-map.mmd skills-map-light.svg
+%%   sed 's/style="max-width/style="--pele-bg:#0d1117;--pele-fg:#e6edf3;--pele-muted:#9198a1;--pele-line:#c9d1d9;--pele-surface:#161b22;--pele-surface-alt:#21262d;--pele-border:#3d444d;--pele-accent:#4493f8;max-width/' skills-map-light.svg > skills-map-dark.svg
+flowchart TB
+  CEIL["<b>ceiling · tracking</b><br/>run records, promotions and their rollback target, after-action reviews<br/><i>tracking-models</i>"]
+  subgraph path[" "]
+    direction LR
+    REQ(["request"]) --> R{"<b>routing</b><br/><i>routing-requests</i>"}
+    R -- "a rule is enough" --> H(["the rule ships"])
+    R -- "worth it? did it work?" --> G(["gallop"])
+    R --> D["<b>develop</b><br/>baseline, threshold, errors, audit<br/><i>training-models</i><br/><i>analyzing-errors</i>"]
+    D --> L["<b>launch</b><br/>serving, release tests, rollout<br/><i>launching-models</i>"]
+    L --> O["<b>operate</b><br/>freshness, skew, alerts<br/><i>monitoring-models</i>"]
+    O --> LIVE(["live model"])
+    O -- "retrain" --> D
+    L -- "refused: revise the objective" --> R
+  end
+  FLOOR["<b>floor · data</b><br/>labels, features as of prediction time, the split, training built like serving<br/><i>building-training-data</i>"]
+  CEIL -. "lookup" .-> path
+  path -. "record" .-> CEIL
+  path -- "fix the data" --- FLOOR
