@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="assets/safflowers.jpg" width="230" alt="Safflowers by Ono Chikkyō: three stems on a blue ground, two in orange bloom and one in bud">
+  <img src="assets/safflowers.jpg" width="230" alt="bluflowers by Ono Chikkyō: three stems on a blue ground, two in orange bloom and one in bud">
 </p>
 
-<h1 align="center">saffML</h1>
+<h1 align="center">bluML</h1>
 
 <p align="center">
   <strong>Skills that make your coding agent think like a product ML engineer.</strong><br>
@@ -17,7 +17,7 @@
 
 Ask a coding agent for a model and it will train one. The code runs, a metric prints, and nothing in the output says that the split shuffled time, that a column was backfilled from the future, that the threshold was left at 0.5, or that the service sends prices in cents. In product ML these are the failures that decide whether a feature works, and none of them raises an error.
 
-saffml gives the agent the habits of an engineer who has shipped models into products: ask what the prediction will decide before training anything, beat the rule before beating a model, distrust a good number until the split and the features are checked, launch in steps that can be taken back, and find the cause before retraining.
+bluML gives the agent the habits of an engineer who has shipped models into products: ask what the prediction will decide before training anything, beat the rule before beating a model, distrust a good number until the split and the features are checked, launch in steps that can be taken back, and find the cause before retraining.
 
 ## Five laws
 
@@ -34,7 +34,7 @@ Every model gets one file, `MODEL.md`, next to its code. Each skill reads it fir
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/map-dark.svg">
-    <img src="docs/map-light.svg" width="816" alt="The saffml map, a flowchart in three phases. It starts at a request for a model. Design: the model is framed, then a decision: is a model worth it? If not, the rule ships. If so, design and data follow. Development: train and evaluate. Deployment: launch and monitor, then a decision: is the model still paying? If not, it is retired to the rule; if so, monitoring continues. Dashed arrows loop back: a rejected design and a lost online test return to framing, a model that loses to the rule returns to data, and a live model returns to training when the world moves and to data when an input breaks.">
+    <img src="docs/map-light.svg" width="816" alt="The bluML map, a flowchart in three phases. It starts at a request for a model. Design: the model is framed, then a decision: is a model worth it? If not, the rule ships. If so, design and data follow. Development: train and evaluate. Deployment: launch and monitor, then a decision: is the model still paying? If not, it is retired to the rule; if so, monitoring continues. Dashed arrows loop back: a rejected design and a lost online test return to framing, a model that loses to the rule returns to data, and a live model returns to training when the world moves and to data when an input breaks.">
   </picture>
 </p>
 
@@ -57,12 +57,12 @@ Four skills carry tested Python checks, run by the agent rather than rewritten e
 
 ## Does it help?
 
-Seven requests with traps planted in synthetic data, each run three times with saffml and three times without, and scored by an LLM judge against five or six criteria. A score is the weighted share of criteria met. Method, criteria and caveats: [evals/](evals/README.md).
+Seven requests with traps planted in synthetic data, each run three times with bluML and three times without, and scored by an LLM judge against five or six criteria. A score is the weighted share of criteria met. Method, criteria and caveats: [evals/](evals/README.md).
 
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/evals-dark.svg">
-    <img src="docs/evals-light.svg" width="816" alt="Paired bars of the eval scores with saffml and without it, for Sonnet and Opus. Where saffml helps: rule-first, fraud-threshold, design-doc and ctr-drop. Caught without it: ship-it, churn-leak and ranker-clicks, at 0.96 to 1.00 in every arm. Mean: Sonnet 0.77 without and 0.90 with; Opus 0.82 without and 0.99 with. The table below has every score.">
+    <img src="docs/evals-light.svg" width="816" alt="Paired bars of the eval scores with bluML and without it, for Sonnet and Opus. Where bluML helps: rule-first, fraud-threshold, design-doc and ctr-drop. Caught without it: ship-it, churn-leak and ranker-clicks, at 0.96 to 1.00 in every arm. Mean: Sonnet 0.77 without and 0.90 with; Opus 0.82 without and 0.99 with. The table below has every score.">
   </picture>
 </p>
 
@@ -82,30 +82,30 @@ Seven requests with traps planted in synthetic data, each run three times with s
 
 </details>
 
-Without saffml, both models already catch the textbook traps: a backfilled column, position bias in clicks, prices sent in cents. What they skip is the product reasoning around the model. Neither compared the fraud model with the rule slice by slice, and neither noticed that it ranks new customers far worse (0 of 6 runs; 5 of 6 with saffml). Opus never weighed a ticket-routing model against the keyword rule that nearly matches it (0 of 3; 3 of 3), and none of Sonnet's design docs both put numbers on the requirements and questioned the brief's "updated live" (0 of 3; 3 of 3). One gap remains: Sonnet with saffml still skips the rule-against-model weighing in every run.
+Without bluML, both models already catch the textbook traps: a backfilled column, position bias in clicks, prices sent in cents. What they skip is the product reasoning around the model. Neither compared the fraud model with the rule slice by slice, and neither noticed that it ranks new customers far worse (0 of 6 runs; 5 of 6 with bluML). Opus never weighed a ticket-routing model against the keyword rule that nearly matches it (0 of 3; 3 of 3), and none of Sonnet's design docs both put numbers on the requirements and questioned the brief's "updated live" (0 of 3; 3 of 3). One gap remains: Sonnet with bluML still skips the rule-against-model weighing in every run.
 
 ## Install
 
 As a Claude Code plugin:
 
 ```text
-/plugin install saffml --marketplace 0trm/saffml
+/plugin install bluml --marketplace 0trm/bluml
 ```
 
 Or copy the skills into a project:
 
 ```bash
-git clone https://github.com/0trm/saffml
+git clone https://github.com/0trm/bluml
 mkdir -p .claude/skills
-cp -r saffml/skills/* .claude/skills/
+cp -r bluml/skills/* .claude/skills/
 ```
 
 The scripts need Python 3.10 or later with numpy and pandas; `uv run <script>` installs them. Run their tests with `uv run --with numpy,pandas,pytest pytest tests`.
 
 ## Scope
 
-saffml covers supervised models that run inside a product: a classifier, a ranker or a forecast whose output the product acts on. LLM applications, research, ML platform work and unsupervised models are out of scope. What each skill is written from, and where its sources disagree: [docs/sources.md](docs/sources.md).
+bluML covers supervised models that run inside a product: a classifier, a ranker or a forecast whose output the product acts on. LLM applications, research, ML platform work and unsupervised models are out of scope. What each skill is written from, and where its sources disagree: [docs/sources.md](docs/sources.md).
 
 ## License
 
-[MIT](LICENSE) for the text and code. The painting in `assets/` is not covered by it: it is Ono Chikkyō (小野竹喬, 1889–1979), *For Haiku Poems in Bashō's Narrow Road to a Far Province: "A lady's eyebrow brush / came to mind when I saw / safflowers in bloom"* (奥の細道句抄絵 まゆはきを俤にして紅粉の花), 1976, color on paper, The National Museum of Modern Art, Kyoto ([collection record](https://artplatform.go.jp/collections/W316214)).
+[MIT](LICENSE) for the text and code. The painting in `assets/` is not covered by it: it is Ono Chikkyō (小野竹喬, 1889–1979), *For Haiku Poems in Bashō's Narrow Road to a Far Province"*.
