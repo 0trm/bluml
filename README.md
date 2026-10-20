@@ -6,7 +6,6 @@
 
 <p align="center">
   <strong>Skills that make your coding agent think like a product ML engineer.</strong><br>
-  From the decision a model serves to the day it needs replacing.
 </p>
 
 <p align="center">
