@@ -28,15 +28,19 @@ payback, months   = build cost ÷ net per month          (never, when net ≤ 0)
 
 Then recompute with the gain halved, and with the input you trust least off by a factor of two. Name the input that flips the answer; that is the question to settle before building.
 
+Count only the decisions the model would change. A model for one category or one market moves the total by its share: a 5% gain on searches that are half the traffic is 2.5% overall, and a 10% gain on a fifth of the traffic is 2%. Weigh how many customers a problem reaches against how badly it hurts them; the smaller slice can still be the better pick when it is bad enough to drive customers away.
+
+When the team can build only one of several models, the same numbers rank them: net value per month and payback, not how new the technique is.
+
 For a classifier, the ceiling comes first and costs nothing: a perfect model saves at most the rule's error cost per month (its false positives and false negatives, priced as in the Decision section). When that ceiling is below the monthly cost, no model can pay, and the rule ships without anything being built.
 
 ## What to count
 
 | Cost | Kind | How to estimate | Often forgotten |
 |---|---|---|---|
-| Build | Once | Engineer weeks at the team's loaded cost, for the data work, the model, serving, the launch and the review | The data pipeline and the launch take longer than the model |
+| Build | Once | Engineer weeks at the team's loaded cost, for the data work, the model, serving, the launch and the review. A timebox is a stretch goal: multiply it by 1.5 to 3 for the estimate | The data pipeline and the launch take longer than the model |
 | Labels | Once, then monthly | Price per label times labels needed; reviewer hours for an audit | Labels for new slices and for retraining keep costing |
-| Upkeep | Monthly, fixed | A share of an engineer: on-call, monitors, incidents, reviewing each retrained version | The model's code is a small part of the system; the pipelines, configuration and monitoring around it carry most of the upkeep |
+| Upkeep | Monthly, fixed | A share of an engineer: on-call, monitors, incidents, reviewing each retrained version. With no team history, Yan's 2 to 4 weeks a year to operate and maintain a system (on-call, updates) is a start; monitors and reviewed retrains add to it | The model's code is a small part of the system; the pipelines, configuration and monitoring around it carry most of the upkeep |
 | Pipelines and storage | Monthly, fixed | Feature jobs, a feature store or cache, logs of served features | Logging served features is required for parity and the next training set |
 | Training compute | Monthly, fixed | Cost per training run, searches included, times runs per month | A retrain schedule set by habit rather than by how fast quality decays |
 | Serving compute | Per decision, or fixed | Cost per 1,000 predictions for batch; instances sized for peak traffic for online | Online capacity is paid for at peak, not at the average |
@@ -55,13 +59,13 @@ A model inside a user-facing request adds time to it: feature lookups, scoring, 
 2. Measure what the model adds, at the median and the 95th percentile, on the real serving path: a benchmark of the model alone misses the feature lookups.
 3. Price it: requests per month times the metric lost per request at that delay times the value of the metric.
 
-Latency is the strongest argument for batch: a lookup of a precomputed score adds almost nothing. When the case only pays without the latency cost, score in batch and re-rank online, cache features, use a smaller model, or call the model only where it changes the decision. The case estimates the latency cost before anything is built; the online test measures it, inside the effect on the product metric, with latency as a guardrail. Once that effect is in, drop the estimated latency line from the case, or it is counted twice.
+Latency is the strongest argument for batch: a lookup of a precomputed score adds almost nothing. When the case only pays without the latency cost, score in batch and re-rank online, cache features, cache the answers for the inputs that make up most of the traffic (the top queries), use a smaller model, or call the model only where it changes the decision: a cascade, where the rule settles the cases it is sure of and only the rest reach the model. The case estimates the latency cost before anything is built; the online test measures it, inside the effect on the product metric, with latency as a guardrail. Once that effect is in, drop the estimated latency line from the case, or it is counted twice.
 
 ## Compute
 
 - **Training:** cost per run (data size, hardware, hours) times runs per month, with hyperparameter searches counted as the runs they are. The retrain schedule comes from how fast quality decays with the model's age (`monitoring-models`); each retrain is also an engineer's review.
 - **Serving, batch:** paid per scheduled run, roughly in proportion to the entities scored. Scoring every entity when only active ones are looked up is the usual waste.
-- **Serving, online:** instances sized for peak traffic and the latency budget, paid around the clock. Cost per 1,000 predictions is the bill divided by predictions served, and it falls as traffic grows; quote both the bill and the unit cost.
+- **Serving, online:** instances sized for peak traffic and the latency budget, paid around the clock. Cost per 1,000 predictions is the bill divided by predictions served, and it falls as traffic grows; quote both the bill and the unit cost. As a check, Yan's example sets the budget for real-time infrastructure at a tenth of the extra revenue it should bring; when online serving takes a much larger share of the value, see whether batch or a cascade keeps most of it.
 - **A larger model** costs more on every line: training runs, serving hardware and latency. A gain that only the larger model reaches has to pay for all three.
 
 Take prices from the team's own bill, not a price list: a month of the current service, a training run already done.

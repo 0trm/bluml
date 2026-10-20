@@ -25,7 +25,7 @@ claude plugin eval . --scaffold --allow-tools Bash Write Edit --model sonnet --j
 
 ## Results
 
-Run on 19 October 2026 with Claude Code 2.1.303. The agent ran as `--model sonnet` or `--model opus`, the judge was Sonnet with three votes per criterion, and each case ran three times per arm. A score is the weighted share of criteria met, averaged over the three runs. A skill fired in every run with bluML. The runs in the table cost about $51, judge included.
+Run on 19 October 2026 with Claude Code 2.1.303, on version 0.1.0 of the skills, before they took in mlkb's update of 20 October. The agent ran as `--model sonnet` or `--model opus`, the judge was Sonnet with three votes per criterion, and each case ran three times per arm. A score is the weighted share of criteria met, averaged over the three runs. A skill fired in every run with bluML. The runs in the table cost about $51, judge included.
 
 | Case | Sonnet with | without | Δ | Opus with | without | Δ |
 |---|---|---|---|---|---|---|

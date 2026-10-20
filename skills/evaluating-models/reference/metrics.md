@@ -30,7 +30,7 @@ AUC and log loss compare models across all thresholds. Use them to choose among 
 
 ## Ranking
 
-Logged clicks reflect the order that produced them. Evaluate rankings on random-order traffic, with position-debiased labels, or with a counterfactual estimate (see `building-datasets`, reference/product-bias.md), and treat the result as a hypothesis for an online test.
+Logged clicks reflect the order that produced them. Evaluate rankings on random-order traffic, with position-debiased labels, or with a counterfactual estimate (IPS or SNIPS, in `building-datasets`, reference/product-bias.md), and treat the result as a hypothesis for an online test. A metric computed on logs the current system produced can rank models in the opposite order to the online test: a greedy ranker can lead on offline precision and trail on clicks.
 
 ## Forecasts
 

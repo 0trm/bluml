@@ -21,3 +21,5 @@ Importance tells you what the model relies on, not what causes the outcome. Use 
 ## The plateau
 
 When the model stops improving, the next gain usually comes from new information rather than tuning (Rules of ML #41): a new source of signal, cleaner labels, or more data on the slice where errors cluster. `evaluating-models` finds which, through error analysis.
+
+Two checks say how far the plateau is from the limit. A learning curve (the same validation rows scored after training on a quarter, half and all of the rows) shows whether more rows still help. The score on the training rows, with the model allowed to overfit, bounds what these features can reach; label agreement between people bounds it too (`building-datasets`, reference/labels.md). Most problems have such a ceiling, and it is lowest when the model predicts what people will do: clicks, purchases, fraud. A target above it is not a plan.

@@ -20,6 +20,8 @@ Write down, in the product's words:
 - **The unit:** what the decision is judged in. Euros, minutes late, demos booked, posts wrongly removed, purchases per search.
 - **Whether acting changes the outcome:** when the action is meant to change what the model predicts (a call to keep a customer, a discount to convert a lead), the model predicts risk, not the effect of acting. Plan a group that is flagged but left alone, so the action itself can be judged.
 
+When the request names a solution, ask why until the problem shows. "Rank fast-shipping products higher": why? They arrive sooner. Why does that matter? Late orders bring complaints. The problem is late orders, and what it needs may be a better delivery estimate, not a ranker. Frame the problem, and note the other framings it allows: a fraud model can flag the fraudulent payments or clear the safe ones.
+
 If nobody can say what the product does with the prediction, stop and ask. A model that serves no decision cannot be judged.
 
 ## 2. Price the errors
@@ -39,11 +41,11 @@ When the costs are unknown, assume a ratio, set the operating point from it, sho
 Every product already decides somehow: by hand, with a rule, with a formula, or with an older model. That is the baseline, and its number is the bar.
 
 1. If a rule or system exists, score it on recent data, in the decision's unit.
-2. If people decide by hand, write the simplest rule a person would use (a cutoff on one field, a lookup table, most popular first) and score that.
+2. If people decide by hand, write the simplest rule a person would use (a cutoff on one field, a lookup table, most popular first) and score that. [reference/framings.md](reference/framings.md) lists rules that are hard to beat for common problems.
 3. Add the trivial baselines at the same operating point: the majority class, and random choice at the same capacity.
 4. Score every baseline on the same rows, held out by time, that the model will later be scored on.
 
-A rule that ships today is also the fallback when the model fails, and the logging that collects the labels the model will need.
+A rule that ships today is also the fallback when the model fails, and the logging that collects the labels the model will need. Written as labelling functions, the same rules can produce the first labels (`building-datasets`, reference/labels.md).
 
 ## 4. Write the metric ladder
 
@@ -53,12 +55,14 @@ Connect the number training will move to the number the business cares about:
 
 For example: retention → share of orders arriving within the promised window → "where is my order" tickets → pinball loss at the 80th percentile on held-out orders. Training moves the bottom rung. If moving it cannot move the top, the objective is wrong; fix it here, not after launch.
 
+When stakeholders want different top rungs (conversion or revenue; this session or the customer's next year), do not optimize a blend nobody chose. The owner picks the rung the model is judged on and the period it is measured over; the others become guardrails. Write both down.
+
 ## 5. Make the case
 
 A gain over the rule is worth building only if it pays for the model, every month. Put numbers on both sides, in money:
 
-- **Value:** decisions per month × the gain over the rule per decision × what one unit of the decision is worth. The gain is an assumption until evaluation: give a range. For a classifier, the ceiling is the rule's error cost per month; a perfect model saves no more.
-- **Build, once:** engineer weeks at the team's loaded cost, labels, the data pipeline, the launch.
+- **Value:** decisions per month × the gain over the rule per decision × what one unit of the decision is worth. Count only the decisions the model would change: a model for one category or one market moves only its share. The gain is an assumption until evaluation: give a range. For a classifier, the ceiling is the rule's error cost per month; a perfect model saves no more.
+- **Build, once:** engineer weeks at the team's loaded cost, labels, the data pipeline, the launch. A timebox is a stretch goal, not an estimate: multiply it by 1.5 to 3.
 - **Run, every month:** upkeep (a share of an engineer for on-call, monitors and retrain reviews), pipelines and feature storage, and training compute (cost per run, searches included, times runs per month).
 - **Per decision:** serving compute (online serving is sized for peak traffic), paid calls, and human work each prediction triggers that the error costs do not already count.
 - **Latency:** a model inside a user-facing request slows every request, and slower pages lose users, including on requests the model gets right. Price it as the product metric lost per 100 ms (from a slowdown test, or an assumption marked as one) times the delay the model adds. Batch serving adds none.
@@ -71,17 +75,17 @@ Take prices from the team's own bill and history; when a number is unknown, assu
 
 Build a model when all of these hold:
 
-- The rule would need too many cases, or cases too fuzzy, to write by hand.
+- The rule would need too many cases, or cases too fuzzy, to write by hand, or it already has so many that changing one breaks another.
 - The patterns shift, so a hand-written rule goes stale.
 - Mistakes are tolerable or caught downstream.
-- Labels exist, or the product can start collecting them.
+- Labels exist and a small set labelled by hand agrees with them, or the product can start collecting them.
 - The expected gain clears the break-even gain, and the build pays back well before the product stops making this decision this way.
 
 Then write one of three outcomes:
 
 - **The rule ships.** The rule is good enough, or the expected gain sits below the break-even gain or only clears it at the top of its range. Write the rule's expected performance and the case, and stop. Revisit when labels accumulate, costs fall, or the rule needs exceptions.
-- **Build a model.** Name the break-even gain it must clear over the rule, in the decision's unit. Unless the model is small, the next step is a design doc reviewed before building (`writing-design-docs`).
-- **Not now.** There is no label and no way to collect one, or the data holds no signal. Say what would change that.
+- **Build a model.** Name the break-even gain it must clear over the rule, in the decision's unit. Consider keeping the rule in front, settling the cases it is sure of, with the model deciding only the rest: a cascade costs less to run (`launching-models`, reference/serving.md). Unless the model is small, the next step is a design doc reviewed before building (`writing-design-docs`).
+- **Not now.** There is no label and no way to collect one, or the data holds no signal. Check every source of labels before settling on it: user reports, an existing system, annotators, a rule that is right when it fires (`building-datasets`, reference/labels.md). Say what would change the answer.
 
 ## Write it down
 
@@ -98,5 +102,6 @@ Lead with the outcome in one line: the rule ships, build a model, or not now, an
 - A rule that already meets the need.
 - A request to "just train something" on a table before anyone has said what the prediction will change.
 - A model on a busy user-facing path, with nobody able to say what its latency costs.
+- A use of the prediction that works against the people it scores: an insurer asking which customers will stay healthy, so it can sell to them and avoid the rest.
 
-For worked framings of common product models (content moderation, claims investigation, lead scoring, delivery estimates, search ranking) and the questions to ask the threshold owner, read [reference/framings.md](reference/framings.md).
+For worked framings of common product models (content moderation, claims investigation, lead scoring, delivery estimates, search ranking), other framings of the same decision, rules that are hard to beat, and the questions to ask the threshold owner, read [reference/framings.md](reference/framings.md).

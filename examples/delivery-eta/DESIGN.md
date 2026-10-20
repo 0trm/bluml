@@ -38,7 +38,7 @@ A regression of minutes from checkout to delivery, trained with a quantile (pinb
 
 ### 5.2 Data
 
-Orders from March to July (about 5 million), one row per order at checkout. Label: delivery minutes, known within the hour; cancelled orders (4%) have none and are counted separately. Restaurant queue and idle couriers have no history before July: the data platform logs them at serving time from July 1, and until then a daily approximation is used for prototyping only.
+Orders from March to July (about 5 million), one row per order at checkout. Label: delivery minutes, from the order system's checkout time to the courier app's drop-off time, known within the hour and final once recorded; cancelled orders (4%) have none and are counted separately. Restaurant queue and idle couriers have no history before July: the data platform logs them at serving time from July 1, and until then a daily approximation is used for prototyping only.
 
 ### 5.3 Techniques
 
@@ -50,7 +50,7 @@ Train on March to July, validate on August, test once on September, by checkout 
 
 ### 5.5 Humans in the loop
 
-Operations can pad estimates for a city during an event (a match, a storm) from the admin panel; padded orders are flagged and left out of training.
+Operations can pad estimates for a city during an event (a match, a storm) from the admin panel; padded orders are flagged and left out of training. One business rule sits on top of the model: the window is rounded to 5 minutes and never starts below 15 (owner: Marc). Support agents see an order's main inputs (queue, distance, idle couriers) next to its estimate, so they can explain a late one to the customer.
 
 ## 6. Implementation
 

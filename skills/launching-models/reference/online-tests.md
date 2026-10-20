@@ -42,6 +42,8 @@ users, where σ is the metric's standard deviation per user and δ the minimum e
 
 Report the primary metric's difference with its interval, the guardrails, and the sample ratio. Check novelty: compare the first and last week. Then follow the decision rule as written. A model that wins on its proxy and loses on the product metric loses (Rules of ML #39: launch decisions are a proxy for long-term goals, and a refused launch sends the objective back to framing).
 
+Write the offline gain next to the online effect, test after test. An offline metric that predicts online results makes every later decision cheaper; one that stops predicting them needs fixing (the metric, the split, or a counterfactual estimate, in `building-datasets`, reference/product-bias.md) before the next offline win is trusted.
+
 ## Interleaving for rankers
 
 For each request, merge the two rankings into one list (team-draft interleaving) and credit each click to the ranking that contributed the item. Preference shows within each request, so it needs far less traffic than an A/B test. It says which ranking users prefer, not by how much the business metric moves; follow a decisive interleaving result with an A/B test when the size of the effect matters.

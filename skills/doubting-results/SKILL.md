@@ -1,6 +1,6 @@
 ---
 name: doubting-results
-description: Checks a model result before it is reported, compared or acted on. Catches scores too good to be true, leaked features, shuffled time splits, a test set used more than once, metrics computed on training data, comparisons on different rows or at different thresholds, accuracy on rare positives, missing intervals and slices too small to judge. Use before writing any model metric into an answer, a MODEL.md, a launch plan or a report; whenever a result beats expectations; and whenever someone else's offline number is offered as the reason to ship or to retrain.
+description: Checks a model result before it is reported, compared or acted on. Catches scores too good to be true, leaked features, shuffled time splits, a test set used more than once, metrics computed on training data, comparisons on different rows or at different thresholds, accuracy on rare positives, missing intervals, slices too small to judge, and labels written by a rule or by the model itself. Use before writing any model metric into an answer, a MODEL.md, a launch plan or a report; whenever a result beats expectations; and whenever someone else's offline number is offered as the reason to ship or to retrain.
 ---
 
 # Doubting results
@@ -23,7 +23,9 @@ A good number is a claim, and in product ML the claims that fail are the ones no
 
 7. **Does the data mean what the code assumes?** Read ten raw rows. Check units, codes that read as missing values (a literal "NA" or "None" parsed as null), labels still maturing in the latest period, and rows that exist only because the old system acted on them.
 
-8. **Will it hold live?** Is each feature computed the same way in serving? Do the logged clicks or outcomes reflect what the current system chose to show? An offline result on logs the current system produced favours the current system.
+8. **Will it hold live?** Is each feature computed the same way in serving? Do the logged clicks or outcomes reflect what the current system chose to show? An offline result on logs the current system produced favours the current system. Have the team's past offline gains held up in online tests? If nobody has checked, or they have not, an offline win is weak evidence.
+
+9. **Who wrote the labels?** Labels written by a rule or a model (weak labels, pseudo-labels, a filter's past verdicts) agree with whatever wrote them. Scored on them, that rule looks perfect, and a model looks good for copying it. Evaluate on labels people checked.
 
 ## Report the checks
 
@@ -36,6 +38,8 @@ difference +1.1 to +4.0 won deals a month; June deals may still be open.
 ```
 
 When a check fails, say so first, before the number, and say what it changes: "The 0.97 AUC comes from `last_stage_reached`, which the CRM overwrites when a deal closes; without it the model scores 0.74 on the latest quarter."
+
+When a number will decide a launch, have a colleague review the method the way code is reviewed, with these checks in hand: features that will not exist at prediction time, the split, and the ceiling the training rows put on the result. The author is the person least likely to see their own leak.
 
 ## When the number is someone else's
 

@@ -36,7 +36,7 @@
 
 ### 5.2 Data
 
-{Training data and the entities in it; the label, its window and its delay; the inputs available at serving time; what the current product put in the labels.}
+{Training data and the entities in it; the label, where it comes from, its window and its delay, and whether it changes after it is recorded; the inputs available at serving time; what the current product put in the labels.}
 
 ### 5.3 Techniques
 
@@ -48,7 +48,7 @@
 
 ### 5.5 Humans in the loop
 
-{Overrides, exclusion lists, review above a value or below a confidence, how people's corrections become labels.}
+{Overrides, exclusion lists, review above a value or below a confidence, how people's corrections become labels. The business rules applied on top of the model's output, each with an owner. The tools support staff use to act on or explain a single prediction.}
 
 ## 6. Implementation
 
@@ -58,7 +58,7 @@
 
 ### 6.2 Serving, scale and performance
 
-{Batch or online, the fallback, throughput and latency targets and how they are met (precomputation, caching), scaling.}
+{Batch or online and why; any cheaper stage in front of the model (the rule settling the cases it is sure of); the fallback; throughput and latency targets and how they are met (precomputation, caching); scaling.}
 
 ### 6.3 Security and data privacy
 
@@ -74,7 +74,7 @@
 
 ### 6.6 Integration points
 
-{The API (inputs, outputs, errors), upstream data owners, downstream consumers.}
+{The API (inputs, outputs, errors), upstream data owners, downstream consumers, and what each team delivers to the next (a table refreshed by a set hour, a service behind an API).}
 
 ### 6.7 Rollout and rollback
 

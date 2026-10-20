@@ -1,6 +1,6 @@
 ---
 name: training-models
-description: Trains a product model the way a production ML engineer would. Baselines first, then the simplest model that can beat them, debugged before tuned, tuned on validation rows only, with every run recorded so it can be rebuilt. Use when fitting, comparing or tuning models, choosing an algorithm, when a loss will not settle or a model will not beat a simple baseline, when a training result looks too good, or before reporting any model as the best one.
+description: Trains a product model the way a production ML engineer would. Baselines first, then the simplest model that can beat them, debugged before tuned, tuned on validation rows only, with every run recorded so it can be rebuilt. Use when fitting, comparing or tuning models, choosing an algorithm, when a loss will not settle or a model will not beat a simple baseline, when deciding whether more data or more tuning will help, when a training result looks too good, or before reporting any model as the best one.
 ---
 
 # Training models
@@ -25,8 +25,10 @@ The simple model also tests the pipeline: if it cannot beat the trivial baseline
 - **Small data, or a model people must read:** a regularized linear model; it is also easier to calibrate and debug (Rules of ML #14).
 - **Text, images, audio:** start from pretrained embeddings or a pretrained model; train a deep network from scratch only with a great deal of data.
 - **Forecasts with asymmetric costs:** a quantile loss at the quantile the product will promise, not squared error.
+- **Many classes, some rare:** one binary classifier per class tends to beat a single multi-class model and is easier to calibrate, and a new class is one more model rather than a retrain. The cost is more models to run and monitor.
+- **Rows from segments that differ in kind** (stores, regions, clinics): compare one model per segment with one pooled model on the same validation rows. Neither wins by default.
 
-Add complexity only when it beats the simpler model by more than the difference between validation folds. A model that is better by noise is worse in production, because it costs more to run and explain.
+Add complexity only when it beats the simpler model by more than the difference between validation folds. A model that is better by noise is worse in production, because it costs more to run and explain. Complex work looks like more effort and earns more credit; neither is a reason to ship it.
 
 ## 3. Debug before tuning
 
@@ -40,6 +42,7 @@ Add complexity only when it beats the simpler model by more than the difference 
 ## 4. Tune on validation only
 
 - Tune on the validation window, or with rolling time-ordered folds; never on test.
+- Before a long search, find the ceiling. Let the model overfit and score it on its own training rows: if even that does not beat the rule by the break-even gain, these features cannot get there, and the fix is new signal or a new framing, not tuning (a high score here proves little). Then train on a quarter, half and all of the rows and score each on the same validation rows: a curve still rising means more data will help; a flat one means it won't.
 - Search a few parameters that matter (tree depth, learning rate, number of trees, regularization) over a small grid or random search, not everything.
 - Keep every trial: parameters, validation result at the operating point, seed.
 - Stop when the best trials differ by less than the variation between folds or seeds.
@@ -50,11 +53,13 @@ If the Decision section sets the threshold from costs, or the product multiplies
 
 ## 6. Record every run
 
-A run is reproducible when its record names the code version, the data version (a hash or snapshot id of the training table), the parameters, the seed, the validation result at the operating point, and where the model file is. Use the team's tracker (MLflow, Weights & Biases, a CSV) and put the run id in `MODEL.md`. A number from a run nobody can rebuild is not evidence. Metrics computed on training data, such as some autologged ones, describe the fit, not the model's quality. [reference/run-records.md](reference/run-records.md) shows a minimal record and the MLflow version of it.
+A run is reproducible when its record names the code version, the data version (a hash or snapshot id of the training table, and the period it covers), the parameters, the seed, the operating point (the threshold or k), the validation result there, and where the model file is. Use the team's tracker (MLflow, Weights & Biases, a CSV) and put the run id in `MODEL.md`. A number from a run nobody can rebuild is not evidence. Metrics computed on training data, such as some autologged ones, describe the fit, not the model's quality. [reference/run-records.md](reference/run-records.md) shows a minimal record and the MLflow version of it.
 
 ## 7. Choose
 
-Pick the simplest model within noise of the best one, and confirm it beats the rule at the operating point on validation by more than it costs to build, serve and maintain. Write the comparison table in the Training section of `MODEL.md` (baselines and candidates, same rows, same unit), tick the gate items that hold, set the stage to evaluation, and hand over to `evaluating-models`. Do not touch the test window here.
+Pick the simplest model within noise of the best one, and confirm it beats the rule at the operating point on validation by more than it costs to build, serve and maintain. Write the comparison table and the ceiling in the Training section of `MODEL.md` (baselines and candidates, same rows, same unit), tick the gate items that hold, set the stage to evaluation, and hand over to `evaluating-models`. Do not touch the test window here.
+
+Before the handover, ask a colleague to review the method the way code is reviewed: any feature that will not exist at prediction time, a split that lets the future in, and the ceiling. These mistakes stay hidden until late unless someone else looks. `doubting-results` lists the checks.
 
 ## Stop signs
 

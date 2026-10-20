@@ -37,7 +37,7 @@ Check the operating point against capacity: a policy that multiplies the review 
 
 ## 2. Compare with the rule, in the decision's unit
 
-Score the model and the rule on the same rows, at their operating points, in the unit from the Decision section: euros, deals won per 40 demos, posts wrongly removed per thousand, minutes late. Give a paired interval for the difference.
+Score the model and the rule on the same rows, at their operating points, in the unit from the Decision section: euros, deals won per 40 demos, posts wrongly removed per thousand, minutes late. Give a paired interval for the difference. When business rules run on top of the model's output (diversity, exclusions, caps), apply them before scoring: the product shows what comes out of the rules.
 
 ```bash
 python scripts/slices.py test_scored.csv --label y --decision model_flag --baseline rule_flag --by segment country --metric cost --cost-act 40 --cost-fn-col claim_amount
@@ -49,7 +49,7 @@ python scripts/slices.py test_scored.csv --label y --decision model_flag --basel
 
 An average hides the users who complain. Slice by what the product cares about: new and returning users, platform, country, plan, price band, entities absent from training, and any group named in the product's fairness commitments. For each slice, report rows, positives, model, rule and the interval of the difference.
 
-- A slice where the model loses to the rule needs its own policy: keep the rule there, a separate threshold, or more data for that group. Do not average it away.
+- A slice where the model loses to the rule needs its own policy: keep the rule there, a separate threshold, a separate model compared with the pooled one, or more data for that group. Do not average it away.
 - A slice with fewer than about 30 positives is too small to judge; say so instead of reading its number.
 - Check the model's own ranking quality per slice too (AUC or the ranking metric), not only the policy's result. A policy can beat the rule on a slice where the model barely ranks, carried by another signal such as the amount; name such slices as weaknesses to fix.
 - With many slices, some will move by chance. Trust a slice result when it is large, when its interval excludes zero, and when it has a plausible cause, such as missing history for new customers.
@@ -61,7 +61,7 @@ Fairness checks (demographic parity, equality of opportunity) are in [reference/
 1. Sample 50 to 100 errors from validation, both kinds.
 2. Tag each with a cause: label noise, missing information, a slice, a feature bug, a genuinely hard case.
 3. Count the tags. Prioritize by share of errors times how far that group is from the best achievable (the rule, human agreement, or the label-noise ceiling).
-4. Decide whether the fix is data (more examples of a slice, cleaner labels, a new signal) or model. In product work it is usually data (Rules of ML #26, #41).
+4. Decide whether the fix is data (more examples of a slice, cleaner labels, a new signal) or model. In product work it is usually data (Rules of ML #26, #41). For more examples of a slice, label the items most like its errors rather than random rows.
 
 [reference/error-analysis.md](reference/error-analysis.md) has a worked tagging table.
 

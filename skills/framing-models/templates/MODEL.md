@@ -38,7 +38,7 @@ Gate:
 ## 3. Data
 
 - **Row:** {one row per entity per prediction time}
-- **Label:** {the event, its window after the prediction time, when it becomes known, and the rows it is missing for}
+- **Label:** {the event, its window after the prediction time, when it becomes known and when it stops changing, and the rows it is missing for}
 - **Split:** {train, validation and test windows, and why they mirror serving}
 
 | Feature | As of | Source | Note |
@@ -47,12 +47,13 @@ Gate:
 
 - **Leak screen:** {result, and what was dropped}
 - **What the product put in the labels:** {what the current system showed or did that shaped who has a label}
-- **Label quality:** {audit sample size and agreement}
+- **Label source and quality:** {where labels come from (user reports, an existing system, annotators, rules); audit sample size; agreement between labellers}
 
 Gate:
 - [ ] Every feature exists, with this value, at prediction time
 - [ ] The leak screen ran and every flag is explained
 - [ ] The split mirrors serving, and training and serving build features with the same code
+- [ ] Labels come from a named source, and a sample checked by hand agrees with them
 
 ## 4. Training
 
@@ -60,6 +61,7 @@ Gate:
 |---|---|---|---|---|
 | {run id} | {baseline: base rate, the rule, a simple model} | {hash or snapshot} | {metric at the operating point} | |
 
+- **Ceiling:** {the score when the model is fit and scored on its own training rows, and whether the learning curve still rises; against the break-even gain}
 - **Chosen:** {run id, and why it beats the simpler ones by enough to be worth it}
 
 Gate:
@@ -86,7 +88,7 @@ Gate:
 - **Serving:** {batch or online, latency budget and the latency measured on the serving path, compute cost per month, the fallback when the model or a feature fails}
 - **Input contract:** {each input with its unit and range, checked at the service}
 - **Rollout:** {shadow, then canary, then the online test, then everyone; each step's pass and stop conditions, and its result}
-- **Online test:** {primary metric, guardrails, duration, decision rule against the break-even gain, written before it starts}
+- **Online test:** {primary metric, guardrails, duration, decision rule against the break-even gain, written before it starts; the result next to the offline gain that predicted it}
 - **Rollback:** {how to switch back without a code change, what triggers it, when it was rehearsed}
 
 Gate:
@@ -101,6 +103,7 @@ Gate:
 | {name} | {system, inputs, outputs or outcomes} | {condition} | {who is paged} |
 
 - **Freshness:** {how fast performance decays with model age, and the retrain schedule it sets}
+- **Retrain gate:** {the newest days held out; the checks against the live model and a naive baseline; the operating point re-chosen from the owner's requirement; a failed check keeps the live model}
 - **The case, live:** {net value per month from the online effect and the actual bill; date checked and next check; retire to the rule when it turns negative}
 - **Incidents:** {date, cause, fix, the monitor added; one line each}
 

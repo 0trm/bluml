@@ -18,7 +18,7 @@ A split is a rehearsal of deployment: the model trains on what it would have kno
 | Scores known entities again over time (accounts each month, users each visit) | By time: train, then validation, then test, in order |
 | Mostly scores entities it has never seen (new restaurants, new items, first-time users) | By time, and also by entity: hold out entities absent from training, and report them separately |
 | Has little data and a long history | Rolling backtest (below) instead of one cut |
-| Rows truly independent and stationary (rare: a fixed benchmark, lab measurements) | A shuffle is acceptable; write down why |
+| Rows truly independent and stationary (rare: a fixed benchmark, lab measurements, a product's category read from its title) | A shuffle is acceptable; write down why |
 
 Keep three parts. Validation is for every choice (features, model, hyperparameters, threshold); test is used once, at the end, to report. When test numbers start steering choices, test has become validation: say so and cut a new test window.
 
@@ -34,7 +34,7 @@ For small tables or seasonal products, repeat the cut: train up to month t, test
 
 ## Entity holdouts
 
-When entities recur across rows, a time split still lets the model memorize an entity's history. That is right when the product will score that entity again. When it mostly will not, hold out entities: group the split by entity id, so no entity has rows on both sides, and compare results on held-out entities with results on returning ones.
+When entities recur across rows (a patient's visits, a customer's months), a random split lets an entity's later rows predict its earlier ones. A time split avoids that, but still lets the model memorize an entity's history. That is right when the product will score that entity again. When it mostly will not, hold out entities: group the split by entity id, so no entity has rows on both sides, and compare results on held-out entities with results on returning ones.
 
 ## Class balance
 
@@ -43,3 +43,5 @@ Validation and test keep the real class rate; the operating point and every metr
 ## When shuffling is fine
 
 The Machine Learning Crash Course shuffles before dividing data, and its own conditions for that are the right test: examples drawn independently and identically, from a distribution that does not change, the same across partitions. Product data rarely meets them. If the positive rate, the feature distributions or the mix of entities change over time, split by time.
+
+The exception that does occur in products is a link between inputs and label that holds over time, such as a product's category read from its title, description or image: there a shuffle and a time split give about the same answer. Check it by running both; if they differ, split by time.

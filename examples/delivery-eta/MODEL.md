@@ -6,7 +6,7 @@ Predicts how long an order will take to arrive, to show "arrives in 25 to 35 min
 
 | Stage | Owner | Threshold owner | Updated |
 |---|---|---|---|
-| live | Ana (ML engineer) | Marc (product manager, checkout), with operations | 2026-09-28 |
+| live | Ana (ML engineer) | Marc (product manager, checkout), with operations | 2026-10-12 |
 
 Stages run framing, design, data, training, evaluation, launch, live, retired. Each section ends at a gate; a stage starts only when the gate before it is ticked, with the evidence linked. When work loops back, set the stage back and say why in the log.
 
@@ -40,7 +40,7 @@ Gate:
 ## 3. Data
 
 - **Row:** one order at checkout.
-- **Label:** minutes from checkout to delivery. Known within the hour. Missing for cancelled orders (4%), which cluster when things go badly; they are kept as a separate count and checked in every slice.
+- **Label:** minutes from checkout to delivery. Known within the hour and final once recorded. Missing for cancelled orders (4%), which cluster when things go badly; they are kept as a separate count and checked in every slice.
 - **Split:** train March to July, validate August, test September, by checkout time; restaurants that joined after July are reported separately.
 
 | Feature | As of | Source | Note |
@@ -53,12 +53,13 @@ Gate:
 
 - **Leak screen:** `courier_id`, `actual_prep_minutes` and `wait_at_restaurant` dropped: all written after checkout. No other flags.
 - **What the product put in the labels:** the promise itself changes behaviour: optimistic promises bring order surges that slow couriers. Measured in the online test, not offline.
-- **Label quality:** 200 orders checked against courier GPS; 3 timestamps wrong, from manual completions.
+- **Label source and quality:** checkout time from the order system, drop-off time from the courier app. 200 orders checked against courier GPS; 3 timestamps wrong, from manual completions.
 
 Gate:
 - [x] Every feature exists, with this value, at prediction time
 - [x] The leak screen ran and every flag is explained
 - [x] The split mirrors serving, and training and serving build features with the same code
+- [x] Labels come from a named source, and a sample checked by hand agrees with them (197 of 200 against GPS)
 
 ## 4. Training
 
@@ -68,6 +69,7 @@ Gate:
 | r02 | Linear quantile regression, 5 features | orders-0731 | pinball@0.8 5.6; on time 78% | Simple model |
 | r07 | Gradient-boosted trees, quantile loss at 0.8 | orders-0731 | pinball@0.8 4.8; on time 80% | Chosen |
 
+- **Ceiling:** fit and scored on its own training rows, r07 is on time for 86%, well past the rule plus the 1-point break-even. Trained on the latest half of the months, it scores pinball@0.8 5.1 on validation, against 4.8 on all five: more data still helps.
 - **Chosen:** r07. It beats the linear model by more than the spread across weekly folds (0.3), and both beat the rule.
 
 Gate:
@@ -94,7 +96,7 @@ Gate:
 - **Serving:** online, inside a 60 ms budget; 20 ms added at the median on the serving path; €1,400 a month to serve and cache features. The rule is the fallback when a live feature times out (0.4% of requests in shadow).
 - **Input contract:** distance 0 to 25 km, queue 0 to 60 orders, prep median 3 to 90 minutes; violations go to the fallback and are counted.
 - **Rollout:** shadow for 7 days (served features and scores matched offline to rounding); canary on 2% for 2 days; online test for 4 weeks; everyone from 2026-09-28.
-- **Online test:** arms P70, P80 and P90 against the rule, randomized by customer. Primary metric: repeat orders at 30 days. Guardrails: checkout conversion, cancellations, tickets. Tickets avoided already pay for the model, so the bar for repeat orders is no loss, not a gain. Decision rule written 2026-08-25: ship the arm with the highest repeat rate whose conversion is within 1% of the rule's. Result: P80 shipped (repeat orders +2.1%, interval +0.6 to +3.6; conversion -0.4%).
+- **Online test:** arms P70, P80 and P90 against the rule, randomized by customer. Primary metric: repeat orders at 30 days. Guardrails: checkout conversion, cancellations, tickets. Tickets avoided already pay for the model, so the bar for repeat orders is no loss, not a gain. Decision rule written 2026-08-25: ship the arm with the highest repeat rate whose conversion is within 1% of the rule's. Result: P80 shipped (repeat orders +2.1%, interval +0.6 to +3.6; conversion -0.4%). Offline it gained 9 points on time; in the test it gained 8 (79% against 71%).
 - **Rollback:** a config flag selects the rule or the model version; rehearsed 2026-08-27; triggered by p99 latency above 60 ms for 10 minutes or a fallback rate above 5%.
 
 Gate:
@@ -112,11 +114,13 @@ Gate:
 | On-time rate by city, daily | Outcomes | Below 75% for two days | Marc |
 
 - **Freshness:** on-time rate falls about 1 point a month as restaurants change; retrained monthly on the latest four months, each version through shadow before it replaces the live one.
+- **Retrain gate:** each monthly version trains without the newest 7 days, then must beat the live model and the rule on them; estimates that move more than 5 minutes from the live model's on over 1% of orders stop the release until explained; the quantile is re-checked so that 80% of those orders fall inside the promise. The October version passed on 2026-10-12.
 - **The case, live:** checked 2026-09-28 with the online test's effects. Repeat orders +2.1% (about 25,000 orders a month, €63,000 at €2.50 margin) and tickets avoided (about €54,000), against conversion -0.4% (-€12,000; this holds the latency's cost and the longer promises together, so the latency estimate is dropped) and €4,850 of monthly cost: about €100,000 a month net. Next check 2026-12-28, or when the serving bill changes.
 - **Incidents:** 2026-10-04: a new city launched with no prep history; promises were the rule's for two weeks as designed; added a monitor for share of fallback estimates by city.
 
 ## Log
 
+- 2026-05-26: the request was to rank restaurants with faster deliveries higher in the app. Asked why: late orders drive tickets. The problem is the promise at checkout, so this is a delivery estimate, not a ranking.
 - 2026-06-02: framed with Marc; late costs more than early, so the model predicts a quantile. The case breaks even at 1 point of on-time rate and pays back in under a month.
 - 2026-06-16: design review passed; online serving with the rule as fallback.
 - 2026-07-30: dropped three post-checkout fields flagged by the leak screen.

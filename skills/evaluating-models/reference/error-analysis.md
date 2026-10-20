@@ -33,6 +33,13 @@ The largest group is label disagreement, which no model fixes; the next two are 
 
 Rules of ML #26: look for patterns in the errors and turn them into features. #41: on a plateau, add a new source of information rather than refining the existing ones.
 
+## Getting more of the right data
+
+- **Label the near neighbours of the errors.** Find the items most similar to the misclassified ones (by embedding or edit distance) and send those for labelling, rather than random rows; a person confirms each before it joins the training set.
+- **Mine hard negatives.** Collect the items the model gets wrong or is unsure of, and their look-alikes, and weight them up in the next training run. Mix them with easy ones: hard ones alone can do no better than random (`building-datasets`, reference/labels.md).
+- **Check that more rows will help at all.** A learning curve that has flattened says the gain lies in new signal or cleaner labels, not volume (`training-models`, reference/debugging.md).
+- **Try a model for the segment.** When the errors sit in a segment that differs in kind (a store type, a region), compare a model trained on it alone with the pooled model, on the same rows.
+
 ## Writing it down
 
 Put the tag table, or its top three rows, under "Errors left" in the Evaluation section of `MODEL.md`, with the fix chosen for each.

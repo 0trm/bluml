@@ -21,6 +21,8 @@ Compare, per request, over at least a full weekly cycle:
 
 Shadow is the cheapest step in the ladder and the one most often skipped.
 
+Shadow every retrained version too, not only the first launch, and for longer after a change of model family (trees to a neural network). It shows whether the version is ready to run (latency, stability, error rate) and how its live predictions lean: more false positives, or more false negatives.
+
 ## Canary
 
 Route 1 to 5% of traffic to the new model and watch system health and guardrails for hours to days. A canary detects breakage, not improvement: it is too small and too short to measure the product metric.
@@ -43,3 +45,5 @@ Partial automation is often the right end state for decisions with costly errors
 ## Keeping the old model warm
 
 Until the new model has passed its online test and run clean for a while, the old one stays deployed, loaded and selectable by configuration or alias. A rollback that needs a build, a retrain or a person who knows the code is not a rollback.
+
+Keep several past versions deployable, not only the last: a problem can surface a release or two late. Yan keeps the images of seven or more past releases when resources allow. Easy rollback is also what makes frequent releases safe: a release that breaks at night is reverted at once and fixed in the morning.

@@ -1,6 +1,6 @@
 ---
 name: monitoring-models
-description: Keeps a live model honest. Sets monitors on system health, inputs, outputs and outcomes, decides how fresh the model must stay, and when a live number moves, finds the cause before choosing the fix (leave it, repair the input, align training and serving, retrain on clean data, or roll back), then writes the incident down. Use when a live model's metric, click rate, flag rate or scores change, when someone asks to retrain or redeploy because results got worse, when inputs or predictions drift, when serving and training scores disagree, when setting up monitoring or alerts for a model, when deciding how often to retrain, or when asking whether a live model still pays for itself or should be retired.
+description: Keeps a live model honest. Sets monitors on system health, inputs, outputs and outcomes, decides how fresh the model must stay, and when a live number moves, finds the cause before choosing the fix (leave it, repair the input, align training and serving, retrain on clean data, or roll back), then writes the incident down. Use when a live model's metric, click rate, flag rate or scores change, when someone asks to retrain or redeploy because results got worse, when inputs or predictions drift, when serving and training scores disagree, when setting up monitoring or alerts for a model, when deciding how often to retrain or whether a retrained version may replace the live one, or when asking whether a live model still pays for itself or should be retired.
 ---
 
 # Monitoring models
@@ -14,11 +14,11 @@ Read `MODEL.md` first: the Launch section says what was launched and with which 
 | Layer | Watch | Catches |
 |---|---|---|
 | System | Latency, errors, throughput, fallback rate | A broken service |
-| Inputs | Schema, missing rate, ranges, distribution against training, by segment (platform, app version, country, source) | Upstream changes, client bugs, unit changes, stale tables (Rules of ML #10) |
+| Inputs | Row counts, duplicate keys, schema, missing rate, ranges, category values, distribution against training, by segment (platform, app version, country, source) | Upstream changes, client bugs, unit changes, stale tables (Rules of ML #10) |
 | Outputs | Score distribution, share of rows acted on, mix of the top of the list | A model reacting to bad inputs, or a serving bug |
-| Outcomes | The label as it matures; the product metric | Real decay, and the world changing |
+| Outcomes | The label as it matures; the product metric; a reviewed sample of outputs; the share of decisions people override | Real decay, the world changing, and people working around a model they do not trust |
 
-Outcomes matter most and arrive last; inputs and outputs are the early warning. Every monitor has a threshold, an owner and a place in the Live section of `MODEL.md`. Segment the input checks: most pipeline bugs live in one platform, version or source and are diluted in the total.
+Outcomes matter most and arrive last; inputs and outputs are the early warning. Every monitor has a threshold, an owner and a place in the Live section of `MODEL.md`. Segment the input checks: most pipeline bugs live in one platform, version or source and are diluted in the total. When labels come late, or from the model's own decisions, have people review a small random sample of outputs (1 to 5%) every week or month, look for new kinds of error, and relabel what they find.
 
 To compare live rows with training rows:
 
@@ -26,21 +26,31 @@ To compare live rows with training rows:
 python scripts/drift.py training_sample.csv live.csv --by platform app_version --time ts --freq D
 ```
 
-`scripts/` is in this skill's directory: use its full path. Any Python with numpy and pandas runs it; `uv run` installs them if missing. It reports PSI, missing-rate changes, out-of-range values and unseen categories, overall, per segment and per day, with the first day each column moved. [reference/monitors.md](reference/monitors.md) explains the statistics and how to set thresholds without drowning in alerts.
+`scripts/` is in this skill's directory: use its full path. Any Python with numpy and pandas runs it; `uv run` installs them if missing. It reports PSI, missing-rate changes, out-of-range values and unseen categories, overall, per segment and per day, with the first day each column moved. It does not count rows or duplicate keys: check those where the data lands. [reference/monitors.md](reference/monitors.md) explains the statistics, output audits, and how to set thresholds without drowning in alerts.
 
 ## 2. Decide how fresh the model must stay
 
-Measure how quality decays with the model's age: train on data up to a date, score each following week, and plot the metric against weeks since training (Rules of ML #8). The retrain schedule comes from that curve, not from habit: retrain when the value lost to decay since the last version exceeds what a retrain costs in compute and review time. Every retrained version passes the same validation and launch checks before it replaces the live one.
+Measure how quality decays with the model's age: train on data up to a date, score each following week, and plot the metric against weeks since training (Rules of ML #8). The retrain schedule comes from that curve, not from habit: retrain when the value lost to decay since the last version exceeds what a retrain costs in compute and review time.
+
+Every retrained version passes a gate before it replaces the live one:
+
+1. Hold out the newest days (a week, more when data is thin) and train on the rest.
+2. Score the new version there against the live model and a naive baseline (the rule, yesterday's best sellers), at the operating point.
+3. Compare its predictions with the live model's, row by row. An item the live model ranked 10,000th and the new one ranks first is a question to answer before release.
+4. Re-choose the operating point from the owner's requirement (the cost ratio, the recall floor, the capacity). A threshold set on the old version's scores does not carry over to the new one.
+5. Any failed check stops the release, and the live model stays: a stale model beats a misbehaving one.
+
+If the recipe then retrains on all rows, the held-out days included, compare that version's predictions with the live model's again before it ships. Shadow it before it takes traffic.
 
 ## 3. When a number moves, find the cause first
 
-Do not retrain, redeploy or roll back until the cause is named with evidence. Work through these in order:
+Do not retrain, redeploy or roll back until the cause is named with evidence. One exception: when the move starts at a model release, roll back first. It is cheap, it stops the harm, and a recovery confirms the release as the cause; then find out why. A rollback does not fix a broken input, since the old model reads it too. Otherwise, work through these in order:
 
 1. **Is it real?** Logging or dashboard changes, late data, a holiday or a campaign, a change in the denominator.
 2. **When did it start?** Find the first bad day or hour.
 3. **Where is it?** Split the drop by segment and time: platform, app version, country, traffic source, model version. A drop concentrated in one segment is almost never the model's fault.
 4. **Which layer moved first?** Inputs moved: a pipeline, client or upstream change. Outputs moved with steady inputs: the model or its serving. Outcomes moved with steady inputs and outputs: the world or the product around the model.
-5. **What changed at that moment?** Releases, schema changes, upstream jobs, new data sources, pricing, campaigns.
+5. **What changed at that moment?** Releases, schema changes, upstream jobs, new data sources, pricing, campaigns, other models or widgets on the same page.
 
 Write the cause as one sentence with its evidence: "Since Monday 2 March the nightly job that refreshes `customer_history` has failed; history features for accounts created since then are missing and default to zero, and the model sends those accounts' returns to review at three times the usual rate."
 
@@ -61,11 +71,11 @@ When a request asks to retrain and the diagnosis points elsewhere, say so plainl
 
 ## 5. Watch for feedback loops
 
-When the model's actions shape its next training data (rankings decide what gets clicked, calls decide who stays), keep a small random or untreated slice, and watch the diversity of what the model shows and acts on. A loop shows as fewer distinct items on top, fresh items never rising, or a positive rate that drifts with no outside cause.
+When the model's actions shape its next training data (rankings decide what gets clicked, calls decide who stays), keep a small random or untreated slice (1% of traffic, or a few random items in each list), and watch the diversity of what the model shows and acts on. A loop shows as fewer distinct items on top, fresh items never rising, or a positive rate that drifts with no outside cause.
 
 ## 6. Keep the case current
 
-A model that paid at launch can stop paying: traffic falls, the bill grows, the rule gets better, the gain decays. Rerun the case in `MODEL.md` every quarter, and whenever the serving bill, the traffic or the rule changes, with live numbers: the online test's effect or a small holdout kept on the rule for the gain, the actual bill for compute, the latency measured on the serving path. Record the date and the result in the Live section. When net value turns negative (the live gain has fallen below the break-even gain), propose retiring the model to the rule: say so with the numbers, and on the owner's agreement set the stage to retired and write why in the log.
+A model that paid at launch can stop paying: traffic falls, the bill grows, the rule gets better, the gain decays. Rerun the case in `MODEL.md` every quarter, and whenever the serving bill, the traffic or the rule changes, with live numbers: the online test's effect or a small holdout kept on the rule for the gain, the actual bill for compute, the latency measured on the serving path. Record the date and the result in the Live section. When net value turns negative (the live gain has fallen below the break-even gain), propose retiring the model to the rule: say so with the numbers, and on the owner's agreement set the stage to retired and write why in the log. The same check prunes features: one that adds nothing on the newest window (permutation importance) still costs a pipeline, a monitor and a way to fail.
 
 ## 7. Write the incident down
 
@@ -78,3 +88,4 @@ For every incident, add one line to the Live section of `MODEL.md`: when it star
 - Inputs that changed at a release boundary.
 - A model with no input monitors, or monitors on the total only.
 - Training data for a retrain that includes the broken period.
+- A retrained version released without the gate, or with the old version's threshold.

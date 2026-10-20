@@ -9,6 +9,8 @@ Five product models framed the way the Decision section of `MODEL.md` asks. The 
 - Lead scoring
 - Delivery estimates
 - Search ranking
+- Other framings of the same decision
+- Rules that are hard to beat
 - Questions for the threshold owner
 
 ## Content moderation
@@ -84,6 +86,33 @@ The asymmetry points to a quantile loss, not squared error. Promising the median
 
 Clicks and purchases on a ranked list measure position as much as appeal, because the current order decides what could be clicked. Framing a ranker includes finding out whether any traffic is shown in random order: that traffic is the only unbiased evidence.
 
+## Other framings of the same decision
+
+The first framing proposed is rarely the only one, and the choice can matter more than the model. Name at least one alternative and say why it lost.
+
+| Decision | Framings |
+|---|---|
+| Stop fraud | Flag the fraudulent payments; clear the safe ones and send the rest to review; estimate the amount at risk rather than a yes or no |
+| Recommend videos | Predict the rating, the chance a video is played, or the minutes watched. Each is a different stand-in for "a good recommendation", and the choice moves the online test's result |
+| Moderate posts | Remove the harmful ones; or order the review queue so moderators see the likeliest harm first, within their capacity |
+
+## Rules that are hard to beat
+
+Simple rules are often hard to beat, for a fraction of the work. Score the one that fits before training anything.
+
+| Problem | Rule to try first |
+|---|---|
+| Recommendations | Last period's most popular items, overall or per category; items often bought or viewed together |
+| Classifying items by their text | Keyword or regular-expression rules on the title: a title with "ring" or "wedding band" files under rings |
+| Review or comment spam | Many posts from one address, posts at odd hours, near-copies of other posts from the same day |
+| Outliers | Values outside the interquartile range, per segment |
+| Forecasts | A moving average of recent periods, or the last value |
+| Matching names or addresses | A dictionary of known variants |
+
+The same rules, written as labelling functions that return a label or abstain, can produce the first labels when none exist (`building-datasets`, reference/labels.md).
+
+Move from the rule to a model when the rule works reasonably well but keeping it right costs more than a model would. The sign is a rule set nobody can change without breaking another rule. Labels you can trust come first: labels written by people who gain from a wrong answer (sellers filing products under the category with the lowest fee) teach the model their gaming, so check a sample by hand.
+
 ## Questions for the threshold owner
 
 1. What does the product do differently when the prediction says yes? What happens today instead?
@@ -92,3 +121,4 @@ Clicks and purchases on a ranked list measure position as much as appeal, becaus
 4. How do you decide today, and how well does that work? Is anyone keeping score?
 5. When do we learn whether a prediction was right, and from what record?
 6. What would make you turn the model off?
+7. If two goals pull apart (conversion and revenue, this session and the next year), which one decides, and over what period is it measured?
