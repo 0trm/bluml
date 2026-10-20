@@ -33,8 +33,8 @@ Every model gets one file, `MODEL.md`, next to its code. Each skill reads it fir
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/map-dark.svg">
-    <img src="docs/map-light.svg" width="816" alt="The bluML map, a flowchart in three phases. It starts at a request for a model. Design: the model is framed, then a decision: is a model worth it? If not, the rule ships. If so, design and data follow. Development: train and evaluate. Deployment: launch and monitor, then a decision: is the model still paying? If not, it is retired to the rule; if so, monitoring continues. Dashed arrows loop back: a rejected design and a lost online test return to framing, a model that loses to the rule returns to data, and a live model returns to training when the world moves and to data when an input breaks.">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/map-dark.png">
+    <img src="docs/map-light.png" width="816" alt="The bluML map, a flowchart in three phases. It starts at a request for a model. Design: the model is framed, then a decision: is a model worth it? If not, the rule ships. If so, design and data follow. Development: train and evaluate. Deployment: launch and monitor, then a decision: is the model still paying? If not, it is retired to the rule; if so, monitoring continues. Dashed arrows loop back: a rejected design and a lost online test return to framing, a model that loses to the rule returns to data, and a live model returns to training when the world moves and to data when an input breaks.">
   </picture>
 </p>
 
@@ -61,8 +61,8 @@ Seven requests with traps planted in synthetic data, each run three times with b
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/evals-dark.svg">
-    <img src="docs/evals-light.svg" width="816" alt="Paired bars of the eval scores with bluML and without it, for Sonnet and Opus. Where bluML helps: rule-first, fraud-threshold, design-doc and ctr-drop. Caught without it: ship-it, churn-leak and ranker-clicks, at 0.96 to 1.00 in every arm. Mean: Sonnet 0.77 without and 0.90 with; Opus 0.82 without and 0.99 with. The table below has every score.">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/evals-dark.png">
+    <img src="docs/evals-light.png" width="816" alt="Paired bars of the eval scores with bluML and without it, for Sonnet and Opus. Where bluML helps: rule-first, fraud-threshold, design-doc and ctr-drop. Caught without it: ship-it, churn-leak and ranker-clicks, at 0.96 to 1.00 in every arm. Mean: Sonnet 0.77 without and 0.90 with; Opus 0.82 without and 0.99 with. The table below has every score.">
   </picture>
 </p>
 

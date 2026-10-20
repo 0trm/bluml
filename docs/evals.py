@@ -1,7 +1,8 @@
 # %%
-"""Draws the README's eval scores as paired bars, in a light and a dark SVG.
+"""Draws the README's eval scores as paired bars, in a light and a dark SVG, and renders each
+to a PNG at twice the size for the README, since the GitHub mobile app shows no SVG.
 
-    python docs/evals.py
+    python docs/evals.py    # needs rsvg-convert (brew install librsvg)
 
 One panel per model and one row per case: a blue bar for the score with bluML over an empty
 frame for the score without, in the map's palette (docs/map.py). Grey bands split the cases
@@ -9,6 +10,7 @@ where bluML helps from those both arms already get right. The scores are the tab
 evals/README.md; when the evals run again, update SCORES and run this.
 """
 
+import subprocess
 from pathlib import Path
 
 OUT = Path(__file__).resolve().parent
@@ -142,5 +144,7 @@ for name, colors in THEMES.items():
         f'<title id="title">Does bluML help?</title>\n<desc id="desc">{DESC}</desc>\n'
         f'<rect width="100%" height="100%" fill="{{page}}"/>\n{body}\n</svg>\n'
     )
-    (OUT / f"evals-{name}.svg").write_text(svg.format(**colors))
-    print(OUT / f"evals-{name}.svg", W, HEIGHT)
+    path = OUT / f"evals-{name}.svg"
+    path.write_text(svg.format(**colors))
+    subprocess.run(["rsvg-convert", "--zoom", "2", str(path), "-o", str(path.with_suffix(".png"))], check=True)
+    print(path, W, HEIGHT)

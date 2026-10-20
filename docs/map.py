@@ -1,7 +1,8 @@
 # %%
-"""Draws the bluML map as a standard flowchart, in a light and a dark SVG.
+"""Draws the bluML map as a standard flowchart, in a light and a dark SVG, and renders each
+to a PNG at twice the size for the README, since the GitHub mobile app shows no SVG.
 
-    python docs/map.py
+    python docs/map.py    # needs rsvg-convert (brew install librsvg)
 
 The main path runs down one column: a start terminator, a box per stage, a diamond per
 decision, and an end terminator. Exits leave to the right; loops back are dashed and run
@@ -10,6 +11,7 @@ column group the stages into phases, labelled in a gutter on the left. Every coo
 is set here rather than by an automatic layout, which is what keeps the column straight.
 """
 
+import subprocess
 from pathlib import Path
 
 OUT = Path(__file__).resolve().parent
@@ -188,5 +190,7 @@ for name, colors in THEMES.items():
         f'<title id="title">The bluML map</title>\n<desc id="desc">{DESC}</desc>\n'
         f'{DEFS}\n<rect width="100%" height="100%" fill="{{page}}"/>\n{body}\n</svg>\n'
     )
-    (OUT / f"map-{name}.svg").write_text(svg.format(**colors))
-    print(OUT / f"map-{name}.svg", WIDTH, HEIGHT)
+    path = OUT / f"map-{name}.svg"
+    path.write_text(svg.format(**colors))
+    subprocess.run(["rsvg-convert", "--zoom", "2", str(path), "-o", str(path.with_suffix(".png"))], check=True)
+    print(path, WIDTH, HEIGHT)
