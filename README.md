@@ -56,7 +56,7 @@ Four skills carry tested Python checks, run by the agent rather than rewritten e
 Seven requests with traps planted in synthetic data, each run three times with bluML and three times without, and scored by an LLM judge against five or six criteria. A score is the weighted share of criteria met. Method, criteria and caveats: [evals/](evals/README.md).
 
 <p align="center">
-  <img src="docs/evals-light.png" width="816" alt="Paired bars of the eval scores with bluML and without it, for Sonnet and Opus. Where bluML helps: rule-first, fraud-threshold, design-doc and ctr-drop. Caught without it: ship-it, churn-leak and ranker-clicks, at 0.96 to 1.00 in every arm. Mean: Sonnet 0.77 without and 0.90 with; Opus 0.82 without and 0.99 with. The table below has every score.">
+  <img src="docs/evals-light.png" width="816" alt="Paired bars of the eval scores with bluML and without it, for Sonnet and Opus. Where bluML helps: rule-first, fraud-threshold, design-doc and ctr-drop. Caught without it: ship-it, churn-leak and ranker-clicks, at 0.88 to 1.00 in every arm. Mean: Sonnet 0.67 without and 0.92 with; Opus 0.84 without and 0.96 with. The table below has every score.">
 </p>
 
 <details>
@@ -64,18 +64,18 @@ Seven requests with traps planted in synthetic data, each run three times with b
 
 | Case | Sonnet with | without | Opus with | without |
 |---|---|---|---|---|
-| `design-doc` | 0.93 | 0.63 | 1.00 | 0.89 |
-| `rule-first` | 0.58 | 0.42 | 0.96 | 0.33 |
-| `churn-leak` | 1.00 | 1.00 | 1.00 | 1.00 |
-| `fraud-threshold` | 0.89 | 0.56 | 1.00 | 0.63 |
-| `ranker-clicks` | 0.96 | 0.96 | 0.96 | 1.00 |
-| `ship-it` | 1.00 | 0.96 | 1.00 | 1.00 |
-| `ctr-drop` | 0.96 | 0.88 | 1.00 | 0.88 |
-| **Mean** | **0.90** | **0.77** | **0.99** | **0.82** |
+| `design-doc` | 1.00 | 0.59 | 1.00 | 0.93 |
+| `rule-first` | 0.58 | 0.25 | 0.83 | 0.50 |
+| `churn-leak` | 1.00 | 0.92 | 1.00 | 1.00 |
+| `fraud-threshold` | 1.00 | 0.52 | 0.96 | 0.63 |
+| `ranker-clicks` | 0.92 | 0.96 | 1.00 | 1.00 |
+| `ship-it` | 1.00 | 0.88 | 1.00 | 0.96 |
+| `ctr-drop` | 0.96 | 0.58 | 0.96 | 0.88 |
+| **Mean** | **0.92** | **0.67** | **0.96** | **0.84** |
 
 </details>
 
-Without bluML, both models already catch the textbook traps: a backfilled column, position bias in clicks, prices sent in cents. What they skip is the product reasoning around the model. Neither compared the fraud model with the rule slice by slice, and neither noticed that it ranks new customers far worse (0 of 6 runs; 5 of 6 with bluML). Opus never weighed a ticket-routing model against the keyword rule that nearly matches it (0 of 3; 3 of 3), and none of Sonnet's design docs both put numbers on the requirements and questioned the brief's "updated live" (0 of 3; 3 of 3). One gap remains: Sonnet with bluML still skips the rule-against-model weighing in every run.
+Without bluML, both models already catch the textbook traps: a backfilled column, position bias in clicks, prices sent in cents. What they skip is the product reasoning around the model. Neither compared the fraud model with the rule slice by slice, and neither noticed that it ranks new customers far worse (0 of 6 runs; 6 of 6 with bluML). Sonnet never scored the keyword rule on the same held-out tickets as its ticket-routing model (0 of 3; 3 of 3), Opus seldom weighed the model against that rule, which nearly matches it (1 of 3; 3 of 3), and none of Sonnet's design docs set out a product metric, guardrails and an online test (0 of 3; 3 of 3). One gap remains: Sonnet with bluML still seldom weighs the model's small gain over the rule against the cost of running it (1 of 3), and never prices a misrouted ticket.
 
 ## Install
 

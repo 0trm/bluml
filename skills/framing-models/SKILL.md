@@ -47,6 +47,8 @@ Every product already decides somehow: by hand, with a rule, with a formula, or 
 
 A rule that ships today is also the fallback when the model fails, and the logging that collects the labels the model will need. Written as labelling functions, the same rules can produce the first labels (`building-datasets`, reference/labels.md).
 
+When the current system decides what is shown or acted on (the order of a list, which payments are reviewed, which accounts are called), it also wrote the labels. What it never showed or acted on has no outcome, and what it favours collects more evidence each day, so it stays favoured. A model trained on those logs inherits the loop, and scoring on the same logs flatters the system that made them. Name the loop under "What the product put in the labels" in `MODEL.md`, keep or start a slice of random traffic, and read `building-datasets` step 6 before training.
+
 ## 4. Write the metric ladder
 
 Connect the number training will move to the number the business cares about:

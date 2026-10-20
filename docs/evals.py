@@ -27,13 +27,13 @@ MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
 # %% The scores: the weighted share of criteria met, averaged over three runs per arm (evals/README.md, Results)
 MODELS = ("Sonnet", "Opus")
 SCORES = {  # case: (Sonnet with, without, Opus with, without)
-    "design-doc": (0.93, 0.63, 1.00, 0.89),
-    "rule-first": (0.58, 0.42, 0.96, 0.33),
-    "churn-leak": (1.00, 1.00, 1.00, 1.00),
-    "fraud-threshold": (0.89, 0.56, 1.00, 0.63),
-    "ranker-clicks": (0.96, 0.96, 0.96, 1.00),
-    "ship-it": (1.00, 0.96, 1.00, 1.00),
-    "ctr-drop": (0.96, 0.88, 1.00, 0.88),
+    "design-doc": (1.00, 0.59, 1.00, 0.93),
+    "rule-first": (0.58, 0.25, 0.83, 0.50),
+    "churn-leak": (1.00, 0.92, 1.00, 1.00),
+    "fraud-threshold": (1.00, 0.52, 0.96, 0.63),
+    "ranker-clicks": (0.92, 0.96, 1.00, 1.00),
+    "ship-it": (1.00, 0.88, 1.00, 0.96),
+    "ctr-drop": (0.96, 0.58, 0.96, 0.88),
 }
 
 
@@ -47,8 +47,8 @@ def gain(case):
     return sum(score(m, case, "with") - score(m, case, "without") for m in MODELS)
 
 
-# Cases where every arm scores 0.96 or more leave no room to show a gain (evals/README.md); each group is sorted by gain
-ceiling = [c for c in SCORES if all(score(m, c, arm) >= 0.96 for m in MODELS for arm in ("with", "without"))]
+# Cases both models already get mostly right without bluML (0.88 or more) leave little room to show a gain (evals/README.md); each group is sorted by gain
+ceiling = [c for c in SCORES if all(score(m, c, "without") >= 0.88 for m in MODELS)]
 GROUPS = [
     ("Where it helps", sorted((c for c in SCORES if c not in ceiling), key=gain, reverse=True)),
     ("Caught without it", sorted(ceiling, key=gain, reverse=True)),
