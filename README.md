@@ -14,8 +14,6 @@
 
 ## Why
 
-Ask a coding agent for a model and it will train one. The code runs, a metric prints, and nothing in the output says that the split shuffled time, that a column was backfilled from the future, that the threshold was left at 0.5, or that the service sends prices in cents. In product ML these are the failures that decide whether a feature works, and none of them raises an error.
-
 bluML gives the agent the habits of an engineer who has shipped models into products: ask what the prediction will decide before training anything, beat the rule before beating a model, distrust a good number until the split and the features are checked, launch in steps that can be taken back, and find the cause before retraining.
 
 ## Five laws
@@ -28,30 +26,38 @@ bluML gives the agent the habits of an engineer who has shipped models into prod
 
 ## How it works
 
-Every model gets one file, `MODEL.md`, next to its code. Each skill reads it first and writes its section last: the decision and what each error costs, the design review, the data, the runs, the verdict, the launch, the incidents. Each section ends at a gate, a short checklist that needs evidence, and a stage starts only when the gate before it is ticked. The file is how a model's reasoning survives between sessions, between people and between versions. A filled example follows a delivery-time model from framing to its first incident: its [MODEL.md](examples/delivery-eta/MODEL.md) and its [design doc](examples/delivery-eta/DESIGN.md).
-
 <p align="center">
   <img src="docs/map-light.png" width="816" alt="The bluML map, a flowchart in three phases. It starts at a request for a model. Design: the model is framed, then a decision: is a model worth it? If not, the rule ships. If so, design and data follow. Development: train and evaluate. Deployment: launch and monitor, then a decision: is the model still paying? If not, it is retired to the rule; if so, monitoring continues. Dashed arrows loop back: a rejected design and a lost online test return to framing, a model that loses to the rule returns to data, and a live model returns to training when the world moves and to data when an input breaks.">
 </p>
+
+Every model gets one file, `MODEL.md`, next to its code. Each skill reads it first and writes its section last: the decision and what each error costs, the design review, the data, the runs, the verdict, the launch, the incidents. Each section ends at a gate, a short checklist that needs evidence, and a stage starts only when the gate before it is ticked. The file is how a model's reasoning survives between sessions, between people and between versions. A filled example follows a delivery-time model from framing to its first incident: its [MODEL.md](examples/delivery-eta/MODEL.md) and its [design doc](examples/delivery-eta/DESIGN.md).
 
 Solid arrows are the main path, and each step on it ends at a gate; dashed arrows are the ways work loops back. The grey bands group the steps into design, development and deployment. Before anything is built, a design doc goes through a rough pre-review and then a formal review, where design flaws are cheapest to fix. Work loops back: a rejected design returns to framing, errors point at the data, a live model goes back to training when the world moves and to the pipeline when an input breaks; a launch that loses its online test sends the objective back to framing, and a live model that stops paying for itself is retired to the rule. `doubting-results` runs across all of it, wherever a number is about to be reported.
 
 ## Skills
 
-| Skill | What it decides | Reach for it when |
-|---|---|---|
-| [`framing-models`](skills/framing-models/SKILL.md) | The problem behind the request, what the product does with each prediction, what each error costs and who owns the threshold, the rule to beat and its number, and the business case: whether the gain pays for the model's build, upkeep, compute and latency, with its break-even gain and payback | someone asks for a model, a request names a model before the decision it serves, or someone asks whether a model is worth it |
-| [`writing-design-docs`](skills/writing-design-docs/SKILL.md) | Why now and how success is measured, quantified requirements, the methodology and the implementation, the risks, the alternatives rejected, and what the reviewers must decide | a framed model is ambiguous, high impact or more than a few days of work, or someone asks for a design doc, spec or proposal |
-| [`building-datasets`](skills/building-datasets/SKILL.md) | The prediction time, the label with its source and when it settles, features as they stood then, a split that mirrors serving, and the bias the product put in its own labels | assembling training data, choosing a label or a split, when labels are scarce or noisy, or when one column predicts suspiciously well |
-| [`training-models`](skills/training-models/SKILL.md) | The baselines, the simplest model that beats them, the ceiling and whether more data helps, how it is debugged and tuned without the test set, and the record that rebuilds it | fitting, comparing or tuning models, or when a model will not beat a simple baseline |
-| [`evaluating-models`](skills/evaluating-models/SKILL.md) | The operating point from costs or capacity, the gain over the rule in the product's unit with its interval, whether that gain clears break-even, the slices where it loses, and the next fix | choosing a threshold, comparing with the rule, or deciding whether a model is ready |
-| [`launching-models`](skills/launching-models/SKILL.md) | Batch, online or behind the rule, the input contract, proof that serving computes what training did, tests of what the model learned, the rollout ladder, the online test's decision rule, and the rollback | a model is about to replace a rule or an older model, or an offline gain is offered as the reason to ship |
-| [`monitoring-models`](skills/monitoring-models/SKILL.md) | What to watch on inputs, outputs and outcomes, how fresh the model must stay and the gate each retrain passes, the cause of a change named before the fix, and whether the model still pays for itself | a live number moves, someone asks to retrain, a model has no alerts, or its costs change |
-| [`doubting-results`](skills/doubting-results/SKILL.md) | Whether a number can be trusted: leaks, splits, reused test sets, training-data metrics, the wrong comparison, missing intervals, labels a rule wrote | before any model number is reported, and whenever a result beats expectations |
+| Skill | Reach for it when |
+|---|---|
+| [`framing-models`](skills/framing-models/SKILL.md) | someone asks for a model, a request names a model before the decision it serves, or someone asks whether a model is worth it |
+| [`writing-design-docs`](skills/writing-design-docs/SKILL.md) | a framed model is ambiguous, high impact or more than a few days of work, or someone asks for a design doc, spec or proposal |
+| [`building-datasets`](skills/building-datasets/SKILL.md) | assembling training data, choosing a label or a split, when labels are scarce or noisy, or when one column predicts suspiciously well |
+| [`training-models`](skills/training-models/SKILL.md) | fitting, comparing or tuning models, or when a model will not beat a simple baseline |
+| [`evaluating-models`](skills/evaluating-models/SKILL.md) | choosing a threshold, comparing with the rule, or deciding whether a model is ready |
+| [`launching-models`](skills/launching-models/SKILL.md) | a model is about to replace a rule or an older model, or an offline gain is offered as the reason to ship |
+| [`monitoring-models`](skills/monitoring-models/SKILL.md) | a live number moves, someone asks to retrain, a model has no alerts, or its costs change |
+| [`doubting-results`](skills/doubting-results/SKILL.md) | before any model number is reported, and whenever a result beats expectations |
 
 Four skills carry tested Python checks, run by the agent rather than rewritten each time: a [leak screen](skills/building-datasets/scripts/leakage_screen.py), a [cost and capacity threshold](skills/evaluating-models/scripts/threshold.py), a [slice comparison with paired intervals](skills/evaluating-models/scripts/slices.py) and a [drift report](skills/monitoring-models/scripts/drift.py).
 
 ## Does it help?
+
+| | without | with bluML |
+|---|--:|--:|
+| Sonnet | 0.67 | **0.92** |
+| Opus | 0.84 | **0.96** |
+
+<details>
+<summary>Per case, and what changed</summary>
 
 Seven requests with traps planted in synthetic data, each run three times with bluML and three times without, and scored by an LLM judge against five or six criteria. A score is the weighted share of criteria met. Method, criteria and caveats: [evals/](evals/README.md).
 
@@ -80,6 +86,8 @@ Seven requests with traps planted in synthetic data, each run three times with b
 </table>
 
 Without bluML, both models already catch the textbook traps: a backfilled column, position bias in clicks, prices sent in cents. What they skip is the product reasoning around the model. Neither compared the fraud model with the rule slice by slice, and neither noticed that it ranks new customers far worse (0 of 6 runs; 6 of 6 with bluML). Sonnet never scored the keyword rule on the same held-out tickets as its ticket-routing model (0 of 3; 3 of 3), Opus seldom weighed the model against that rule, which nearly matches it (1 of 3; 3 of 3), and none of Sonnet's design docs set out a product metric, guardrails and an online test (0 of 3; 3 of 3). One gap remains: Sonnet with bluML still seldom weighs the model's small gain over the rule against the cost of running it (1 of 3), and never prices a misrouted ticket.
+
+</details>
 
 ## Install
 
