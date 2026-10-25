@@ -56,11 +56,13 @@ Read the training feature code and the serving code side by side, feature by fea
 | Shadow | The model scores live traffic; nothing uses the scores | Served features and scores match offline; flag rate as expected; no errors | Parity fails; scores drift from validation |
 | Canary | 1 to 5% of traffic uses the model | Errors, latency and guardrails stay flat | Any guardrail breaks |
 | Online test | A randomized share uses the model for a fixed duration | The decision rule says ship | The decision rule says stop, or a guardrail breaks |
-| Full rollout | Everyone, with the old model kept warm | Monitors stay quiet | A monitor alerts; roll back |
+| Full rollout | Everyone, with the old model kept warm, less the permanent holdout when step 6 keeps one | Monitors stay quiet | A monitor alerts; roll back |
 
 Each step has an owner and a date. Expect each tenfold step in traffic to surface problems the step before did not, and watch the first hours after it. A request to "roll out to all users this week" gets the ladder anyway; say what fits in the week (usually shadow and canary) and when the decision can be made. [reference/rollout.md](reference/rollout.md) covers shadow comparisons, degrees of automation and keeping past versions warm.
 
 ## 6. Design the online test before it starts
+
+With gallop installed, write the test plan with its `designing-experiments` instead of the list below. The primary metric is the product rung, which must be trusted in gallop's metric registry (if it is not, `defining-metrics` comes first), and the break-even gain, on the primary metric and without the latency line, since the test arm already runs at the real latency, is the X in its decision rule. The control is the current rule, never no rule at all, and when the decision runs continuously a small slice is never scored, as a permanent holdout. `reading-experiments` reads the result and `writing-reports` files it; the Launch section of `MODEL.md` links to the filed plan instead of writing its own decision rule.
 
 Write down, before the first user sees the model:
 
@@ -79,7 +81,7 @@ The current model or rule stays deployed and selectable by configuration, a feat
 
 ## 8. Write it down
 
-Fill the Launch section of `MODEL.md`: serving shape and fallback, the latency measured on the serving path and the compute bill, input contract, parity evidence, rollout steps with dates and results, the online test design and its result next to the offline gain that predicted it, the rollback and its rehearsal. Tick the gate items that hold. When the decision rule says ship and rollout completes, write the case with the online effect in the Live section (replacing the latency estimate, which the effect now contains) and set the stage to live.
+Fill the Launch section of `MODEL.md`: serving shape and fallback, the latency measured on the serving path and the compute bill, input contract, parity evidence, rollout steps with dates and results, the online test design (with gallop installed, the link to the plan filed by `designing-experiments`) and its result next to the offline gain that predicted it, the rollback and its rehearsal. Tick the gate items that hold. When the decision rule says ship and rollout completes, write the case with the online effect in the Live section (replacing the latency estimate, which the effect now contains) and set the stage to live.
 
 ## Report
 
