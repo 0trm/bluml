@@ -88,7 +88,7 @@ Gate:
 - **Serving:** {batch or online, latency budget and the latency measured on the serving path, compute cost per month, the fallback when the model or a feature fails}
 - **Input contract:** {each input with its unit and range, checked at the service}
 - **Rollout:** {shadow, then canary, then the online test, then everyone; each step's pass and stop conditions, and its result}
-- **Online test:** {primary metric, guardrails, duration, decision rule against the break-even gain, written before it starts; the result next to the offline gain that predicted it}
+- **Online test:** {primary metric, guardrails, duration, decision rule against the break-even gain, written before it starts, or with gallop installed the link to the plan filed by designing-experiments; the result next to the offline gain that predicted it}
 - **Rollback:** {how to switch back without a code change, what triggers it, when it was rehearsed}
 
 Gate:

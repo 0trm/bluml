@@ -1,11 +1,13 @@
 ---
 name: framing-models
-description: Starts any product ML task. Frames the prediction problem before data or training work and decides whether a model should be built at all: what the product does with each prediction, when it predicts, what each kind of error costs and who owns the threshold, the rule or current system a model must beat, measured, and the business case: whether the gain over the rule pays for building and running the model, compute and latency included, with its break-even gain and payback. Creates the model's MODEL.md, which the other bluML skills read and update. Use first whenever asked to build, train or ship a model (classifier, ranker, recommender, scoring, churn, fraud, forecast or "some ML"), whenever a request names a model before the decision it serves, and when asked whether a model is worth it, its ROI or what it costs to run.
+description: Starts any product ML task. Frames the prediction problem before data or training work and decides whether a model should be built at all: what the product does with each prediction, when it predicts, what each kind of error costs and who owns the threshold, the rule or current system a model must beat, measured, and the business case: whether the gain over the rule pays for building and running the model, compute and latency included, with its break-even gain and payback. Creates the model's MODEL.md, which the other bluML skills read and update. Use first whenever asked to build, train or ship a model (classifier, ranker, recommender, scoring, churn, fraud, forecast or "some ML"), whenever a request names a model before the decision it serves, and when asked whether a model is worth it, its ROI or what it costs to run. With gallop installed, its routing-questions and building-models run first; one-off forecasts, uplift and impact reads stay with gallop.
 ---
 
 # Framing models
 
 A model earns its place only when it improves a decision the product already makes, by more than a rule would, at a cost someone has agreed to pay. Settle that before touching data, and write the answer down.
+
+With gallop installed, gallop's `routing-questions` and `building-models` run first; if they have not, run them first. They settle that the question is a model's, that the volume can validate one, which output it needs, and that it is not an uplift model, which gallop keeps. Start from the record below as usual; gallop's intake supplies the question in the requester's words and the trusted metric. A forecast made once for a plan also stays with gallop, and so does reading whether a launch moved anything (`launching-models` step 6).
 
 ## Start from the record
 
@@ -42,7 +44,7 @@ Every product already decides somehow: by hand, with a rule, with a formula, or 
 
 1. If a rule or system exists, score it on recent data, in the decision's unit.
 2. If people decide by hand, write the simplest rule a person would use (a cutoff on one field, a lookup table, most popular first) and score that. [reference/framings.md](reference/framings.md) lists rules that are hard to beat for common problems.
-3. Add the trivial baselines at the same operating point: the majority class, and random choice at the same capacity.
+3. Add the trivial baselines at the same operating point: the majority class, and random choice at the same capacity. For a forecast, add the seasonal naive, the same period last season, and judge the forecast by MASE, its mean absolute error divided by the seasonal naive's on the same dates: at 1 or above, the naive ships.
 4. Score every baseline on the same rows, held out by time, that the model will later be scored on.
 
 A rule that ships today is also the fallback when the model fails, and the logging that collects the labels the model will need. Written as labelling functions, the same rules can produce the first labels (`building-datasets`, reference/labels.md).
@@ -57,7 +59,7 @@ Connect the number training will move to the number the business cares about:
 
 For example: retention → share of orders arriving within the promised window → "where is my order" tickets → pinball loss at the 80th percentile on held-out orders. Training moves the bottom rung. If moving it cannot move the top, the objective is wrong; fix it here, not after launch.
 
-When stakeholders want different top rungs (conversion or revenue; this session or the customer's next year), do not optimize a blend nobody chose. The owner picks the rung the model is judged on and the period it is measured over; the others become guardrails. Write both down.
+When stakeholders want different top rungs (conversion or revenue; this session or the customer's next year), do not optimize a blend nobody chose. The owner picks the rung the model is judged on and the period it is measured over; the others become guardrails. Write both down. With gallop installed, the rung the model is judged on must be `trusted` in gallop's metric registry; if it is not, `defining-metrics` comes first.
 
 ## 5. Make the case
 

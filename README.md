@@ -16,6 +16,8 @@
 
 bluML gives the agent the habits of an engineer who has shipped models into products: ask what the prediction will decide before training anything, beat the rule before beating a model, distrust a good number until the split and the features are checked, launch in steps that can be taken back, and find the cause before retraining.
 
+With its sibling [gallop](https://github.com/0trm/gallop) installed, gallop keeps the questions around a model: forecasts made for a plan, uplift targeting, and reading whether a launch moved anything.
+
 ## Five laws
 
 1. **Ship a rule first.** It is the baseline to beat and the pipeline that collects the labels.
