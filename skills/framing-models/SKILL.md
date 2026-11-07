@@ -88,7 +88,7 @@ Build a model when all of these hold:
 Then write one of three outcomes:
 
 - **The rule ships.** The rule is good enough, or the expected gain sits below the break-even gain or only clears it at the top of its range. Write the rule's expected performance and the case, and stop. Revisit when labels accumulate, costs fall, or the rule needs exceptions.
-- **Build a model.** Name the break-even gain it must clear over the rule, in the decision's unit. Consider keeping the rule in front, settling the cases it is sure of, with the model deciding only the rest: a cascade costs less to run (`launching-models`, reference/serving.md). Unless the model is small, the next step is a design doc reviewed before building (`writing-design-docs`).
+- **Build a model.** Name the break-even gain it must clear over the rule, in the decision's unit. Consider keeping the rule in front, settling the cases it is sure of, with the model deciding only the rest: a cascade costs less to run (`launching-models`, reference/serving.md). Next, put the data in front of the owner (`exploring-data`); unless the model is small, the step after it is a design doc reviewed before building (`writing-design-docs`).
 - **Not now.** There is no label and no way to collect one, or the data holds no signal. Check every source of labels before settling on it: user reports, an existing system, annotators, a rule that is right when it fires (`building-datasets`, reference/labels.md). Say what would change the answer.
 
 ## Write it down
