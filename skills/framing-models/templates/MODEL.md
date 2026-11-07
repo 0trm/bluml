@@ -37,6 +37,7 @@ Gate:
 
 ## 3. Data
 
+- **Exploration:** {link to the EDA page; one line per decision it led to}
 - **Row:** {one row per entity per prediction time}
 - **Label:** {the event, its window after the prediction time, when it becomes known and when it stops changing, and the rows it is missing for}
 - **Split:** {train, validation and test windows, and why they mirror serving}
@@ -50,6 +51,7 @@ Gate:
 - **Label source and quality:** {where labels come from (user reports, an existing system, annotators, rules); audit sample size; agreement between labellers}
 
 Gate:
+- [ ] The exploration page has the owner's reading and an implication in every section, and every decision it led to is recorded here
 - [ ] Every feature exists, with this value, at prediction time
 - [ ] The leak screen ran and every flag is explained
 - [ ] The split mirrors serving, and training and serving build features with the same code

@@ -7,7 +7,7 @@ description: Builds the training table for a product model so that every row loo
 
 The training table decides what a model can learn and how honest its scores will be. Most product models that disappoint after launch were trained on rows that could not have existed when the prediction was made.
 
-Read the model's `MODEL.md` first; the Decision section says when the model predicts and what the product does with it. If there is no `MODEL.md`, run `framing-models` first, or write down the prediction moment before going on.
+Read the model's `MODEL.md` first; the Decision section says when the model predicts and what the product does with it. If there is no `MODEL.md`, run `framing-models` first, or write down the prediction moment before going on. If nobody has looked at the data yet, run `exploring-data` first: the grain, the window and the outliers it settles are decisions this table inherits.
 
 Copy this checklist into your work and tick it as you go:
 
