@@ -17,7 +17,7 @@ Read `MODEL.md` first. The design doc starts from its Decision section (what the
 
 ## 2. Answer the feasibility questions first
 
-Before writing the methodology, spend a short, fixed time on the questions that decide it: does the data exist at prediction time, how many labels are there and how late do they arrive, what does the rule score, does a simple baseline beat it at all. Put the numbers in the doc. Take them from the exploration page the model's owner has read (`exploring-data`), and run it first if nobody has looked at the data. A design built on unmeasured assumptions gets redesigned in review.
+Before writing the methodology, spend a short, fixed time on the questions that decide it: does the data exist at prediction time, how many labels are there and how late do they arrive, what does the rule score, does a simple baseline beat it at all. Put the numbers in the doc. Take them from the exploration notebook the model's owner has read (`exploring-data`), and run it first if nobody has looked at the data. A design built on unmeasured assumptions gets redesigned in review.
 
 Read how others framed and evaluated the same problem, write-ups of systems in production first: the framing they chose, how they defined and cleaned the labels, and how they made offline metrics track online results. Their architecture matters less.
 
