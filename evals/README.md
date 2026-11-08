@@ -153,11 +153,24 @@ On 0.5.0, the two runs with bluML that missed the live check ended at using the 
 
 Every run with bluML now opens its recommendation with the lookup table run beside the agents first, including the two that loaded only `framing-models`. The misrouting was priced in 3 of 5 runs with bluML, against 2 of 3 on 21 October and 0 of 3 on 0.5.0: that criterion swings between rounds, and 0.5.2 does not target it. Five runs per arm is still a small sample.
 
+### Misrouting priced, on version 0.5.3
+
+All 8 runs with bluML on 0.5.0 and 0.5.2 stated what a misroute costs. The 3 that passed priced each kind in agent-minutes or euros and used the prices in the case: the misroutes taken off the monthly value, or the lookup's misroutes as the most a model could save. The 5 that failed said the costs do not change the verdict, since no threshold moves with them, and four of them valued the router by triage time alone. `framing-models` step 2 tied the costs to the threshold, and the threshold never moves here: the model's scores sit near 0 and 1, and the lookup has none. Version 0.5.3 says the case needs a price for each kind of error even when the threshold does not move, and that a rule or a model taking a decision over from people is worth the work it saves minus what its errors cost. `rule-first` then ran again on 8 November, Opus 5.5 at high effort, five runs per arm with traces kept. It took 10 minutes and cost $7.26, judge included.
+
+| | with | without |
+|---|---|---|
+| States what each kind of misrouting costs and uses it in the recommendation | 4/5 | 0/5 |
+| Weighs the model's gap over the keyword rule against the cost of running a model | 5/5 | 2/5 |
+| Says how readiness would be confirmed on live tickets | 5/5 | 5/5 |
+| **Score** | **0.95** | **0.60** |
+
+The run that missed it priced each kind (10 agent-minutes for a billing ticket sent to general, a third of that for the reverse) but valued automating triage by triage time alone. In this data the costs never change the answer, since the lookup ships at any ratio, so the criterion checks that they reach the case, not that they move it. Five runs per arm is still a small sample.
+
 ### What it still misses
 
-- Sonnet with bluML weighed the model's small gain over the keyword rule against the cost of running a model in 1 of 3 runs, and never priced the misrouting (0 of 3). Opus 5.5 at high effort weighed the gain in 3 of 3 runs on 0.5.0, but no run in either arm priced the misrouting; on 0.5.2, 3 of 5 runs with bluML priced it and none without. Settling that is `framing-models`' main job, so it is still the next thing to fix.
+- Sonnet with bluML weighed the model's small gain over the keyword rule against the cost of running a model in 1 of 3 runs, and never priced the misrouting (0 of 3). Opus 5.5 at high effort weighed the gain in every run since 0.5.0 and priced the misrouting in 4 of 5 runs on 0.5.3; Sonnet has not run since 0.2.0.
 - Choosing features group by group dropped a column that only matters next to another one (`from_waitlist` beside the class hour, in `feature-choice` on 0.5.0). Since 0.5.1 the miss shows only in runs where `training-models` does not load.
-- In a request that runs from the data to a verdict, the advice in the other skills reaches the agent only if it asks for the next skill. No run of the ranker re-run did, and on 8 November 1 of 5 runs of `feature-choice` and 2 of 5 of `rule-first` loaded only `framing-models`.
+- In a request that runs from the data to a verdict, the advice in the other skills reaches the agent only if it asks for the next skill. No run of the ranker re-run did, and on 8 November 1 of 5 runs of `feature-choice`, and 2 of 5 and then 3 of 5 of `rule-first`, loaded only `framing-models`.
 - Opus did not load the skills in 2 of 21 runs of the main round, and in 3 of 5 runs of the ranker re-run. Opus 5.5 at high effort loaded one in all 24 runs on 0.5.0.
 
 ### How to read it
