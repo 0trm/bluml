@@ -1,6 +1,6 @@
 # Evals
 
-Seven scenarios, each a realistic request with traps planted in synthetic data. Every case runs with bluML loaded and without it, and an LLM judge scores the final reply against five or six pass or fail criteria; the difference between the two arms is what the skills add. The skills' examples are deliberately drawn from other domains (moderation, claims, lead scoring, delivery estimates, marketplace search, returns abuse), so the scenarios test whether the method transfers, not whether the answer was memorized.
+Eight scenarios, each a realistic request with traps planted in synthetic data. Every case runs with bluML loaded and without it, and an LLM judge scores the final reply against five or six pass or fail criteria; the difference between the two arms is what the skills add. The skills' examples are deliberately drawn from other domains (moderation, claims, lead scoring, delivery estimates, marketplace search, returns abuse), so the scenarios test whether the method transfers, not whether the answer was memorized.
 
 | Case | The request | What is planted |
 |---|---|---|
@@ -11,6 +11,7 @@ Seven scenarios, each a realistic request with traps planted in synthetic data. 
 | `ranker-clicks` | Train a ranker on logged clicks and decide whether it replaces the popularity rule | Clicks fall twelvefold by position; the rule keeps new articles off the top; a 5% random-order holdout is the only unbiased evidence |
 | `ship-it` | Write the launch plan for a model that gained 2 AUC points | The service sends prices in cents, uses stale medians and a different click-rate window; training's click rate includes the click being predicted; the offline split is random |
 | `ctr-drop` | Retrain and redeploy because CTR fell 15% | A new Android release sends prices in cents; a holiday shifts traffic the day before |
+| `feature-choice` | Build a no-show model, say which columns it needs and whether to renew a 1,500-euro-a-month data feed | The feed's columns score well alone and add nothing; a waitlist flag scores like noise alone and matters next to the class hour; three duplicate pairs |
 
 Each case directory holds `prompt.md` (the request; its `description` lists the traps), `graders/` (one file per criterion, core criteria weighted 2, plus an indicator of whether a skill fired; the design doc and the launch plan are graded from the file the agent writes), `case.yaml` and `scaffold.sh`, which copies `files/` into the workspace and builds a Python environment there.
 
@@ -74,6 +75,21 @@ Without bluML, both models found the backfilled health score, split by time, eva
 | Opus | 1.00 | 0.88 | 5/5 vs 2/5 | 2/5, `framing-models` only |
 
 The earlier loss does not hold up: over the main round and this one, Sonnet named the loop in 2 of 8 runs with bluML and 3 of 8 without. The paragraph shows no effect either: no run followed it to `building-datasets`, and Sonnet named the loop no more often after it. Opus named the loop in every run with bluML, but in three of them no skill fired, so the paragraph cannot take the credit. The re-run cost $10.51, judge included.
+
+### The feature step, on version 0.3.1
+
+`feature-choice` was added with step 4 of `training-models`, choosing the features, and ran on 8 November 2026 with Claude Code 2.1.319, Sonnet as agent and judge, three runs per arm. It cost $2.50, judge included.
+
+| Criterion | with | without |
+|---|---|---|
+| Compares the model with and without the feed, and advises against renewing it | 3/3 | 3/3 |
+| Backs `from_waitlist` with a comparison with and without it | 1/3 | 0/3 |
+| Keeps one column of each duplicate pair | 3/3 | 3/3 |
+| Gives a short list of columns with a reason for each | 3/3 | 3/3 |
+| Splits by time and measures the noise before calling a difference real | 3/3 | 0/3 |
+| **Score** | **0.83** | **0.62** |
+
+The +0.21 cannot be credited to step 4. A skill fired in 1 of 3 runs, and it was `framing-models`; `training-models` never loaded, so in two runs the arms differed only by the skills' descriptions in the agent's context. Every run kept `from_waitlist`, because importance ranks it high, so the trap for choosing by each feature's score alone did not bite; that criterion separates runs only by whether they backed the feature with a comparison. Three criteria pass in every run of both arms and leave no room to show a gain.
 
 ### What it still misses
 
