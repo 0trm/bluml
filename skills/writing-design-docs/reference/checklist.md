@@ -30,6 +30,8 @@ The questions a senior reviewer asks of each section. Run them on your own draft
 - Is the framing justified against at least one other framing?
 - If the model predicts a surrogate (clicks for satisfaction, a score for a decision), is the gap between the two acknowledged and measured?
 - Does every feature exist at prediction time, and are labels' delays stated?
+- Are there enough labelled examples for every class the model must predict?
+- Has anyone solved a similar problem? If not, is the plan a set of timeboxed steps, each ending in a decision?
 - Is the rule measured on the same data, and is it the first baseline?
 - Does the split mirror serving?
 - Is the online test designed: unit, success and guardrail metrics, duration, decision rule?
@@ -60,5 +62,6 @@ The questions a senior reviewer asks of each section. Run them on your own draft
 ## The review itself
 
 - Does the doc say what the review must decide?
+- Are the teams that must approve part of the system (data access, security, legal) named, and were they asked before the review?
 - Did a pre-review happen, so the formal review finds no major redesign?
 - Are decisions from the review recorded in the doc and in `MODEL.md`?

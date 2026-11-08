@@ -20,6 +20,8 @@ Read `MODEL.md` first: the Launch section says what was launched and with which 
 
 Outcomes matter most and arrive last; inputs and outputs are the early warning. Every monitor has a threshold, an owner and a place in the Live section of `MODEL.md`. Segment the input checks: most pipeline bugs live in one platform, version or source and are diluted in the total. When labels come late, or from the model's own decisions, have people review a small random sample of outputs (1 to 5%) every week or month, look for new kinds of error, and relabel what they find.
 
+When the model retrains on a schedule, the jobs that rebuild it can fail while every serving chart stays green: a failed run leaves an older version serving. Monitor them too, as the pipelines layer in `MODEL.md`: the data job (drift and missing values in features and labels), training (run time, failed runs), validation (drift in the newest test rows), and the compute quota they share, with an alert before one runaway job uses it up.
+
 To compare live rows with training rows:
 
 ```bash
@@ -30,7 +32,7 @@ python scripts/drift.py training_sample.csv live.csv --by platform app_version -
 
 ## 2. Decide how fresh the model must stay
 
-Measure how quality decays with the model's age: train on data up to a date, score each following week, and plot the metric against weeks since training (Rules of ML #8). The retrain schedule comes from that curve, not from habit: retrain when the value lost to decay since the last version exceeds what a retrain costs in compute and review time.
+Measure how quality decays with the model's age: train on data up to a date, score each following week, and plot the metric against weeks since training (Rules of ML #8). The retrain schedule comes from that curve, not from habit: retrain when the value lost to decay since the last version exceeds what a retrain costs in compute and review time. Retrain early enough that one failed run or one rejected version still leaves time before the live model gets that stale.
 
 Every retrained version passes a gate before it replaces the live one:
 
@@ -38,7 +40,7 @@ Every retrained version passes a gate before it replaces the live one:
 2. Score the new version there against the live model and a naive baseline (the rule, yesterday's best sellers), at the operating point.
 3. Compare its predictions with the live model's, row by row. An item the live model ranked 10,000th and the new one ranks first is a question to answer before release.
 4. Re-choose the operating point from the owner's requirement (the cost ratio, the recall floor, the capacity). A threshold set on the old version's scores does not carry over to the new one.
-5. Any failed check stops the release, and the live model stays: a stale model beats a misbehaving one.
+5. Any failed check stops the release, and the live model stays: a stale model beats a misbehaving one. A failed check also alerts the owner: a new version worse than the live one can come from a broken data or validation job, not only from the world.
 
 If the recipe then retrains on all rows, the held-out days included, compare that version's predictions with the live model's again before it ships. Shadow it before it takes traffic.
 
@@ -89,3 +91,4 @@ For every incident, add one line to the Live section of `MODEL.md`: when it star
 - A model with no input monitors, or monitors on the total only.
 - Training data for a retrain that includes the broken period.
 - A retrained version released without the gate, or with the old version's threshold.
+- A model that retrains on a schedule with no monitors on the jobs that retrain it.

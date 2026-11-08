@@ -22,7 +22,7 @@
 | PSI (population stability index) | Distributions | Under 0.1 stable, 0.1 to 0.25 worth a look, above 0.25 a shift. Bins come from training deciles |
 | Kolmogorov-Smirnov | Numeric distributions | With large samples it flags tiny, harmless shifts; read the effect size, not the p-value |
 | Correlation with the label | Each feature, as labels arrive | A sudden rise suggests a leak; a slow decline, drift |
-| Mean score and share acted on | Outputs | The first sign that the model sees something different |
+| Mean score and share acted on | Outputs | The first sign that the model sees something different. A mean score that drifts away from the rate of positives in training is prediction bias |
 | Feature importance | Each retrained version | A feature that jumps in importance may be leaking |
 | Outcomes by group | Groups named in the fairness check (`evaluating-models`) | A gap opening between groups after launch |
 | Overrides | Decisions people can change | A rising share means people do not trust the model and work around it; the product metric pays for it |
@@ -38,7 +38,7 @@
 
 ## Late labels
 
-When outcomes arrive late (chargebacks, churn at month end, repayment), the newest live period always looks better than it is. Compare outcomes only for periods whose label window has closed, and use inputs and outputs as the early warning in between. Estimate quality on unlabelled data with proxies when the delay is long: agreement with the rule, a labelled audit sample, the share of decisions overturned by people.
+When outcomes arrive late (chargebacks, churn at month end, repayment), the newest live period always looks better than it is. Compare outcomes only for periods whose label window has closed, and use inputs and outputs as the early warning in between. Estimate quality on unlabelled data with proxies when the delay is long: agreement with the rule, a labelled audit sample, the share of decisions overturned by people. Read a proxy by how it moves, not by its level: in a mail app, the share of mail users move to the spam folder going from 0.5% to 3% says the filter broke, whatever the right level is.
 
 ## Output audits
 

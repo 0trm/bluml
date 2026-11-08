@@ -54,7 +54,7 @@ Do not choose by each feature's score alone (its correlation or mutual informati
 ## 5. Tune on validation only
 
 - Tune on the validation window, or with rolling time-ordered folds; never on test.
-- Before a long search, find the ceiling. Let the model overfit and score it on its own training rows: if even that does not beat the rule by the break-even gain, these features cannot get there, and the fix is new signal or a new framing, not tuning (a high score here proves little). Then train on a quarter, half and all of the rows and score each on the same validation rows: a curve still rising means more data will help; a flat one means it won't.
+- Before a long search, find the ceiling. Let the model overfit and score it on its own training rows: if even that does not beat the rule by the break-even gain, these features cannot get there, and the fix is new signal or a new framing, not tuning (a high score here proves little). A new framing can be a smaller question: a regression that cannot predict the value closely enough may only need to say whether it lands above a threshold. Then train on a quarter, half and all of the rows and score each on the same validation rows: a curve still rising means more data will help; a flat one means it won't.
 - Search a few parameters that matter (tree depth, learning rate, number of trees, regularization) over a small grid or random search, not everything.
 - Keep every trial: parameters, validation result at the operating point, seed.
 - Stop when the best trials differ by less than the variation between folds or seeds.

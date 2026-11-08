@@ -18,7 +18,7 @@ Look for the model's `MODEL.md`: beside its code, or under `models/<name>/`. If 
 Write down, in the product's words:
 
 - **The action:** what the product does when the prediction says yes, or how it uses the score (hide the post, investigate the claim, book the demo, order the search results), and who or what takes the action.
-- **The moment:** when the prediction is made, and what is known at that moment. This fixes which data the model may use, so be exact: "at checkout", "at 06:00 on the first of the month", "when the page is requested".
+- **The moment:** when the prediction is made, and what is known at that moment. This fixes which data the model may use, so be exact: "at checkout", "at 06:00 on the first of the month", "when the page is requested". It must also leave time for the action to work: a churn model that sees a week ahead may be too late for any offer to change the customer's mind.
 - **The unit:** what the decision is judged in. Euros, minutes late, demos booked, posts wrongly removed, purchases per search.
 - **Whether acting changes the outcome:** when the action is meant to change what the model predicts (a call to keep a customer, a discount to convert a lead), the model predicts risk, not the effect of acting. Plan a group that is flagged but left alone, so the action itself can be judged.
 
@@ -57,7 +57,7 @@ Connect the number training will move to the number the business cares about:
 
 `business metric → product metric → online proxy → offline metric`
 
-For example: retention → share of orders arriving within the promised window → "where is my order" tickets → pinball loss at the 80th percentile on held-out orders. Training moves the bottom rung. If moving it cannot move the top, the objective is wrong; fix it here, not after launch.
+For example: retention → share of orders arriving within the promised window → "where is my order" tickets → pinball loss at the 80th percentile on held-out orders. Training moves the bottom rung. If moving it cannot move the top, the objective is wrong; fix it here, not after launch. If the top rung is not measured today, instrument it before setting a target: a goal of 15% more clicks means nothing while nobody counts clicks.
 
 When stakeholders want different top rungs (conversion or revenue; this session or the customer's next year), do not optimize a blend nobody chose. The owner picks the rung the model is judged on and the period it is measured over; the others become guardrails. Write both down. With gallop installed, the rung the model is judged on must be `trusted` in gallop's metric registry; if it is not, `defining-metrics` comes first.
 

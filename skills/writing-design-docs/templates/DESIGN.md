@@ -6,6 +6,8 @@
 
 **What this review must decide:** {the decisions needed, the risks to check, the help wanted}
 
+**Approvals needed:** {teams that must sign off on part of the system (data access, security, legal), what each approves, and when it was asked}
+
 ## 1. Overview
 
 {Three to five sentences: the problem, the proposed solution, and the outcome expected.}
@@ -95,7 +97,7 @@
 
 - **Offline results:** {tables, with the baseline beside each number}
 - **Benchmarks:** {throughput and latency against instance size}
-- **Milestones:** {dates and what each delivers}
+- **Milestones:** {timeboxed steps, each with its date, what it delivers and the decision it ends in: go on, change course or stop}
 - **FAQ from pre-review:** {questions and answers}
 - **Glossary and references**
 

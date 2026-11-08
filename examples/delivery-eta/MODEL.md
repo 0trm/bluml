@@ -98,6 +98,7 @@ Gate:
 - **Rollout:** shadow for 7 days (served features and scores matched offline to rounding); canary on 2% for 2 days; online test for 4 weeks; everyone from 2026-09-28.
 - **Online test:** arms P70, P80 and P90 against the rule, randomized by customer. Primary metric: repeat orders at 30 days. Guardrails: checkout conversion, cancellations, tickets. Tickets avoided already pay for the model, so the bar for repeat orders is no loss, not a gain. Decision rule written 2026-08-25: ship the arm with the highest repeat rate whose conversion is within 1% of the rule's. Result: P80 shipped (repeat orders +2.1%, interval +0.6 to +3.6; conversion -0.4%). Offline it gained 9 points on time; in the test it gained 8 (79% against 71%).
 - **Rollback:** a config flag selects the rule or the model version; rehearsed 2026-08-27; triggered by p99 latency above 60 ms for 10 minutes or a fallback rate above 5%.
+- **Runbook:** Ana approves the start and each widening, Marc the move to everyone; a scripted release goes to shadow first, then the canary; a failed deployment leaves the flag on the current version and pages Ana; rollback is the flag above.
 
 Gate:
 - [x] Shadow traffic shows the served features and scores match the offline ones
@@ -112,6 +113,7 @@ Gate:
 | Inputs against training, by city | Inputs | PSI above 0.25, missing rate up 5 points, contract violations above 1% | Ana |
 | Promise length by city and hour | Outputs | Median moves 3 minutes in a day | Ana |
 | On-time rate by city, daily | Outcomes | Below 75% for two days | Marc |
+| Monthly retrain job | Pipelines | A failed run, a run twice as long as usual, or a version that fails the gate | Ana |
 
 - **Freshness:** on-time rate falls about 1 point a month as restaurants change; retrained monthly on the latest four months, each version through shadow before it replaces the live one.
 - **Retrain gate:** each monthly version trains without the newest 7 days, then must beat the live model and the rule on them; estimates that move more than 5 minutes from the live model's on over 1% of orders stop the release until explained; the quantile is re-checked so that 80% of those orders fall inside the promise. The October version passed on 2026-10-12.
