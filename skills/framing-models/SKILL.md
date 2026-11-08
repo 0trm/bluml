@@ -36,7 +36,7 @@ A model is wrong in two directions, and they rarely cost the same.
 - **Capacity:** a sales team that can run 40 demos a week needs the best 40 leads, not a probability threshold. Write the limit down.
 - **The threshold owner:** the person who answers for the cost of each error, such as the trust and safety lead, the claims manager or the head of sales. The model proposes an operating point; the owner sets it.
 
-When the costs are unknown, assume a ratio, set the operating point from it, show how the answer moves if the ratio is off by a factor of two, and list each assumption as a question for the owner. Do not leave the costs out because nobody gave them, and do not let a default threshold of 0.5 stand in for a cost ratio nobody chose.
+When the costs are unknown, assume a ratio, set the operating point from it, show how the answer moves if the ratio is off by a factor of two, and list each assumption as a question for the owner. Do not leave the costs out because nobody gave them, and do not let a default threshold of 0.5 stand in for a cost ratio nobody chose. The case in step 5 needs a price for each kind of error, in minutes or money, not only their ratio, and it needs them even when the operating point does not move with the costs (scores near 0 and 1, a lookup with no score): the case prices every option's errors.
 
 ## 3. Measure the rule to beat
 
@@ -65,7 +65,7 @@ When stakeholders want different top rungs (conversion or revenue; this session 
 
 A gain over the rule is worth building only if it pays for the model, every month. Put numbers on both sides, in money:
 
-- **Value:** decisions per month × the gain over the rule per decision × what one unit of the decision is worth. Count only the decisions the model would change: a model for one category or one market moves only its share. The gain is an assumption until evaluation: give a range. For a classifier, the ceiling is the rule's error cost per month; a perfect model saves no more.
+- **Value:** decisions per month × the gain over the rule per decision × what one unit of the decision is worth. Count only the decisions the model would change: a model for one category or one market moves only its share. The gain is an assumption until evaluation: give a range. For a classifier, the ceiling is the rule's error cost per month; a perfect model saves no more. When the rule or the model takes a decision over from people, its value is the work it saves minus what its errors cost, each kind at its own price, set against the errors people make today when they are known.
 - **Build, once:** engineer weeks at the team's loaded cost, labels, the data pipeline, the launch. A timebox is a stretch goal, not an estimate: multiply it by 1.5 to 3.
 - **Run, every month:** upkeep (a share of an engineer for on-call, monitors and retrain reviews), pipelines and feature storage, and training compute (cost per run, searches included, times runs per month).
 - **Per decision:** serving compute (online serving is sized for peak traffic), paid calls, and human work each prediction triggers that the error costs do not already count.
