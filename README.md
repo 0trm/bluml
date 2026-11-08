@@ -58,11 +58,14 @@ Four skills carry tested Python checks, run by the agent rather than rewritten e
 |---|--:|--:|
 | Sonnet | 0.67 | **0.92** |
 | Opus | 0.84 | **0.96** |
+| Opus 5.5, high effort | 0.89 | **0.92** |
+
+Sonnet and Opus: version 0.2.0 on seven cases, 21 October 2026. Opus 5.5 at high effort: version 0.5.0 on eight cases, 8 November 2026.
 
 <details>
 <summary>Per case, and what changed</summary>
 
-Seven requests with traps planted in synthetic data, each run three times with bluML and three times without, and scored by an LLM judge against five or six criteria. A score is the weighted share of criteria met. Method, criteria and caveats: [evals/](evals/README.md).
+Requests with traps planted in synthetic data, each run three times with bluML and three times without, and scored by an LLM judge against five or six criteria. A score is the weighted share of criteria met. The table is the round of 21 October. Method, criteria and caveats: [evals/](evals/README.md).
 
 <table>
   <thead>
@@ -89,6 +92,8 @@ Seven requests with traps planted in synthetic data, each run three times with b
 </table>
 
 Without bluML, both models already catch the textbook traps: a backfilled column, position bias in clicks, prices sent in cents. What they skip is the product reasoning around the model. Neither compared the fraud model with the rule slice by slice, and neither noticed that it ranks new customers far worse (0 of 6 runs; 6 of 6 with bluML). Sonnet never scored the keyword rule on the same held-out tickets as its ticket-routing model (0 of 3; 3 of 3), Opus seldom weighed the model against that rule, which nearly matches it (1 of 3; 3 of 3), and none of Sonnet's design docs set out a product metric, guardrails and an online test (0 of 3; 3 of 3). One gap remains: Sonnet with bluML still seldom weighs the model's small gain over the rule against the cost of running it (1 of 3), and never prices a misrouted ticket.
+
+On 8 November, version 0.5.0 ran on Opus 5.5 at high effort, with an eighth case, `feature-choice`: 0.92 with bluML and 0.89 without. On October's seven cases the arm with bluML holds at 0.94 (0.96 then), while the arm without it rose from 0.84 to 0.88. bluML still made the agent compare the fraud model with the rule by slice (2 of 3; 0 of 3), notice the new-customer gap (3 of 3; 1 of 3), and weigh the routing model against the keyword rule (3 of 3; 1 of 3). It lost on `feature-choice`, where 1 of 3 runs backed a column that matters only next to the class hour (3 of 3 without), and it still seldom says how a shipped rule is checked on live tickets (1 of 3; 3 of 3).
 
 </details>
 
