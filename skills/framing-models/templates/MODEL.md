@@ -42,9 +42,9 @@ Gate:
 - **Label:** {the event, its window after the prediction time, when it becomes known and when it stops changing, and the rows it is missing for}
 - **Split:** {train, validation and test windows, and why they mirror serving}
 
-| Feature | As of | Source | Note |
-|---|---|---|---|
-| {name} | {its value at prediction time, or how it is lagged} | {table or service} | {owner, backfills, units} |
+| Feature | As of | Source | Note | Why in |
+|---|---|---|---|---|
+| {name} | {its value at prediction time, or how it is lagged} | {table or service} | {owner, backfills, units} | {baseline, or the gain its group added and the run id; filled in training} |
 
 - **Leak screen:** {result, and what was dropped}
 - **What the product put in the labels:** {what the current system showed or did that shaped who has a label}
@@ -68,6 +68,7 @@ Gate:
 
 Gate:
 - [ ] Baselines are recorded next to the candidates, on the same validation rows
+- [ ] Every feature in the chosen model has a Why in line backed by a run
 - [ ] Every run can be rebuilt from its record (code, data version, parameters, seed)
 
 ## 5. Evaluation

@@ -44,7 +44,7 @@ Solid arrows are the main path, and each step on it ends at a gate; dashed arrow
 | [`exploring-data`](skills/exploring-data/SKILL.md) | a model is framed and its owner has not looked at the data yet, someone asks for EDA or to profile the data, or a source or the tracking changes |
 | [`writing-design-docs`](skills/writing-design-docs/SKILL.md) | a framed model is ambiguous, high impact or more than a few days of work, or someone asks for a design doc, spec or proposal |
 | [`building-datasets`](skills/building-datasets/SKILL.md) | assembling training data, choosing a label or a split, when labels are scarce or noisy, or when one column predicts suspiciously well |
-| [`training-models`](skills/training-models/SKILL.md) | fitting, comparing or tuning models, or when a model will not beat a simple baseline |
+| [`training-models`](skills/training-models/SKILL.md) | fitting, comparing or tuning models, choosing features, or when a model will not beat a simple baseline |
 | [`evaluating-models`](skills/evaluating-models/SKILL.md) | choosing a threshold, comparing with the rule, or deciding whether a model is ready |
 | [`launching-models`](skills/launching-models/SKILL.md) | a model is about to replace a rule or an older model, or an offline gain is offered as the reason to ship |
 | [`monitoring-models`](skills/monitoring-models/SKILL.md) | a live number moves, someone asks to retrain, a model has no alerts, or its costs change |

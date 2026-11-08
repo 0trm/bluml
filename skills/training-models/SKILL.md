@@ -1,6 +1,6 @@
 ---
 name: training-models
-description: Trains a product model the way a production ML engineer would. Baselines first, then the simplest model that can beat them, debugged before tuned, tuned on validation rows only, with every run recorded so it can be rebuilt. Use when fitting, comparing or tuning models, choosing an algorithm, when a loss will not settle or a model will not beat a simple baseline, when deciding whether more data or more tuning will help, when a training result looks too good, or before reporting any model as the best one.
+description: Trains a product model the way a production ML engineer would. Baselines first, then the simplest model that can beat them, debugged before tuned, tuned on validation rows only, with every run recorded so it can be rebuilt. Use when fitting, comparing or tuning models, choosing an algorithm, choosing which features or predictors to keep, when a loss will not settle or a model will not beat a simple baseline, when deciding whether more data or more tuning will help, when a training result looks too good, or before reporting any model as the best one.
 ---
 
 # Training models
@@ -39,7 +39,19 @@ Add complexity only when it beats the simpler model by more than the difference 
 
 [reference/debugging.md](reference/debugging.md) has the symptoms and their usual causes.
 
-## 4. Tune on validation only
+## 4. Choose the features
+
+Every feature served is a pipeline to run, a parity check, a monitor and one more way to fail, so it stays only if it earns its place on the validation rows. Start from the features the leak screen cleared.
+
+1. **Start with a handful:** the simple model's features, fields observed directly and understood by the people who own them (Rules of ML #17). Keep the count in proportion to the rows: about a dozen features for a thousand rows in a linear model (#21).
+2. **Add one group at a time.** Group features by source or idea (account history, recent activity, price). Keep a group only when the model with it beats the model without it, at the operating point, by more than the variation between folds. Each comparison is a recorded run.
+3. **Drop near-duplicates.** Two features that carry the same information (the same quantity in two units, a count and its log, a rank correlation above about 0.9) split the importance between them and double the upkeep. Keep the one that is cheaper to serve and easier to explain.
+4. **Ablate the final set.** Groups interact, so retrain once without each group on the same rows. A group whose removal costs less than the noise between folds goes: an unused feature is debt (#22).
+5. **Write why each feature is in** in the Why in column of the feature table in `MODEL.md`: the baseline, or the gain its group added and the run that showed it. A feature with no line there is not served.
+
+Do not choose by each feature's score alone (its correlation or mutual information with the label, the leak screen's AUC): a feature weak alone can matter next to others, and one strong alone is a leak until the screen explains it. L1 regularization and tree importance can propose drops; confirm each with a run, as in point 4. `monitoring-models` repeats the check on the newest rows every quarter.
+
+## 5. Tune on validation only
 
 - Tune on the validation window, or with rolling time-ordered folds; never on test.
 - Before a long search, find the ceiling. Let the model overfit and score it on its own training rows: if even that does not beat the rule by the break-even gain, these features cannot get there, and the fix is new signal or a new framing, not tuning (a high score here proves little). Then train on a quarter, half and all of the rows and score each on the same validation rows: a curve still rising means more data will help; a flat one means it won't.
@@ -47,15 +59,15 @@ Add complexity only when it beats the simpler model by more than the difference 
 - Keep every trial: parameters, validation result at the operating point, seed.
 - Stop when the best trials differ by less than the variation between folds or seeds.
 
-## 5. Calibrate when the decision uses the probability
+## 6. Calibrate when the decision uses the probability
 
 If the Decision section sets the threshold from costs, or the product multiplies the score by an amount, the score must read as a probability. Check a reliability table on validation (mean score against the observed rate by score bin). If they differ, calibrate on validation rows (isotonic or Platt scaling) and check again on rows the calibration did not see. Resampled or reweighted training data always needs this step.
 
-## 6. Record every run
+## 7. Record every run
 
 A run is reproducible when its record names the code version, the data version (a hash or snapshot id of the training table, and the period it covers), the parameters, the seed, the operating point (the threshold or k), the validation result there, and where the model file is. Use the team's tracker (MLflow, Weights & Biases, a CSV) and put the run id in `MODEL.md`. A number from a run nobody can rebuild is not evidence. Metrics computed on training data, such as some autologged ones, describe the fit, not the model's quality. [reference/run-records.md](reference/run-records.md) shows a minimal record and the MLflow version of it.
 
-## 7. Choose
+## 8. Choose
 
 Pick the simplest model within noise of the best one, and confirm it beats the rule at the operating point on validation by more than it costs to build, serve and maintain. Write the comparison table and the ceiling in the Training section of `MODEL.md` (baselines and candidates, same rows, same unit), tick the gate items that hold, set the stage to evaluation, and hand over to `evaluating-models`. Do not touch the test window here.
 
@@ -66,4 +78,5 @@ Before the handover, ask a colleague to review the method the way code is review
 - Validation far above the rule or above what similar products achieve: run `doubting-results` before going further.
 - No model beats the trivial baseline: the data holds little signal for this label; go back to `framing-models`.
 - The best model beats the simple one by less than the noise between folds.
+- A feature in the chosen model that no run shows earning its place.
 - A result that cannot be rebuilt from its record.
