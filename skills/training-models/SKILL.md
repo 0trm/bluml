@@ -44,7 +44,7 @@ Add complexity only when it beats the simpler model by more than the difference 
 Every feature served is a pipeline to run, a parity check, a monitor and one more way to fail, so it stays only if it earns its place on the validation rows. Start from the features the leak screen cleared.
 
 1. **Start with a handful:** the simple model's features, fields observed directly and understood by the people who own them (Rules of ML #17). Keep the count in proportion to the rows: about a dozen features for a thousand rows in a linear model (#21).
-2. **Add one group at a time.** Group features by source or idea (account history, recent activity, price). Keep a group only when the model with it beats the model without it, at the operating point, by more than the variation between folds. Each comparison is a recorded run.
+2. **Add one group at a time.** Group features by source or idea (account history, recent activity, price). Keep a group only when the model with it beats the model without it, at the operating point, by more than the variation between folds. Run these comparisons, and the ablation in point 4, with a model that can combine features, such as the boosted trees from step 2. A linear model weighs each feature on its own, so a feature that matters only next to another adds nothing there: a promo-code flag that lifts conversion on first visits and lowers it on returning ones can cancel out to no gain. When the chosen model is linear, cross such a feature with the one it depends on (Rules of ML #20), and keep the cross only if it earns its place. Each comparison is a recorded run.
 3. **Drop near-duplicates.** Two features that carry the same information (the same quantity in two units, a count and its log, a rank correlation above about 0.9) split the importance between them and double the upkeep. Keep the one that is cheaper to serve and easier to explain.
 4. **Ablate the final set.** Groups interact, so retrain once without each group on the same rows. A group whose removal costs less than the noise between folds goes: an unused feature is debt (#22).
 5. **Write why each feature is in** in the Why in column of the feature table in `MODEL.md`: the baseline, or the gain its group added and the run that showed it. A feature with no line there is not served.
@@ -79,4 +79,5 @@ Before the handover, ask a colleague to review the method the way code is review
 - No model beats the trivial baseline: the data holds little signal for this label; go back to `framing-models`.
 - The best model beats the simple one by less than the noise between folds.
 - A feature in the chosen model that no run shows earning its place.
+- A feature dropped because a linear model gained nothing from it, never compared in a model that can combine features.
 - A result that cannot be rebuilt from its record.

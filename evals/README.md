@@ -126,11 +126,23 @@ Runs that met each criterion where the arms differ, with bluML against without:
 
 `feature-choice` is the case where bluML scored lower. Without it, every run kept `from_waitlist` and backed it: members promoted from the waitlist skip about a third of evening classes and almost no daytime ones. With it, one run did; one kept the column with no evidence, and one dropped it because adding it back gave "no measurable gain". That reads like step 4 of `training-models` missing a feature that matters only next to another one, but it rests on one reply, and which skill each run loaded is not recorded, since the round ran without `--keep-temp`.
 
+### The feature step, on version 0.5.1
+
+On the case's data, `from_waitlist` adds +0.000 AUC to a logistic regression without a cross, +0.029 (sd 0.006 over three monthly folds) to boosted trees, and +0.036 to the logistic regression with a cross by the hour. The run that dropped it had used a logistic regression, and step 4 never said which model the comparisons run on. Version 0.5.1 tells step 4 to compare groups with a model that can combine features, and to cross a feature with the one it depends on when the chosen model is linear. `feature-choice` then ran again on 8 November, Opus 5.5 at high effort, five runs per arm with traces kept. It cost $9.24, judge included.
+
+| | with | without |
+|---|---|---|
+| Backs `from_waitlist` with evidence that it matters next to other columns | 4/5 | 2/5 |
+| `training-models` loaded | 3/5 | |
+| **Score** | **0.90** | **0.78** |
+
+Every run that loaded `training-models` backed `from_waitlist` (3 of 3), and the one run that missed it loaded only `framing-models`. Over both rounds the arm without bluML backed it in 5 of 8 runs, so its 3 of 3 on 0.5.0 overstated it. Five runs per arm is still a small sample.
+
 ### What it still misses
 
 - Sonnet with bluML weighed the model's small gain over the keyword rule against the cost of running a model in 1 of 3 runs, and never priced the misrouting (0 of 3). Opus 5.5 at high effort weighed the gain in 3 of 3 runs on 0.5.0, but no run in either arm priced the misrouting. Settling that is `framing-models`' main job, so it is still the next thing to fix.
 - When Opus with bluML concluded that the keyword rule should ship, it stopped there: it said how readiness would be confirmed on live tickets in 1 of 3 runs, against 3 of 3 without bluML, on 21 October and again on 8 November with 0.5.0. `framing-models` ends the outcome "The rule ships" with "stop", yet a rule put in front of people needs the same live check as a model.
-- Choosing features group by group can drop a column that only matters next to another one (`from_waitlist` beside the class hour, in `feature-choice` on 0.5.0).
+- Choosing features group by group dropped a column that only matters next to another one (`from_waitlist` beside the class hour, in `feature-choice` on 0.5.0). Since 0.5.1 the miss shows only in runs where `training-models` does not load.
 - In a request that runs from the data to a verdict, only `framing-models` loads. The advice in the other skills reaches the agent only if it asks for the next skill, and no run of the ranker re-run did.
 - Opus did not load the skills in 2 of 21 runs of the main round, and in 3 of 5 runs of the ranker re-run. Opus 5.5 at high effort loaded one in all 24 runs on 0.5.0.
 
