@@ -15,13 +15,13 @@ Stages run framing, design, data, training, evaluation, launch, live, retired. E
 - **What each error costs:** {a false positive costs ...; a false negative costs ...; any capacity limit, such as 40 demos a week}
 - **The rule to beat:** {the rule or current system, and its number on recent data, in the product's unit}
 - **The metric ladder:** {business metric} → {product metric} → {online proxy} → {offline metric}
-- **Why a model:** {what the rule cannot do, or "the rule ships" and why}
+- **Why a model:** {what the rule cannot do, or "the rule ships", why, and how it goes live: beside the people who decide today, the share of cases where they differ that lets it take over, and the switch back}
 - **The case:** {decisions per month, the expected gain over the rule (a range) and what one unit is worth; build cost; monthly cost: upkeep, pipelines, training compute, serving compute, paid calls, latency; net value per month, break-even gain, payback in months; the input that flips the answer}
 
 Gate:
 - [ ] The threshold owner agreed the decision and the error costs
 - [ ] The rule's number is measured on recent data
-- [ ] The expected gain clears the break-even gain, or the rule ships and this file stops here
+- [ ] The expected gain clears the break-even gain, or the rule ships with its live check written and this file stops here
 
 ## 2. Design
 

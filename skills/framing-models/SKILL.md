@@ -87,7 +87,7 @@ Build a model when all of these hold:
 
 Then write one of three outcomes:
 
-- **The rule ships.** The rule is good enough, or the expected gain sits below the break-even gain or only clears it at the top of its range. Write the rule's expected performance and the case, and stop. Revisit when labels accumulate, costs fall, or the rule needs exceptions.
+- **The rule ships.** The rule is good enough, or the expected gain sits below the break-even gain or only clears it at the top of its range. Write the rule's expected performance and the case, and how the rule goes live: its offline number is a hypothesis too. When people make the decision today, run the rule beside them first: they keep deciding, the rule's call is logged next to theirs, and the share of cases where the two differ, over a period fixed in advance, decides whether it takes over. Read a sample of those cases to see which side was wrong. Then let the rule suggest before it decides, and keep a switch that hands the decision back to people without a deploy (`launching-models`, reference/rollout.md). When nobody makes the decision today, the rule goes to a small share of traffic first, as a model would. Nothing else is built. Revisit when labels accumulate, costs fall, or the rule needs exceptions.
 - **Build a model.** Name the break-even gain it must clear over the rule, in the decision's unit. Consider keeping the rule in front, settling the cases it is sure of, with the model deciding only the rest: a cascade costs less to run (`launching-models`, reference/serving.md). Next, put the data in front of the owner (`exploring-data`); unless the model is small, the step after it is a design doc reviewed before building (`writing-design-docs`).
 - **Not now.** There is no label and no way to collect one, or the data holds no signal. Check every source of labels before settling on it: user reports, an existing system, annotators, a rule that is right when it fires (`building-datasets`, reference/labels.md). Say what would change the answer.
 
@@ -97,13 +97,14 @@ Fill the Decision section of `MODEL.md`, tick the gate items that hold, and add 
 
 ## Report
 
-Lead with the outcome in one line: the rule ships, build a model, or not now, and why. Then give the decision, the costs and their owner, the rule's number, the case (net value per month, break-even gain, payback), and the open questions for the owner. Keep assumptions visible: list each one next to the number it affects.
+Lead with the outcome in one line: the rule ships, build a model, or not now, and why. Then give the decision, the costs and their owner, the rule's number, the case (net value per month, break-even gain, payback), and the open questions for the owner. When the rule ships, say how it goes live and what result would stop it. Keep assumptions visible: list each one next to the number it affects.
 
 ## Stop signs
 
 - A request for "a model" with no decision behind it.
 - A label nobody can observe, or one that arrives after the decision stops mattering.
 - A rule that already meets the need.
+- A rule about to take a decision over from people, with no plan to check it on live cases first.
 - A request to "just train something" on a table before anyone has said what the prediction will change.
 - A model on a busy user-facing path, with nobody able to say what its latency costs.
 - A use of the prediction that works against the people it scores: an insurer asking which customers will stay healthy, so it can sell to them and avoid the rest.
