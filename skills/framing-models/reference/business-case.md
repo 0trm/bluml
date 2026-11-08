@@ -51,6 +51,8 @@ For a classifier, the ceiling comes first and costs nothing: a perfect model sav
 
 Leave out costs the rule also has: the case is the model against the rule, not against nothing.
 
+The quality bar sets the build cost more than anything else, and progress is not proportional to effort. In Google's examples, two teams took a model to 90% in a few months, several teams took more than five years to bring it to the 99.9% production needed, and raising precision from 99.9% to 99.99% can multiply a project's cost by ten or more. When the decision needs near-perfect output, price the build for it, or lower the bar the model must meet alone: let it decide where it is sure and send the rest to people (`launching-models`, reference/rollout.md, partial automation).
+
 ## Latency
 
 A model inside a user-facing request adds time to it: feature lookups, scoring, network. Slower pages lose users on every request, not only on the ones whose decision changed, so a small delay on a busy page can cost more than the model gains.

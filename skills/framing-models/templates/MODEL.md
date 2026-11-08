@@ -93,6 +93,7 @@ Gate:
 - **Rollout:** {shadow, then canary, then the online test, then everyone; each step's pass and stop conditions, and its result}
 - **Online test:** {primary metric, guardrails, duration, decision rule against the break-even gain, written before it starts, or with gallop installed the link to the plan filed by designing-experiments; the result next to the offline gain that predicted it}
 - **Rollback:** {how to switch back without a code change, what triggers it, when it was rehearsed}
+- **Runbook:** {who approves the start and each widening of the rollout, the steps, where a version goes first, what to do when a deployment fails; link}
 
 Gate:
 - [ ] Shadow traffic shows the served features and scores match the offline ones
@@ -103,7 +104,7 @@ Gate:
 
 | Monitor | Layer | Alert when | Owner |
 |---|---|---|---|
-| {name} | {system, inputs, outputs or outcomes} | {condition} | {who is paged} |
+| {name} | {system, inputs, outputs, outcomes, or pipelines when it retrains on a schedule} | {condition} | {who is paged} |
 
 - **Freshness:** {how fast performance decays with model age, and the retrain schedule it sets}
 - **Retrain gate:** {the newest days held out; the checks against the live model and a naive baseline; the operating point re-chosen from the owner's requirement; a failed check keeps the live model}

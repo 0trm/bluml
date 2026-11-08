@@ -17,7 +17,7 @@ A model learns what its labels say, so the labels cap what it can do. This file 
 
 | Source | Examples | What it brings in |
 |---|---|---|
-| Users | Spam flags, harassment reports, disputed charges confirmed as fraud | Labels only for what users saw and chose to report; blocking a sender is a weaker signal than a report |
+| Users | Spam flags, harassment reports, disputed charges confirmed as fraud | Labels only for what users saw and chose to report, so silence is not a label (spam left unopened in the inbox reads as "not spam"); blocking a sender is a weaker signal than a report |
 | Existing systems | A table's classification passed on to the tables built from it; code paths that only ever handle one kind of data | Labels at no cost, as good as the system that wrote them |
 | Annotators | An internal team, a vendor or experts labelling a sample | The ambiguous cases rules miss, and new patterns; slow and costly, so it becomes the bottleneck |
 | Rules that are right when they fire | Rules that settle the cases they are sure of, such as bot rules that classify 15% of traffic with the lowest false positive rate of any method | Many labels, but only for the cases the rule recognizes; a model trained only on them learns the rule |

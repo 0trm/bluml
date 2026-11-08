@@ -16,7 +16,7 @@ Read `MODEL.md` first. The Evaluation section must show the model beats the rule
 - [ ] 4. Tests pass before any traffic
 - [ ] 5. Rollout ladder with pass and stop conditions
 - [ ] 6. Online test designed, decision rule written
-- [ ] 7. Rollback rehearsed; monitors live
+- [ ] 7. Runbook written, rollback rehearsed, monitors live
 - [ ] 8. MODEL.md Launch section written
 ```
 
@@ -75,13 +75,17 @@ Write down, before the first user sees the model:
 
 For rankers, interleaving finds a preference with far less traffic than an A/B test; follow it with an A/B test when the business metric must be measured. [reference/online-tests.md](reference/online-tests.md) has the sizing formula and the checks.
 
-## 7. Rehearse the rollback; turn on monitors
+## 7. Write the runbook, rehearse the rollback, turn on monitors
 
 The current model or rule stays deployed and selectable by configuration, a feature flag or a registry alias, never by a code change; keep several past versions deployable, not only the last. Name what triggers a rollback (a guardrail breach, contract violations above a rate, scores outside a band) and who pulls it. Rehearse it once before the canary. Monitors on inputs, outputs and outcomes must be live before users see the model: set them up with `monitoring-models`.
 
+Write the runbook, so anyone on the team can release a version the same way: who approves the start of the rollout and each widening, the steps, where a version goes first (staging, shadow, canary), what to do when a deployment fails, and how to roll back. Once retraining is automated, script validation and deployment too: a release then waits for no one person, and the on-call engineer can run it.
+
 ## 8. Write it down
 
-Fill the Launch section of `MODEL.md`: serving shape and fallback, the latency measured on the serving path and the compute bill, input contract, parity evidence, rollout steps with dates and results, the online test design (with gallop installed, the link to the plan filed by `designing-experiments`) and its result next to the offline gain that predicted it, the rollback and its rehearsal. Tick the gate items that hold. When the decision rule says ship and rollout completes, write the case with the online effect in the Live section (replacing the latency estimate, which the effect now contains) and set the stage to live.
+Fill the Launch section of `MODEL.md`: serving shape and fallback, the latency measured on the serving path and the compute bill, input contract, parity evidence, rollout steps with dates and results, the online test design (with gallop installed, the link to the plan filed by `designing-experiments`) and its result next to the offline gain that predicted it, the rollback and its rehearsal, and the runbook. Tick the gate items that hold. When the decision rule says ship and rollout completes, write the case with the online effect in the Live section (replacing the latency estimate, which the effect now contains) and set the stage to live.
+
+When other engineers will maintain the model, `MODEL.md`, the design doc and the runbook are the handover: why the model and its features are what they are, how it is released and what is watched. Add the data's quirks a newcomer would trip on (a backfilled column, a source that lags) to the notes of the Data section's feature table.
 
 ## Report
 

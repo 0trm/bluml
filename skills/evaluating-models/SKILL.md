@@ -23,6 +23,7 @@ Read `MODEL.md` first: the Decision section has the decision, the costs and the 
 The threshold is a product decision, made with the costs from the Decision section. Pick the method that matches the decision:
 
 - **Costs per error:** the threshold with the lowest total cost on validation. When the cost of a miss varies by row (the amount of a fraud, the value of an account), the lowest-cost policy acts row by row when the expected cost of acting is lower (act when p × cost of a miss > cost of acting), which needs calibrated scores.
+- **A floor:** when the owner states a requirement instead of costs (precision of at least 90% among flags, wrong outputs under 0.1%), the threshold that does best on the one metric being optimized, such as recall, while clearing the floor on validation. Agree on that one metric; every other requirement is a floor.
 - **Capacity:** the top k per period (40 demos a week); report precision and recall among them.
 - **Forecasts:** the quantile the product promises.
 

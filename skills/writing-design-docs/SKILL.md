@@ -17,13 +17,13 @@ Read `MODEL.md` first. The design doc starts from its Decision section (what the
 
 ## 2. Answer the feasibility questions first
 
-Before writing the methodology, spend a short, fixed time on the questions that decide it: does the data exist at prediction time, how many labels are there and how late do they arrive, what does the rule score, does a simple baseline beat it at all. Put the numbers in the doc. Take them from the exploration notebook the model's owner has read (`exploring-data`), and run it first if nobody has looked at the data. A design built on unmeasured assumptions gets redesigned in review.
+Before writing the methodology, spend a short, fixed time on the questions that decide it: does the data exist at prediction time, may it be stored and used for this, how many labels are there for each class and how late do they arrive, what does the rule score, how well do people do the task, does a simple baseline beat it at all. Put the numbers in the doc. Take them from the exploration notebook the model's owner has read (`exploring-data`), and run it first if nobody has looked at the data. A design built on unmeasured assumptions gets redesigned in review.
 
-Read how others framed and evaluated the same problem, write-ups of systems in production first: the framing they chose, how they defined and cleaned the labels, and how they made offline metrics track online results. Their architecture matters less.
+Read how others framed and evaluated the same problem, write-ups of systems in production first: the framing they chose, how they defined and cleaned the labels, and how they made offline metrics track online results. Their architecture matters less. If nobody has solved a similar problem, say so: the project is research with no guaranteed result, so plan it as timeboxed steps that each end in a decision to go on, change course or stop (two weeks to learn whether the data can be had, two more to see whether a simple model works).
 
 ## 3. Draft for pre-review
 
-Copy [templates/DESIGN.md](templates/DESIGN.md) beside `MODEL.md` (or into the team's document tool) and fill it as an outline: bullets, open questions, rough numbers. Mark it "pre-review draft" at the top. It goes to one to three people (a teammate, a senior engineer, the threshold owner) to narrow the options early. Expect most of it to change. Collect their questions; the ones a reader will also ask go into the FAQ.
+Copy [templates/DESIGN.md](templates/DESIGN.md) beside `MODEL.md` (or into the team's document tool) and fill it as an outline: bullets, open questions, rough numbers. Mark it "pre-review draft" at the top. It goes to one to three people (a teammate, a senior engineer, the threshold owner) to narrow the options early. Expect most of it to change. Collect their questions; the ones a reader will also ask go into the FAQ. List the teams that must approve part of the system as well (access to personal data, security, legal), what each needs to see and when, and ask them now: an approval first asked for at launch delays it.
 
 ## 4. Write the review version
 

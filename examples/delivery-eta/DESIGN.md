@@ -8,6 +8,8 @@
 
 **What this review must decide:** online serving inside checkout's latency budget, or a precomputed table refreshed every five minutes; whether the data platform can log live queue and courier features at serving time from July; and who owns the choice of promised quantile (proposed: Marc, settled by the online test).
 
+**Approvals needed:** Priya (data platform) for logging live queue and courier features, asked 2026-05-28; the privacy lead for keeping order logs 13 months, asked 2026-05-28 and approved 2026-06-10.
+
 ## 1. Overview
 
 Customers see "arrives in 25 to 35 minutes" at checkout, computed today from a restaurant's average prep time and distance. It is on time for 71% of orders, and late orders drive most "where is my order" tickets. We propose a gradient-boosted model that predicts the 80th percentile of delivery time from the restaurant's live queue, recent prep times, distance, weather and courier supply, served online at checkout with today's formula as the fallback. We expect on-time orders to rise from 71% to about 80% offline, and the online test to decide whether that raises repeat orders.
