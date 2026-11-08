@@ -138,12 +138,26 @@ On the case's data, `from_waitlist` adds +0.000 AUC to a logistic regression wit
 
 Every run that loaded `training-models` backed `from_waitlist` (3 of 3), and the one run that missed it loaded only `framing-models`. Over both rounds the arm without bluML backed it in 5 of 8 runs, so its 3 of 3 on 0.5.0 overstated it. Five runs per arm is still a small sample.
 
+### The rule's live check, on version 0.5.2
+
+On 0.5.0, the two runs with bluML that missed the live check ended at using the subject→queue table; the one that passed added two weeks beside the agents. Both places where bluML decides to ship the rule ended there: `framing-models` step 6 said "and stop", and `evaluating-models`' verdict said only to recommend the rule. Version 0.5.2 says how a shipped rule goes live: beside the people who decide today, with the share of cases where the two differ deciding whether it takes over, then suggesting before it decides, with a switch back to people. `rule-first` then ran again on 8 November, Opus 5.5 at high effort, five runs per arm with traces kept. It took 10 minutes and cost $7.61, judge included.
+
+| | with | without |
+|---|---|---|
+| Says how readiness would be confirmed on live tickets | 5/5 | 5/5 |
+| Weighs the model's gap over the keyword rule against the cost of running a model | 5/5 | 2/5 |
+| States what each kind of misrouting costs and sets the operating point from it | 3/5 | 0/5 |
+| `framing-models` loaded | 5/5 | |
+| `evaluating-models` loaded | 3/5 | |
+| **Score** | **0.90** | **0.55** |
+
+Every run with bluML now opens its recommendation with the lookup table run beside the agents first, including the two that loaded only `framing-models`. The misrouting was priced in 3 of 5 runs with bluML, against 2 of 3 on 21 October and 0 of 3 on 0.5.0: that criterion swings between rounds, and 0.5.2 does not target it. Five runs per arm is still a small sample.
+
 ### What it still misses
 
-- Sonnet with bluML weighed the model's small gain over the keyword rule against the cost of running a model in 1 of 3 runs, and never priced the misrouting (0 of 3). Opus 5.5 at high effort weighed the gain in 3 of 3 runs on 0.5.0, but no run in either arm priced the misrouting. Settling that is `framing-models`' main job, so it is still the next thing to fix.
-- When Opus with bluML concluded that the keyword rule should ship, it stopped there: it said how readiness would be confirmed on live tickets in 1 of 3 runs, against 3 of 3 without bluML, on 21 October and again on 8 November with 0.5.0. `framing-models` ends the outcome "The rule ships" with "stop", yet a rule put in front of people needs the same live check as a model.
+- Sonnet with bluML weighed the model's small gain over the keyword rule against the cost of running a model in 1 of 3 runs, and never priced the misrouting (0 of 3). Opus 5.5 at high effort weighed the gain in 3 of 3 runs on 0.5.0, but no run in either arm priced the misrouting; on 0.5.2, 3 of 5 runs with bluML priced it and none without. Settling that is `framing-models`' main job, so it is still the next thing to fix.
 - Choosing features group by group dropped a column that only matters next to another one (`from_waitlist` beside the class hour, in `feature-choice` on 0.5.0). Since 0.5.1 the miss shows only in runs where `training-models` does not load.
-- In a request that runs from the data to a verdict, only `framing-models` loads. The advice in the other skills reaches the agent only if it asks for the next skill, and no run of the ranker re-run did.
+- In a request that runs from the data to a verdict, the advice in the other skills reaches the agent only if it asks for the next skill. No run of the ranker re-run did, and on 8 November 1 of 5 runs of `feature-choice` and 2 of 5 of `rule-first` loaded only `framing-models`.
 - Opus did not load the skills in 2 of 21 runs of the main round, and in 3 of 5 runs of the ranker re-run. Opus 5.5 at high effort loaded one in all 24 runs on 0.5.0.
 
 ### How to read it
