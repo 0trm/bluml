@@ -41,7 +41,7 @@ PATH = [
     ("retire", "terminator", "Retire to the rule", None),
 ]
 
-# The phases, after the design, development and deployment parts of the mlkb notes (docs/sources.md)
+# The phases, after the design, development and deployment parts of the mllc notes (docs/sources.md)
 PHASES = [
     ("Design", ["frame", "worth", "design", "data"]),
     ("Development", ["train", "evaluate"]),

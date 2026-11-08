@@ -28,7 +28,7 @@ The command has no flag for the agent's effort: export `CLAUDE_CODE_EFFORT_LEVEL
 
 ## Results
 
-Run on 21 October 2026 with Claude Code 2.1.305, on version 0.2.0 of the skills, after they took in mlkb's update of 20 October. The agent ran as `--model sonnet` or `--model opus`, the judge was Sonnet with three votes per criterion, and each case ran three times per arm. A score is the weighted share of criteria met, averaged over the three runs. A skill fired in 40 of the 42 runs with bluML; Opus went without one once in `churn-leak` and once in `ranker-clicks`. The runs in the table cost about $50, judge included: $19 for Sonnet and $31 for Opus.
+Run on 21 October 2026 with Claude Code 2.1.305, on version 0.2.0 of the skills, after they took in mllc's update of 20 October. The agent ran as `--model sonnet` or `--model opus`, the judge was Sonnet with three votes per criterion, and each case ran three times per arm. A score is the weighted share of criteria met, averaged over the three runs. A skill fired in 40 of the 42 runs with bluML; Opus went without one once in `churn-leak` and once in `ranker-clicks`. The runs in the table cost about $50, judge included: $19 for Sonnet and $31 for Opus.
 
 | Case | Sonnet with | without | Δ | Opus with | without | Δ |
 |---|---|---|---|---|---|---|
@@ -95,7 +95,7 @@ The +0.21 cannot be credited to step 4. A skill fired in 1 of 3 runs, and it was
 
 ### Version 0.5.0 on Opus 5.5 at high effort
 
-Run on 8 November 2026 with Claude Code 2.1.319, on version 0.5.0, after the skills took in mlkb's update of 8 November. The agent ran as `--model claude-opus-5-5` with `CLAUDE_CODE_EFFORT_LEVEL=high`, the judge was Sonnet with three votes per criterion, and each of the eight cases ran three times per arm. A skill fired in all 24 runs with bluML. The round took an hour and cost $46.16: $39.33 for the agent and $6.83 for the judge.
+Run on 8 November 2026 with Claude Code 2.1.319, on version 0.5.0, after the skills took in mllc's update of 8 November. The agent ran as `--model claude-opus-5-5` with `CLAUDE_CODE_EFFORT_LEVEL=high`, the judge was Sonnet with three votes per criterion, and each of the eight cases ran three times per arm. A skill fired in all 24 runs with bluML. The round took an hour and cost $46.16: $39.33 for the agent and $6.83 for the judge.
 
 | Case | with | without | Δ |
 |---|---|---|---|
