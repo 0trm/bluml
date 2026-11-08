@@ -24,6 +24,8 @@ claude plugin eval . --scaffold --allow-tools Bash Write Edit --model sonnet --j
 
 `--scaffold` runs each case's `scaffold.sh` as you; it only copies files and installs numpy, pandas, scikit-learn and scipy into the run's workspace. Each case runs three times per arm by default. Reports land in `evals/results/`. Add `--keep-temp` to keep each run's trace, which shows the skills it loaded. In the JSON from `--json`, `costUsd` counts the agent only; the judge's cost is in each run's `judgeCostUsd`.
 
+The command has no flag for the agent's effort: export `CLAUDE_CODE_EFFORT_LEVEL` (for example `high`) before it, and the runs inherit it. It exits with 1 when cases score below `--threshold`, which defaults to 1.0, so a round with no failed runs can still exit with 1.
+
 ## Results
 
 Run on 21 October 2026 with Claude Code 2.1.305, on version 0.2.0 of the skills, after they took in mlkb's update of 20 October. The agent ran as `--model sonnet` or `--model opus`, the judge was Sonnet with three votes per criterion, and each case ran three times per arm. A score is the weighted share of criteria met, averaged over the three runs. A skill fired in 40 of the 42 runs with bluML; Opus went without one once in `churn-leak` and once in `ranker-clicks`. The runs in the table cost about $50, judge included: $19 for Sonnet and $31 for Opus.
@@ -91,12 +93,46 @@ The earlier loss does not hold up: over the main round and this one, Sonnet name
 
 The +0.21 cannot be credited to step 4. A skill fired in 1 of 3 runs, and it was `framing-models`; `training-models` never loaded, so in two runs the arms differed only by the skills' descriptions in the agent's context. Every run kept `from_waitlist`, because importance ranks it high, so the trap for choosing by each feature's score alone did not bite; that criterion separates runs only by whether they backed the feature with a comparison. Three criteria pass in every run of both arms and leave no room to show a gain.
 
+### Version 0.5.0 on Opus 5.5 at high effort
+
+Run on 8 November 2026 with Claude Code 2.1.319, on version 0.5.0, after the skills took in mlkb's update of 8 November. The agent ran as `--model claude-opus-5-5` with `CLAUDE_CODE_EFFORT_LEVEL=high`, the judge was Sonnet with three votes per criterion, and each of the eight cases ran three times per arm. A skill fired in all 24 runs with bluML. The round took an hour and cost $46.16: $39.33 for the agent and $6.83 for the judge.
+
+| Case | with | without | Δ |
+|---|---|---|---|
+| `design-doc` | 1.00 | 0.93 | +0.07 |
+| `rule-first` | 0.67 | 0.58 | +0.08 |
+| `churn-leak` | 1.00 | 1.00 | 0.00 |
+| `fraud-threshold` | 0.89 | 0.67 | +0.22 |
+| `ranker-clicks` | 1.00 | 1.00 | 0.00 |
+| `ship-it` | 1.00 | 1.00 | 0.00 |
+| `ctr-drop` | 1.00 | 0.96 | +0.04 |
+| `feature-choice` | 0.83 | 0.96 | −0.12 |
+| **Mean** | **0.92** | **0.89** | **+0.04** |
+
+On the seven cases of 21 October, the arm with bluML scores 0.94, against 0.96 for October's `--model opus` at its default effort: within the noise of three runs. The arm without bluML scores 0.88, against 0.84, and that is most of why Δ on those cases fell from +0.12 to +0.06. No case grades what 0.5.0 added (the deployment runbook, monitors on the retraining jobs, a floor as an operating point), so this round shows that nothing regressed, not that the additions help.
+
+Runs that met each criterion where the arms differ, with bluML against without:
+
+| Criterion | with | without |
+|---|---|---|
+| `fraud-threshold`: compares the model with the rule slice by slice, new against existing customers | 2/3 | 0/3 |
+| `fraud-threshold`: notes that the model separates fraud much worse for new customers | 3/3 | 1/3 |
+| `rule-first`: weighs the model's gap over the keyword rule against the cost of running a model | 3/3 | 1/3 |
+| `design-doc`: measures the current badge rule and treats keeping it as a real alternative | 3/3 | 2/3 |
+| `ctr-drop`: proposes a monitor by platform and app version that would have caught the drop | 3/3 | 2/3 |
+| `feature-choice`: splits by time and measures the noise before calling a difference real | 3/3 | 2/3 |
+| `feature-choice`: backs `from_waitlist` with evidence that it matters next to other columns | 1/3 | 3/3 |
+| `rule-first`: says how readiness would be confirmed on live tickets | 1/3 | 3/3 |
+
+`feature-choice` is the case where bluML scored lower. Without it, every run kept `from_waitlist` and backed it: members promoted from the waitlist skip about a third of evening classes and almost no daytime ones. With it, one run did; one kept the column with no evidence, and one dropped it because adding it back gave "no measurable gain". That reads like step 4 of `training-models` missing a feature that matters only next to another one, but it rests on one reply, and which skill each run loaded is not recorded, since the round ran without `--keep-temp`.
+
 ### What it still misses
 
-- Sonnet with bluML weighed the model's small gain over the keyword rule against the cost of running a model in 1 of 3 runs, and never priced the misrouting (0 of 3). Settling that is `framing-models`' main job, so it is still the next thing to fix.
-- When Opus with bluML concluded that the keyword rule should ship, it stopped there: it said how readiness would be confirmed on live tickets in 1 of 3 runs, against 3 of 3 without bluML. `framing-models` ends the outcome "The rule ships" with "stop", yet a rule put in front of people needs the same live check as a model.
+- Sonnet with bluML weighed the model's small gain over the keyword rule against the cost of running a model in 1 of 3 runs, and never priced the misrouting (0 of 3). Opus 5.5 at high effort weighed the gain in 3 of 3 runs on 0.5.0, but no run in either arm priced the misrouting. Settling that is `framing-models`' main job, so it is still the next thing to fix.
+- When Opus with bluML concluded that the keyword rule should ship, it stopped there: it said how readiness would be confirmed on live tickets in 1 of 3 runs, against 3 of 3 without bluML, on 21 October and again on 8 November with 0.5.0. `framing-models` ends the outcome "The rule ships" with "stop", yet a rule put in front of people needs the same live check as a model.
+- Choosing features group by group can drop a column that only matters next to another one (`from_waitlist` beside the class hour, in `feature-choice` on 0.5.0).
 - In a request that runs from the data to a verdict, only `framing-models` loads. The advice in the other skills reaches the agent only if it asks for the next skill, and no run of the ranker re-run did.
-- Opus did not load the skills in 2 of 21 runs of the main round, and in 3 of 5 runs of the ranker re-run.
+- Opus did not load the skills in 2 of 21 runs of the main round, and in 3 of 5 runs of the ranker re-run. Opus 5.5 at high effort loaded one in all 24 runs on 0.5.0.
 
 ### How to read it
 
