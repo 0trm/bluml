@@ -16,6 +16,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.metrics import roc_auc_score
 
 ROOT = Path(__file__).parent
@@ -363,6 +364,132 @@ def make_ctr(rng: np.random.Generator) -> tuple[pd.DataFrame, pd.DataFrame]:
     return ref[cols], live[cols]
 
 
+# %% feature-choice: a paid feed that adds nothing, a feature that only works with another, duplicates
+def make_bookings(rng: np.random.Generator) -> pd.DataFrame:
+    n_members, n = 1500, 12000
+    studio_eff = rng.normal(0, 0.3, 9)  # studios 1 to 8
+    z = rng.normal(0, 1, n_members)  # how reliably each member turns up
+    plan = rng.choice(["unlimited", "class_pack", "drop_in"], n_members, p=[0.5, 0.35, 0.15])
+    home = rng.integers(1, 9, n_members)
+    joined = pd.Timestamp("2026-04-01") - pd.to_timedelta(rng.exponential(400, n_members), unit="D")
+    prior_b = rng.poisson(12, n_members)
+    prior_ns = rng.binomial(prior_b, sigmoid(-2.0 + 0.9 * z))
+
+    m = rng.integers(0, n_members, n)
+    day = pd.Timestamp("2026-04-01") + pd.to_timedelta(rng.integers(0, 183, n), unit="D")
+    hw = np.array([4, 8, 6, 3, 2, 3, 6, 4, 2, 2, 3, 6, 9, 9, 7, 4], float)
+    hour = rng.choice(np.arange(6, 22), n, p=hw / hw.sum())
+    start = day + pd.to_timedelta(hour, unit="h")
+    lead_h = np.round(2 + rng.exponential(40, n), 1)
+    booked = start - pd.to_timedelta(lead_h, unit="h")
+    studio = np.where(rng.random(n) < 0.8, home[m], rng.integers(1, 9, n))
+    ctype = rng.choice(["spin", "hiit", "yoga", "pilates", "strength"], n, p=[0.28, 0.2, 0.22, 0.15, 0.15])
+    channel = rng.choice(["app", "web", "front_desk"], n, p=[0.7, 0.2, 0.1])
+    wait = rng.random(n) < 0.25
+    dow = start.day_of_week.to_numpy()
+    tenure = (booked.normalize() - joined[m].normalize()).days.to_numpy().clip(0)
+
+    logit = (
+        -2.4 + 0.9 * z[m] + 0.35 * np.log1p(lead_h / 24)
+        + np.select([hour < 9, hour >= 17], [-0.4, 0.4], 0.0)
+        + pd.Series(ctype).map({"spin": 0.2, "hiit": 0.1, "yoga": -0.1, "pilates": -0.2, "strength": 0.0}).to_numpy()
+        + pd.Series(plan[m]).map({"unlimited": 0.5, "class_pack": 0.0, "drop_in": -0.6}).to_numpy()
+        + pd.Series(channel).map({"app": 0.0, "web": 0.1, "front_desk": -0.5}).to_numpy()
+        + studio_eff[studio] - 0.2 * (dow >= 5) - 0.1 * np.log1p(tenure / 30)
+        # A spot from the waitlist: before 17:00 the member took it and nearly always comes;
+        # for evening classes the offer lands mid-workday and is often missed.
+        + wait * np.where(hour >= 17, 0.9, -3.0)
+    )
+    no_show = rng.random(n) < sigmoid(logit)
+
+    df = pd.DataFrame(dict(
+        booking_id=np.arange(700001, 700001 + n), booked_at=booked.round("min"), class_start=start,
+        member_id=[f"M{i:05d}" for i in m], studio_id=studio, class_type=ctype, class_hour=hour,
+        day_of_week=start.day_name(), membership=plan[m], channel=channel, from_waitlist=wait.astype(int),
+        lead_time_hours=lead_h, tenure_days=tenure, no_show=no_show.astype(int),
+    )).sort_values("class_start").reset_index(drop=True)
+    df["booking_id"] = 700000 + df["booked_at"].rank(method="first").astype(int)  # issued in booking order
+    g = df.groupby("member_id")
+    mi = df["member_id"].str[1:].astype(int).to_numpy()
+    df["past_bookings"] = prior_b[mi] + g.cumcount().to_numpy()
+    df["past_no_shows"] = prior_ns[mi] + (g["no_show"].cumsum() - df["no_show"]).to_numpy()
+    rate = df["past_no_shows"] / df["past_bookings"].replace(0, np.nan)
+    df["past_noshow_rate"] = rate.round(4)
+    # Duplicates: the same quantity in another unit or on another scale.
+    df["lead_time_days"] = (df["lead_time_hours"] / 24).round(3)
+    df["log_past_bookings"] = np.log1p(df["past_bookings"]).round(4)
+    df["past_noshow_pct"] = (100 * rate).round(2)
+
+    # The location feed: facts about each studio's area, and footfall by hour and weekday.
+    # Every column is a function of the studio, the hour and the weekday, plus noise.
+    s, h = df["studio_id"].to_numpy(), df["class_hour"].to_numpy()
+    d = df["class_start"].dt.day_of_week.to_numpy()
+    rank = studio_eff.argsort().argsort()
+    static = dict(
+        area_median_income_k=40 + 4 * rank + rng.normal(0, 3, 9),
+        area_pop_density=3000 + 900 * rank + rng.normal(0, 1500, 9),
+        area_transit_score=50 + 5 * rank + rng.normal(0, 8, 9),
+        area_parking_score=rng.uniform(10, 90, 9),
+        area_competitor_gyms_1km=rng.integers(0, 12, 9),
+        area_office_share=0.2 + 0.05 * rank + rng.normal(0, 0.05, 9),
+        area_age_median=rng.uniform(28, 44, 9),
+        area_green_space_share=rng.uniform(0.05, 0.4, 9),
+        area_rent_index=80 + 6 * rank + rng.normal(0, 10, 9),
+        area_crime_index=rng.uniform(20, 70, 9),
+    )
+    for k, v in static.items():
+        df[k] = np.round(v[s], 3)
+    k = len(df)
+    commute = np.exp(-((h - 8) ** 2) / 4) + np.exp(-((h - 18.5) ** 2) / 5)
+    df["area_foot_traffic_idx"] = np.round(100 * commute * np.where(d >= 5, 0.6, 1.0) + rng.normal(0, 8, k), 1)
+    df["area_commuter_share_now"] = np.round(np.clip(0.1 + 0.035 * (h - 6) + rng.normal(0, 0.05, k), 0, 1), 3)
+    df["area_dwell_minutes"] = np.round(20 + 1.5 * (h - 6) + 2 * rank[s] + rng.normal(0, 4, k), 1)
+    df["area_visits_forecast"] = np.round(500 + 60 * h + 40 * rank[s] + rng.normal(0, 150, k))
+    df["area_footfall_vs_avg"] = np.round(df["area_foot_traffic_idx"] / 50 - 1 + rng.normal(0, 0.1, k), 3)
+    # App telemetry, unrelated to turning up.
+    df["app_build"] = rng.choice(["5.10.2", "5.11.0", "5.11.1", "5.12.0"], k)
+    df["device_os"] = rng.choice(["ios", "android", "web"], k, p=[0.5, 0.35, 0.15])
+    df["push_opt_in"] = (rng.random(k) < 0.6).astype(int)
+    df["profile_complete"] = (rng.random(k) < 0.7).astype(int)
+    area = [c for c in df if c.startswith("area_")]
+    df = df[[
+        "booking_id", "booked_at", "class_start", "member_id", "studio_id", "class_type", "class_hour",
+        "day_of_week", "membership", "channel", "from_waitlist", "lead_time_hours", "lead_time_days",
+        "tenure_days", "past_bookings", "log_past_bookings", "past_no_shows", "past_noshow_rate",
+        "past_noshow_pct", *area, "app_build", "device_os", "push_opt_in", "profile_complete", "no_show",
+    ]]
+
+    # Trap checks, with boosted trees on a time split: train before August, validate on August and September.
+    X = df.drop(columns=["booking_id", "booked_at", "class_start", "member_id", "no_show"]).copy()
+    for c in ["class_type", "day_of_week", "membership", "channel", "app_build", "device_os"]:
+        X[c] = X[c].astype("category").cat.codes
+    y = df["no_show"].to_numpy()
+    tr = (df["class_start"] < "2026-08-01").to_numpy()
+
+    def auc(cols):
+        model = HistGradientBoostingClassifier(max_iter=200, learning_rate=0.05, random_state=0)
+        model.fit(X.loc[tr, cols], y[tr])
+        return roc_auc_score(y[~tr], model.predict_proba(X.loc[~tr, cols])[:, 1])
+
+    core = ["studio_id", "class_type", "class_hour", "day_of_week", "membership", "channel",
+            "lead_time_hours", "tenure_days", "past_bookings", "past_no_shows", "past_noshow_rate"]
+    alone = {c: roc_auc_score(y, X[c].fillna(-1)) for c in X}
+    found = dict(
+        rate=y.mean(), every=auc(list(X)), no_feed=auc([c for c in X if c not in area]),
+        core=auc(core), core_wait=auc(core + ["from_waitlist"]), wait_alone=alone["from_waitlist"],
+        feed_strong=sum(abs(alone[c] - 0.5) > 0.05 for c in area),
+    )
+    assert 0.12 < found["rate"] < 0.18, found
+    assert found["every"] < found["no_feed"] + 0.003, found  # the feed adds nothing
+    assert found["feed_strong"] >= 4, found  # yet several of its columns score well alone
+    assert abs(found["wait_alone"] - 0.5) < 0.02, found  # from_waitlist scores like noise alone
+    assert found["core_wait"] - found["core"] > 0.025, found  # and matters next to the hour
+    for a, b in [("lead_time_hours", "lead_time_days"), ("past_bookings", "log_past_bookings"),
+                 ("past_noshow_rate", "past_noshow_pct")]:
+        assert df[a].rank().corr(df[b].rank()) > 0.999, (a, b)
+    return df
+
+
 # %%
 if __name__ == "__main__":
     make_tickets(np.random.default_rng(SEED)).to_csv(out("rule-first", "tickets.csv"), index=False)
@@ -371,6 +498,7 @@ if __name__ == "__main__":
     make_impressions(np.random.default_rng(SEED + 3)).to_csv(out("ship-it", "impressions_sample.csv"), index=False)
     make_ranker(np.random.default_rng(SEED + 5)).to_csv(out("ranker-clicks", "impressions.csv"), index=False)
     make_listings(np.random.default_rng(SEED + 6)).to_csv(out("design-doc", "listings_sample.csv"), index=False)
+    make_bookings(np.random.default_rng(SEED + 7)).to_csv(out("feature-choice", "bookings.csv"), index=False)
     ref, live = make_ctr(np.random.default_rng(SEED + 4))
     ref.to_csv(out("ctr-drop", "training_reference.csv"), index=False)
     live.to_csv(out("ctr-drop", "live_requests.csv"), index=False)
