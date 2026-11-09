@@ -213,7 +213,7 @@ On 0.5.5 and 0.5.6, 2 of 15 runs of `feature-choice` that started in `framing-mo
 | Loaded `doubting-results` | 8/10 (9/10 on 0.5.6) | 5/5 (4/5 on 0.5.4) |
 | **Score** | **0.95** (0.99 on 0.5.6) | **1.00** (1.00 on 0.5.4) |
 
-All 11 runs that started in `framing-models` loaded the later skills, within two steps of it. Of the other `feature-choice` runs, the two that started in `building-datasets` went on; the one that started in `training-models` stopped there, as one did on 0.5.5, and one loaded no skill. `rule-first` passed every criterion in all 5 runs. `feature-choice` missed the duplicate-columns criterion in 2 of 10 runs, against 1 of 35 since 0.5.1: one started in `building-datasets`, which this version did not change, and the other recommended a two-column rule over the model and named no duplicate pair. The stop is gone from `framing-models` in these 15 runs, but a miss seen in 2 of 15 needs more runs to rule out.
+All 11 runs that started in `framing-models` loaded the later skills, within two steps of it. Of the other `feature-choice` runs, the two that started in `building-datasets` went on; the one that started in `training-models` stopped there, as one did on 0.5.5, and one loaded no skill. `rule-first` passed every criterion in all 5 runs. `feature-choice` missed the duplicate-columns criterion in 2 of 10 runs, against 1 of 35 since 0.5.1: one started in `building-datasets`, which this version did not change, and the other named the duplicates but recommended a two-column rule over the model and dropped both lead-time columns, and two of its three judges failed it. The stop is gone from `framing-models` in these 15 runs, but a miss seen in 2 of 15 needs more runs to rule out.
 
 ### Later skills from the top of `training-models`, on version 0.5.8
 
@@ -227,11 +227,22 @@ On 0.5.5 and 0.5.7, both runs of `feature-choice` that started in `training-mode
 
 All five 0.5.8 runs loaded `doubting-results` and `evaluating-models` right after `training-models`, before the first query on the data. The score fell for two reasons the runs do not tie to the change. One run hit the 30-minute limit before replying and scored 0: its run log stopped parsing and it reran every stage; a 0.5.7 run also took the full 30 minutes, and finished. Two runs left the duplicate columns out of the reply, though `MODEL.md` named all three pairs in both; the three 0.5.7 runs that loaded `evaluating-models` at about the same point named them. Without the run that timed out, 0.5.8 scores 0.88. A probe that names the skill is not a run that picks it, and five runs a side is a small sample.
 
+### Duplicate columns in the reply, on version 0.5.9
+
+From 0.5.1 to 0.5.8, 4 of the 54 replies of `feature-choice` and its `training-models` probe missed the duplicate-columns criterion by naming fewer than two pairs. In all 4, `MODEL.md` named all three pairs; the reply put them under "everything else is dropped", called them "the duplicate columns (log, percentage, days)", named one pair, or left them out. The reply lines from 0.5.6 asked for each kept feature's number and nothing about the columns dropped. Version 0.5.9 has `training-models` and `evaluating-models` name the dropped columns in the reply by reason, each near-duplicate beside the column it repeats and the one that stayed. `feature-choice` ran ten times and the probe five, on 9 November, Opus 5.5 at high effort, with bluML only; the two batches cost $23.75, judge included.
+
+| | `feature-choice` | Probe that starts in `training-models` |
+|---|---|---|
+| Names at least two duplicate pairs in the reply and keeps one of each | 10/10 (8/10 on 0.5.7) | 3/5, 2 timed out before replying (2/5 on 0.5.8, 1 timed out) |
+| **Score** | **1.00** (0.95 on 0.5.7) | **0.60** (0.70 on 0.5.8) |
+
+Every reply that came back named all three dropped columns beside the ones they repeat. The two `feature-choice` runs that started in `training-models` loaded `doubting-results` and `evaluating-models` at once, the first runs to test 0.5.8 without the probe's prompt; both such runs before 0.5.8 had stopped there. One run loaded no skill and still passed every criterion. The two probe runs that timed out were rerunning every stage so their run log matched the code, and still training. Ten runs and five are small samples.
+
 ### What it still misses
 
 - Sonnet with bluML weighed the model's small gain over the keyword rule against the cost of running a model in 1 of 3 runs, and never priced the misrouting (0 of 3). Opus 5.5 at high effort weighed the gain in every run since 0.5.0 and priced the misrouting in 4 of 5 runs on 0.5.3; Sonnet has not run since 0.2.0.
-- A run that finds the duplicate columns does not always name them in the reply: since 0.5.7, 4 of the 19 runs of `feature-choice` and its probe that replied missed the duplicate-columns criterion, against 1 of 35 from 0.5.1 to 0.5.6. In 3 of the 4, `MODEL.md` named all three pairs and the reply named fewer than two.
-- Opus did not load the skills in 2 of 21 runs of the main round, and in 3 of 5 runs of the ranker re-run. Opus 5.5 at high effort loaded one in 91 of its 94 runs from 0.5.0 to 0.5.7.
+- Runs got slower. With ten runs at once on one machine, `feature-choice` on 0.5.9 took a median of 18 minutes, against 9 on 0.5.7, when the batch beside it was `rule-first` rather than the probe. The probe hit the 30-minute limit in 3 of its 10 runs on 0.5.8 and 0.5.9, and in none of 5 on 0.5.7; a run that times out scores 0 on every criterion. The machine's load and the skills are not yet told apart.
+- Opus did not load the skills in 2 of 21 runs of the main round, and in 3 of 5 runs of the ranker re-run. Opus 5.5 at high effort loaded one in 100 of its 104 runs of the suite's cases from 0.5.0 to 0.5.9.
 
 ### How to read it
 
