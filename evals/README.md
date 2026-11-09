@@ -178,12 +178,25 @@ In the 15 runs with bluML kept from the re-runs of 0.5.1 to 0.5.3, 6 loaded only
 
 The line in `framing-models` works: runs that started there went on to the next stage's skill in 9 of 10. Runs that started elsewhere did not, in 0 of 4: `feature-choice` entered through `building-datasets` or `training-models` in 4 of its 10 runs on 0.5.4, and loaded no skill in 1. Its first batch, before the line at the top of `building-datasets` and `training-models` was added, loaded a second skill in 0 of 5 and scored 0.88; since then only one run has started in `training-models`, and it did not follow the line. `rule-first` ran before that line was added.
 
+### Entry skills, on version 0.5.5
+
+On 0.5.4, the four `feature-choice` runs that started in `building-datasets` or `training-models` loaded no later skill. Three of them ran before those skills named the later stages. The one after them, and a run that reached `building-datasets` from `framing-models`, read the pointer at the end of the skill's opening paragraph and did not follow it, while the paragraph of its own in `framing-models` was followed in 9 of 10 runs. Version 0.5.5 gives `building-datasets`, `training-models` and `evaluating-models` a paragraph of their own that loads the later stages' skills as soon as the skill loads, not when each stage starts. `feature-choice` ran ten times, and `fraud-threshold`, which starts in `evaluating-models`, five times, on 9 November, Opus 5.5 at high effort, with bluML only. Scores leave out the skill-loaded check. The two batches cost $18.31, judge included.
+
+| | `feature-choice` | `fraud-threshold` |
+|---|---|---|
+| Started outside `framing-models` | 3/10 | 5/5 |
+| Of those, loaded the later stages' skills | 2/3 (0/4 on 0.5.4) | 5/5 |
+| Loaded `doubting-results` | 7/10 (2/10 on 0.5.4) | 5/5 |
+| **Score** | **0.88** (0.90 on 0.5.4) | **1.00** (0.89 on 0.5.0) |
+
+Runs that started outside `framing-models` loaded the later skills in 7 of 8, against 0 of 4 on 0.5.4, and 6 of the 7 loaded them at the start, as the paragraph says. The one that did not started in `training-models`, with the new paragraph in front of it. On 0.5.0, each of `fraud-threshold`'s three runs loaded one skill only. Of the runs that started in `framing-models`, 5 of 6 went on, and 1 run loaded no skill. `feature-choice` missed the `from_waitlist` criterion in 5 of 10 runs, against 3 of 10 on 0.5.4, a gap ten runs cannot tell from chance; every one kept the column but gave no number for it in the reply, and 4 of the 5 had loaded `training-models`.
+
 ### What it still misses
 
 - Sonnet with bluML weighed the model's small gain over the keyword rule against the cost of running a model in 1 of 3 runs, and never priced the misrouting (0 of 3). Opus 5.5 at high effort weighed the gain in every run since 0.5.0 and priced the misrouting in 4 of 5 runs on 0.5.3; Sonnet has not run since 0.2.0.
-- Choosing features group by group dropped a column that only matters next to another one (`from_waitlist` beside the class hour, in `feature-choice` on 0.5.0). Since 0.5.1 it shows mostly in runs where `training-models` does not load: 3 of the 4 misses in 15 runs.
-- A run that starts in a skill other than `framing-models` seldom loads the next one: 0 of 4 on 0.5.4, against 9 of 10 that started in `framing-models`. The advice in the later skills reaches it only if it asks for them.
-- Opus did not load the skills in 2 of 21 runs of the main round, and in 3 of 5 runs of the ranker re-run. Opus 5.5 at high effort loaded one in 53 of its 54 runs from 0.5.0 to 0.5.4.
+- Choosing features group by group dropped a column that only matters next to another one (`from_waitlist` beside the class hour, in `feature-choice` on 0.5.0). No run has dropped it since 0.5.1, but 9 of 25 kept it with no evidence in the reply that it matters next to the hour, whether `training-models` loaded (5 of 15) or not (4 of 10).
+- A run does not always load the next stage's skill: on 0.5.5, 1 of 6 runs that started in `framing-models` and 1 of 8 that started elsewhere stopped at their first skill. The advice in the later skills reaches a run only if it asks for them.
+- Opus did not load the skills in 2 of 21 runs of the main round, and in 3 of 5 runs of the ranker re-run. Opus 5.5 at high effort loaded one in 67 of its 69 runs from 0.5.0 to 0.5.5.
 
 ### How to read it
 

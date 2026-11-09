@@ -7,7 +7,9 @@ description: Builds the training table for a product model so that every row loo
 
 The training table decides what a model can learn and how honest its scores will be. Most product models that disappoint after launch were trained on rows that could not have existed when the prediction was made.
 
-Read the model's `MODEL.md` first; the Decision section says when the model predicts and what the product does with it. If there is no `MODEL.md`, run `framing-models` first, or write down the prediction moment before going on. If nobody has looked at the data yet, run `exploring-data` first: the grain, the window and the outliers it settles are decisions this table inherits. When the request goes on past the table (train the model, choose its columns, say whether it is ready), load each later stage's skill when its work starts: `training-models` before the first fit, `evaluating-models` before the verdict, and `doubting-results` before any model number goes into the reply.
+Read the model's `MODEL.md` first; the Decision section says when the model predicts and what the product does with it. If there is no `MODEL.md`, run `framing-models` first, or write down the prediction moment before going on. If nobody has looked at the data yet, run `exploring-data` first: the grain, the window and the outliers it settles are decisions this table inherits.
+
+When the request goes on past the table (train the model, choose its columns, say whether it is ready or worth what it costs), load the skills for those stages now, before going on: `training-models` for the fits and the choice of columns, `evaluating-models` for the verdict, and `doubting-results` for every model number that goes into the reply. Their steps apply once this table is built.
 
 Copy this checklist into your work and tick it as you go:
 
