@@ -13,6 +13,8 @@ With gallop installed, gallop's `routing-questions` and `building-models` run fi
 
 Look for the model's `MODEL.md`: beside its code, or under `models/<name>/`. If it exists, read it and continue with the skill for its stage (design: `writing-design-docs`, data: `building-datasets`, training: `training-models`, evaluation: `evaluating-models`, launch: `launching-models`, live: `monitoring-models`). If it doesn't, copy [templates/MODEL.md](templates/MODEL.md) next to the model's code and fill its Decision section as you work through the steps below.
 
+When the request goes on past framing (build the model, say whether it is ready), load the later stages' skills now, before the first query on the data: `building-datasets` for the split, the features and the leak checks, `training-models` for the fits and the choice of columns, `evaluating-models` for the verdict, and `doubting-results` for every model number that goes into the reply. Framing's steps still come first, and each skill's steps apply when its stage starts. That holds for a model built only to show that the rule is enough. Working alone, skip what needs the owner (the readings in `exploring-data`, the design review), and say so.
+
 ## 1. Name the decision
 
 Write down, in the product's words:
@@ -94,8 +96,6 @@ Then write one of three outcomes:
 ## Write it down
 
 Fill the Decision section of `MODEL.md`, tick the gate items that hold, and add a dated line to the log. Leave unticked items unticked and say why.
-
-When the same request goes on past framing (build the model, say whether it is ready), each stage's skill still applies: load it when that stage's work starts, as the record's stage would route it. `building-datasets` comes before the split and the features, `training-models` before the first fit, `evaluating-models` before the verdict, and `doubting-results` before any model number goes into the reply. That holds for a model built only to show that the rule is enough. Working alone, skip what needs the owner (the readings in `exploring-data`, the design review), and say so.
 
 ## Report
 
