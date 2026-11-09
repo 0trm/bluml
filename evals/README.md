@@ -191,12 +191,23 @@ On 0.5.4, the four `feature-choice` runs that started in `building-datasets` or 
 
 Runs that started outside `framing-models` loaded the later skills in 7 of 8, against 0 of 4 on 0.5.4, and 6 of the 7 loaded them at the start, as the paragraph says. The one that did not started in `training-models`, with the new paragraph in front of it. On 0.5.0, each of `fraud-threshold`'s three runs loaded one skill only. Of the runs that started in `framing-models`, 5 of 6 went on, and 1 run loaded no skill. `feature-choice` missed the `from_waitlist` criterion in 5 of 10 runs, against 3 of 10 on 0.5.4, a gap ten runs cannot tell from chance; every one kept the column but gave no number for it in the reply, and 4 of the 5 had loaded `training-models`.
 
+### Feature evidence in the reply, on version 0.5.6
+
+From 0.5.1 to 0.5.5, 9 of 25 runs of `feature-choice` kept `from_waitlist` but gave no evidence in the reply that it matters next to the class hour. In 6 of them, `MODEL.md` held what removing it cost (0.010 in log loss, or 0.024 to 0.033 in AUC), and the reply said only "strong combined with the others" or listed the column. The other 3 never compared the model with and without it, and none of them loaded `training-models`. Replies that passed and replies that failed were the same length, so the number was not crowded out. Step 4 of `training-models` sent each feature's reason to `MODEL.md` only, and the reply line in `evaluating-models` did not mention features. Version 0.5.6 has both say that when the request asks which features the model needs, the reply gives what removing each kept group costs and, for a column weak on its own, what removing it costs or the rate that shows the interaction. `feature-choice` ran ten times on 9 November, Opus 5.5 at high effort, with bluML only, for $16.38, judge included.
+
+| | 0.5.6 | 0.5.1 to 0.5.5 |
+|---|---|---|
+| Backs `from_waitlist` with evidence that it matters next to other columns | 10/10 | 16/25 |
+| Loaded `training-models` | 9/10 | 15/25 |
+| **Score** | **0.99** | **0.89** |
+
+Each of the 9 runs that loaded `training-models` put the column's cost of removal in the reply (about 0.03 in AUC, or 0.015 in log loss), all with the no-show rates by class hour beside it. The run that loaded only `framing-models` backed it too, but missed the noise criterion. Ten runs is a small sample.
+
 ### What it still misses
 
 - Sonnet with bluML weighed the model's small gain over the keyword rule against the cost of running a model in 1 of 3 runs, and never priced the misrouting (0 of 3). Opus 5.5 at high effort weighed the gain in every run since 0.5.0 and priced the misrouting in 4 of 5 runs on 0.5.3; Sonnet has not run since 0.2.0.
-- Choosing features group by group dropped a column that only matters next to another one (`from_waitlist` beside the class hour, in `feature-choice` on 0.5.0). No run has dropped it since 0.5.1, but 9 of 25 kept it with no evidence in the reply that it matters next to the hour, whether `training-models` loaded (5 of 15) or not (4 of 10).
-- A run does not always load the next stage's skill: on 0.5.5, 1 of 6 runs that started in `framing-models` and 1 of 8 that started elsewhere stopped at their first skill. The advice in the later skills reaches a run only if it asks for them.
-- Opus did not load the skills in 2 of 21 runs of the main round, and in 3 of 5 runs of the ranker re-run. Opus 5.5 at high effort loaded one in 67 of its 69 runs from 0.5.0 to 0.5.5.
+- A run does not always load the next stage's skill: on 0.5.5 and 0.5.6, 2 of 15 runs that started in `framing-models` and 1 of 9 that started elsewhere stopped at their first skill. The advice in the later skills reaches a run only if it asks for them: of the 9 runs from 0.5.1 to 0.5.5 that kept `from_waitlist` without evidence, the 3 that never compared it with and without had not loaded `training-models`.
+- Opus did not load the skills in 2 of 21 runs of the main round, and in 3 of 5 runs of the ranker re-run. Opus 5.5 at high effort loaded one in 77 of its 79 runs from 0.5.0 to 0.5.6.
 
 ### How to read it
 
