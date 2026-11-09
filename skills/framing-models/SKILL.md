@@ -95,6 +95,8 @@ Then write one of three outcomes:
 
 Fill the Decision section of `MODEL.md`, tick the gate items that hold, and add a dated line to the log. Leave unticked items unticked and say why.
 
+When the same request goes on past framing (build the model, say whether it is ready), each stage's skill still applies: load it when that stage's work starts, as the record's stage would route it. `building-datasets` comes before the split and the features, `training-models` before the first fit, `evaluating-models` before the verdict, and `doubting-results` before any model number goes into the reply. That holds for a model built only to show that the rule is enough. Working alone, skip what needs the owner (the readings in `exploring-data`, the design review), and say so.
+
 ## Report
 
 Lead with the outcome in one line: the rule ships, build a model, or not now, and why. Then give the decision, the costs and their owner, the rule's number, the case (net value per month, break-even gain, payback), and the open questions for the owner. When the rule ships, say how it goes live and what result would stop it. Keep assumptions visible: list each one next to the number it affects.
