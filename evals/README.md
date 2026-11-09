@@ -215,10 +215,22 @@ On 0.5.5 and 0.5.6, 2 of 15 runs of `feature-choice` that started in `framing-mo
 
 All 11 runs that started in `framing-models` loaded the later skills, within two steps of it. Of the other `feature-choice` runs, the two that started in `building-datasets` went on; the one that started in `training-models` stopped there, as one did on 0.5.5, and one loaded no skill. `rule-first` passed every criterion in all 5 runs. `feature-choice` missed the duplicate-columns criterion in 2 of 10 runs, against 1 of 35 since 0.5.1: one started in `building-datasets`, which this version did not change, and the other recommended a two-column rule over the model and named no duplicate pair. The stop is gone from `framing-models` in these 15 runs, but a miss seen in 2 of 15 needs more runs to rule out.
 
+### Later skills from the top of `training-models`, on version 0.5.8
+
+On 0.5.5 and 0.5.7, both runs of `feature-choice` that started in `training-models` stopped there: they loaded it after reading the column notes and went straight into queries and fits, without `evaluating-models` or `doubting-results`. The paragraph that loads them came third, under the `MODEL.md` check these runs skip, and applied only when the request went on past training; choosing the columns and asking whether to renew the feed can both read as training's own work. Version 0.5.8 moves it to the top of `training-models`, loads `doubting-results` in every case and `evaluating-models` unless the request is only about the fit itself, and counts choosing the columns or pricing a data source as a request for the verdict. A run starts in `training-models` about one time in ten, so this was measured on a probe outside the suite: the `feature-choice` prompt with one sentence added, "Start from bluML's `training-models` skill.", and the same graders. It ran five times on 0.5.7 and five on 0.5.8, on 9 November, Opus 5.5 at high effort, with bluML only, for $18.44, judge included.
+
+| | 0.5.7 | 0.5.8 |
+|---|---|---|
+| Loaded `evaluating-models` and `doubting-results` | 3/5 | 5/5 |
+| Names at least two duplicate pairs in the reply and keeps one of each | 5/5 | 2/5 |
+| **Score** | **1.00** | **0.70** |
+
+All five 0.5.8 runs loaded `doubting-results` and `evaluating-models` right after `training-models`, before the first query on the data. The score fell for two reasons the runs do not tie to the change. One run hit the 30-minute limit before replying and scored 0: its run log stopped parsing and it reran every stage; a 0.5.7 run also took the full 30 minutes, and finished. Two runs left the duplicate columns out of the reply, though `MODEL.md` named all three pairs in both; the three 0.5.7 runs that loaded `evaluating-models` at about the same point named them. Without the run that timed out, 0.5.8 scores 0.88. A probe that names the skill is not a run that picks it, and five runs a side is a small sample.
+
 ### What it still misses
 
 - Sonnet with bluML weighed the model's small gain over the keyword rule against the cost of running a model in 1 of 3 runs, and never priced the misrouting (0 of 3). Opus 5.5 at high effort weighed the gain in every run since 0.5.0 and priced the misrouting in 4 of 5 runs on 0.5.3; Sonnet has not run since 0.2.0.
-- A run that starts in `training-models` stops there: 2 of 2 since 0.5.5, with the paragraph that loads the later skills in front of it. Runs that start in `framing-models` (11 of 11 on 0.5.7), `building-datasets` (5 of 5 since 0.5.5) or `evaluating-models` (5 of 5) load them. The advice in the later skills reaches a run only if it asks for them: of the 9 runs from 0.5.1 to 0.5.5 that kept `from_waitlist` without evidence, the 3 that never compared it with and without had not loaded `training-models`.
+- A run that finds the duplicate columns does not always name them in the reply: since 0.5.7, 4 of the 19 runs of `feature-choice` and its probe that replied missed the duplicate-columns criterion, against 1 of 35 from 0.5.1 to 0.5.6. In 3 of the 4, `MODEL.md` named all three pairs and the reply named fewer than two.
 - Opus did not load the skills in 2 of 21 runs of the main round, and in 3 of 5 runs of the ranker re-run. Opus 5.5 at high effort loaded one in 91 of its 94 runs from 0.5.0 to 0.5.7.
 
 ### How to read it
