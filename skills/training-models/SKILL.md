@@ -7,9 +7,9 @@ description: Trains a product model the way a production ML engineer would. Base
 
 Training is the step people expect to take the most time, and in product work it should take the least. Its job is to find the simplest model that beats the rule by enough to be worth running, on rows that rehearse deployment.
 
-Read `MODEL.md` first. Training needs the Decision section (the decision, the operating point and the rule's number) and the Data section (the split and the features cleared by the leak screen). If the Data gate is not ticked, go back to `building-datasets`: a model trained on an unscreened table only measures its leaks.
+Load `doubting-results` now, before the first query on the data: every model number in the reply goes through its checks first. Load `evaluating-models` now as well, unless the request is only about the fit itself (a loss that will not settle, a tuning run): a model built for use ends in its verdict on whether it beats the rule at the operating point, and so does a request to choose the columns or to say whether a feature or its data source is worth what it costs. Training's steps still come first, and each skill's steps apply when its stage starts.
 
-When the request goes on past training (whether the model is ready, beats the rule, or is worth what it and its data cost), load `evaluating-models` now, before the first fit. Load `doubting-results` now as well: every model number in the reply goes through its checks first.
+Read `MODEL.md` first. Training needs the Decision section (the decision, the operating point and the rule's number) and the Data section (the split and the features cleared by the leak screen). If the Data gate is not ticked, go back to `building-datasets`: a model trained on an unscreened table only measures its leaks.
 
 ## 1. Baselines first, on the validation rows
 
