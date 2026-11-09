@@ -7,7 +7,7 @@ description: Builds the training table for a product model so that every row loo
 
 The training table decides what a model can learn and how honest its scores will be. Most product models that disappoint after launch were trained on rows that could not have existed when the prediction was made.
 
-Read the model's `MODEL.md` first; the Decision section says when the model predicts and what the product does with it. If there is no `MODEL.md`, run `framing-models` first, or write down the prediction moment before going on. If nobody has looked at the data yet, run `exploring-data` first: the grain, the window and the outliers it settles are decisions this table inherits.
+Read the model's `MODEL.md` first; the Decision section says when the model predicts and what the product does with it. If there is no `MODEL.md`, run `framing-models` first, or write down the prediction moment before going on. If nobody has looked at the data yet, run `exploring-data` first: the grain, the window and the outliers it settles are decisions this table inherits. When the request goes on past the table (train the model, choose its columns, say whether it is ready), load each later stage's skill when its work starts: `training-models` before the first fit, `evaluating-models` before the verdict, and `doubting-results` before any model number goes into the reply.
 
 Copy this checklist into your work and tick it as you go:
 
@@ -83,7 +83,7 @@ Training and serving must compute each feature the same way: same units, windows
 
 ## 8. Write it down
 
-Fill the Data section of `MODEL.md`: the row, the label and its delay, the feature table with each as-of time, the split, the leak screen's result and what was dropped, what the product put in the labels, and where the labels come from and how good they are. Tick the gate items that hold, set the stage to training if all do, and log the date.
+Fill the Data section of `MODEL.md`: the row, the label and its delay, the feature table with each as-of time, the split, the leak screen's result and what was dropped, what the product put in the labels, and where the labels come from and how good they are. Tick the gate items that hold, set the stage to training if all do, and log the date. Training starts with `training-models`.
 
 ## Stop signs
 

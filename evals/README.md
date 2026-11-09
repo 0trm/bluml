@@ -166,12 +166,24 @@ All 8 runs with bluML on 0.5.0 and 0.5.2 stated what a misroute costs. The 3 tha
 
 The run that missed it priced each kind (10 agent-minutes for a billing ticket sent to general, a third of that for the reverse) but valued automating triage by triage time alone. In this data the costs never change the answer, since the lookup ships at any ratio, so the criterion checks that they reach the case, not that they move it. Five runs per arm is still a small sample.
 
+### Stage skills, on version 0.5.4
+
+In the 15 runs with bluML kept from the re-runs of 0.5.1 to 0.5.3, 6 loaded only `framing-models` and then wrote their training scripts without `training-models` or `evaluating-models`, and none loaded `doubting-results`. The only forward pointers in `framing-models` led to `exploring-data` and the design doc, which need the owner, so an agent working alone skipped them and nothing named the skill for the next stage. Version 0.5.4 tells `framing-models` to load each stage's skill when that stage's work starts, and `doubting-results` before any model number goes into the reply, and puts the same line at the top of `building-datasets` and `training-models`. Both cases ran on 8 November, Opus 5.5 at high effort, five runs each with bluML only, since skill text cannot change the arm without it. Scores leave out the skill-loaded check, so they compare with earlier rounds. The three batches cost $16.97, judge included.
+
+| | `rule-first` | `feature-choice` |
+|---|---|---|
+| Loaded a skill after the first | 5/5 (2/5 on 0.5.3) | 4/5 (4/5 on 0.5.1) |
+| Loaded `evaluating-models` or `doubting-results` | 5/5 (2/5) | 3/5 (0/5) |
+| **Score** | **1.00** (0.95) | **0.93** (0.90) |
+
+The line in `framing-models` works: runs that started there went on to the next stage's skill in 9 of 10. Runs that started elsewhere did not, in 0 of 4: `feature-choice` entered through `building-datasets` or `training-models` in 4 of its 10 runs on 0.5.4, and loaded no skill in 1. Its first batch, before the line at the top of `building-datasets` and `training-models` was added, loaded a second skill in 0 of 5 and scored 0.88; since then only one run has started in `training-models`, and it did not follow the line. `rule-first` ran before that line was added.
+
 ### What it still misses
 
 - Sonnet with bluML weighed the model's small gain over the keyword rule against the cost of running a model in 1 of 3 runs, and never priced the misrouting (0 of 3). Opus 5.5 at high effort weighed the gain in every run since 0.5.0 and priced the misrouting in 4 of 5 runs on 0.5.3; Sonnet has not run since 0.2.0.
-- Choosing features group by group dropped a column that only matters next to another one (`from_waitlist` beside the class hour, in `feature-choice` on 0.5.0). Since 0.5.1 the miss shows only in runs where `training-models` does not load.
-- In a request that runs from the data to a verdict, the advice in the other skills reaches the agent only if it asks for the next skill. No run of the ranker re-run did, and on 8 November 1 of 5 runs of `feature-choice`, and 2 of 5 and then 3 of 5 of `rule-first`, loaded only `framing-models`.
-- Opus did not load the skills in 2 of 21 runs of the main round, and in 3 of 5 runs of the ranker re-run. Opus 5.5 at high effort loaded one in all 24 runs on 0.5.0.
+- Choosing features group by group dropped a column that only matters next to another one (`from_waitlist` beside the class hour, in `feature-choice` on 0.5.0). Since 0.5.1 it shows mostly in runs where `training-models` does not load: 3 of the 4 misses in 15 runs.
+- A run that starts in a skill other than `framing-models` seldom loads the next one: 0 of 4 on 0.5.4, against 9 of 10 that started in `framing-models`. The advice in the later skills reaches it only if it asks for them.
+- Opus did not load the skills in 2 of 21 runs of the main round, and in 3 of 5 runs of the ranker re-run. Opus 5.5 at high effort loaded one in 53 of its 54 runs from 0.5.0 to 0.5.4.
 
 ### How to read it
 
