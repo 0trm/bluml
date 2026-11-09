@@ -203,11 +203,23 @@ From 0.5.1 to 0.5.5, 9 of 25 runs of `feature-choice` kept `from_waitlist` but g
 
 Each of the 9 runs that loaded `training-models` put the column's cost of removal in the reply (about 0.03 in AUC, or 0.015 in log loss), all with the no-show rates by class hour beside it. The run that loaded only `framing-models` backed it too, but missed the noise criterion. Ten runs is a small sample.
 
+### Later skills from the top of `framing-models`, on version 0.5.7
+
+On 0.5.5 and 0.5.6, 2 of 15 runs of `feature-choice` that started in `framing-models` stopped there: both went from framing straight into profiling and leak checks and never loaded `building-datasets`. `framing-models` was the one skill still saying to load each skill when its stage's work starts, a moment that blurs when framing itself queries the data to measure the rule; runs that reached `building-datasets` loaded the rest at once. Version 0.5.7 moves the paragraph to the top of `framing-models` and has it load the later stages' skills before the first query on the data, with framing's steps still first. `feature-choice` ran ten times and `rule-first` five, on 9 November, Opus 5.5 at high effort, with bluML only; `rule-first` checks that loading the later skills early does not push a run past the rule. The two batches cost $20.97, judge included.
+
+| | `feature-choice` | `rule-first` |
+|---|---|---|
+| Started in `framing-models` and loaded the later skills | 6/6 (13/15 on 0.5.5 and 0.5.6) | 5/5 (5/5 on 0.5.4) |
+| Loaded `doubting-results` | 8/10 (9/10 on 0.5.6) | 5/5 (4/5 on 0.5.4) |
+| **Score** | **0.95** (0.99 on 0.5.6) | **1.00** (1.00 on 0.5.4) |
+
+All 11 runs that started in `framing-models` loaded the later skills, within two steps of it. Of the other `feature-choice` runs, the two that started in `building-datasets` went on; the one that started in `training-models` stopped there, as one did on 0.5.5, and one loaded no skill. `rule-first` passed every criterion in all 5 runs. `feature-choice` missed the duplicate-columns criterion in 2 of 10 runs, against 1 of 35 since 0.5.1: one started in `building-datasets`, which this version did not change, and the other recommended a two-column rule over the model and named no duplicate pair. The stop is gone from `framing-models` in these 15 runs, but a miss seen in 2 of 15 needs more runs to rule out.
+
 ### What it still misses
 
 - Sonnet with bluML weighed the model's small gain over the keyword rule against the cost of running a model in 1 of 3 runs, and never priced the misrouting (0 of 3). Opus 5.5 at high effort weighed the gain in every run since 0.5.0 and priced the misrouting in 4 of 5 runs on 0.5.3; Sonnet has not run since 0.2.0.
-- A run does not always load the next stage's skill: on 0.5.5 and 0.5.6, 2 of 15 runs that started in `framing-models` and 1 of 9 that started elsewhere stopped at their first skill. The advice in the later skills reaches a run only if it asks for them: of the 9 runs from 0.5.1 to 0.5.5 that kept `from_waitlist` without evidence, the 3 that never compared it with and without had not loaded `training-models`.
-- Opus did not load the skills in 2 of 21 runs of the main round, and in 3 of 5 runs of the ranker re-run. Opus 5.5 at high effort loaded one in 77 of its 79 runs from 0.5.0 to 0.5.6.
+- A run that starts in `training-models` stops there: 2 of 2 since 0.5.5, with the paragraph that loads the later skills in front of it. Runs that start in `framing-models` (11 of 11 on 0.5.7), `building-datasets` (5 of 5 since 0.5.5) or `evaluating-models` (5 of 5) load them. The advice in the later skills reaches a run only if it asks for them: of the 9 runs from 0.5.1 to 0.5.5 that kept `from_waitlist` without evidence, the 3 that never compared it with and without had not loaded `training-models`.
+- Opus did not load the skills in 2 of 21 runs of the main round, and in 3 of 5 runs of the ranker re-run. Opus 5.5 at high effort loaded one in 91 of its 94 runs from 0.5.0 to 0.5.7.
 
 ### How to read it
 
