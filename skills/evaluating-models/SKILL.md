@@ -7,7 +7,7 @@ description: Decides whether a trained model is better than what the product doe
 
 A model is good when the product makes better decisions with it than without it. Evaluation answers that at the operating point the product will use, against the rule it would replace, on every group of users that matters, with the uncertainty stated.
 
-Read `MODEL.md` first: the Decision section has the decision, the costs and the capacity; the Training section has the chosen model and the baselines. If the costs are not there, go back to `framing-models` or state the assumed costs before computing anything.
+Read `MODEL.md` first: the Decision section has the decision, the costs and the capacity; the Training section has the chosen model and the baselines. If the costs are not there, go back to `framing-models` or state the assumed costs before computing anything. Load `doubting-results` now as well: every number in the verdict goes through its checks before the reply.
 
 ```
 - [ ] 1. Operating point set from costs or capacity
