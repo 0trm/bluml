@@ -223,7 +223,7 @@ def report(result: dict) -> str:
     lines = [head + ".\n", "## Flags\n"]
     lines += [f"- {f}" for f in result["flags"]] or ["- None."]
     lines.append("\n## Features, strongest first\n")
-    metric = "AUC alone" if binary else "|rho| alone"
+    metric = "AUC alone" if binary else r"\|rho\| alone"  # escaped: a bare | starts a new table cell
     lines.append(f"| Feature | Kind | {metric} | Missing | Missing gap by class | {metric}, by stretch of time |")
     lines.append("|---|---|---|---|---|---|")
     for r in sorted(result["rows"], key=lambda r: -(r["strength"] if r["strength"] == r["strength"] else 0)):
