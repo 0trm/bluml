@@ -5,6 +5,7 @@
 """
 
 import importlib.util
+import re
 from pathlib import Path
 
 import numpy as np
@@ -101,6 +102,10 @@ def test_screen_flags_a_feature_that_changes_strength_over_time_for_a_count_labe
     assert "`honest`" not in flagged and "`noise`" not in flagged
     assert len(result["stretches"]) == leak.TIME_CHUNKS
     assert result["stretches"][0].startswith("0 to") and result["stretches"][-1].endswith("to 11")  # oldest first
+    # Every row of the features table has as many cells as its header, |rho| included.
+    table = [line for line in leak.report(result).splitlines() if line.startswith("| ")]
+    cells = {len(re.split(r"(?<!\\)\|", line)) for line in table}
+    assert len(cells) == 1
 
 
 # %% threshold
