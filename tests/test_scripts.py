@@ -69,6 +69,40 @@ def test_screen_reports_entities_and_time_overlap_across_splits():
     assert "appear in more than one split" in flags
 
 
+def test_screen_reports_empty_values_with_splits_instead_of_crashing(tmp_path, capsys):
+    path = tmp_path / "na.csv"
+    pd.DataFrame(dict(t=[1, 1, 2, 2], id=["a", "b", "a", "b"], x=[1.0, None, 2.0, 3.0],
+                      y=[0, 1, 0, 1], split=["train", "train", "valid", "valid"])).to_csv(path, index=False)
+    code = leak.main([str(path), "--label", "y", "--time", "t", "--id", "id", "--split", "split"])
+    assert code in (0, 1)
+    x_line = next(line for line in capsys.readouterr().out.splitlines() if line.startswith("| x |"))
+    assert "| 25.0% |" in x_line
+
+
+def test_rows_empty_in_the_same_column_count_as_duplicates_across_splits():
+    df = pd.DataFrame(dict(x=[1.0, np.nan, np.nan, 2.0], c=["a", None, None, "b"],
+                           y=[0, 1, 1, 0], split=["train", "train", "test", "test"]))
+    flags = " ".join(leak.screen(df, "y", split="split")["flags"])
+    assert "1 distinct feature rows appear in more than one split" in flags
+
+
+def test_screen_flags_a_feature_that_changes_strength_over_time_for_a_count_label():
+    rng = np.random.default_rng(8)
+    n = 20000
+    month = rng.integers(0, 12, n)
+    risk = rng.normal(0, 1, n)
+    y = rng.poisson(np.exp(0.5 * risk))
+    backfilled = np.where(month < 8, y + rng.normal(0, 0.1, n), rng.normal(0, 1, n))
+    df = pd.DataFrame(dict(month=month, honest=risk + rng.normal(0, 1, n), backfilled=backfilled,
+                           noise=rng.normal(0, 1, n), y=y))
+    result = leak.screen(df, "y", time="month")
+    flagged = " ".join(result["flags"])
+    assert "`backfilled` scores" in flagged and "produced differently over time" in flagged
+    assert "`honest`" not in flagged and "`noise`" not in flagged
+    assert len(result["stretches"]) == leak.TIME_CHUNKS
+    assert result["stretches"][0].startswith("0 to") and result["stretches"][-1].endswith("to 11")  # oldest first
+
+
 # %% threshold
 def test_cost_threshold_finds_the_known_optimum():
     # Calibrated scores with equal costs: the best threshold is 0.5.
