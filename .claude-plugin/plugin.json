@@ -1,6 +1,6 @@
 {
   "name": "bluml",
-  "version": "0.5.9",
+  "version": "0.5.10",
   "description": "Skills that make your coding agent think like a product ML engineer: frame the decision, look at the data, build honest training data, beat the rule, launch safely, and keep the model alive.",
   "author": {
     "name": "Tomás Ravalli",

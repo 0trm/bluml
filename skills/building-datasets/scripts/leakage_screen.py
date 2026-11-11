@@ -34,15 +34,19 @@ TOO_STRONG_RHO = 0.80
 # stretches (a backfill, a redefinition).
 PERIOD_SPREAD = 0.15
 PERIOD_Z = 3.0
+# The same bar for a numeric label, on the |rho| scale (2 * AUC - 1, as above).
+PERIOD_SPREAD_RHO = 0.30
 # Time is cut into this many consecutive stretches of equal row count, fewer when
-# positives are scarce, so that each stretch's AUC is stable enough to compare.
+# a two-class label's positives are scarce, so that each stretch's strength is
+# stable enough to compare.
 TIME_CHUNKS = 4
 MIN_POSITIVES_PER_CHUNK = 100
 # A feature missing far more often for one class was often filled in after the outcome.
 MISSING_GAP = 0.30
 # Columns with nearly one value per row behave like identifiers.
 ID_UNIQUE_RATIO = 0.90
-# Fewer positives or negatives than this in a period gives an AUC too noisy to compare.
+# Fewer positives or negatives than this in a period gives an AUC too noisy to compare;
+# for a numeric label, fewer rows than this gives a |rho| too noisy to compare.
 MIN_CLASS = 30
 
 
@@ -70,6 +74,12 @@ def auc_se(a: float, pos: int, neg: int) -> float:
     """Hanley and McNeil (1982) standard error of an AUC."""
     q1, q2 = a / (2 - a), 2 * a * a / (1 + a)
     return float(np.sqrt((a * (1 - a) + (pos - 1) * (q1 - a * a) + (neg - 1) * (q2 - a * a)) / (pos * neg)))
+
+
+def rho_se(r: float, n: int) -> float:
+    """Standard error of a Spearman correlation: Fieller, Hartley and Pearson (1957)
+    give 1.06 / (n - 3) as the variance of atanh(rho), carried back to the rho scale."""
+    return float((1 - r * r) * np.sqrt(1.06 / (n - 3)))
 
 
 def spearman(x: pd.Series, y: pd.Series) -> float:
@@ -123,12 +133,13 @@ def screen(df: pd.DataFrame, label: str, time: str | None = None, id_col: str | 
         folds = rng.integers(0, 2, len(df))
 
     chunks = None
-    if time and binary:
+    if time:
         order = df[time] if pd.api.types.is_numeric_dtype(df[time]) else pd.to_datetime(df[time], errors="coerce")
-        k = int(min(TIME_CHUNKS, max(2, y.sum() // MIN_POSITIVES_PER_CHUNK)))
+        k = int(min(TIME_CHUNKS, max(2, y.sum() // MIN_POSITIVES_PER_CHUNK))) if binary else TIME_CHUNKS
         idx = pd.Series(np.minimum((order.rank(method="first") - 1) * k // len(df), k - 1).astype(int), index=df.index)
         names = {i: f"{df.loc[idx == i, time].min()} to {df.loc[idx == i, time].max()}" for i in range(k)}
-        chunks = idx.map(names)
+        # Categories in time order, so stretches are compared and printed oldest first.
+        chunks = pd.Series(pd.Categorical(idx.map(names), categories=list(dict.fromkeys(names.values()))), index=df.index)
 
     skip = {label, time, id_col, split} | drop
     rows, flags = [], []
@@ -142,12 +153,19 @@ def screen(df: pd.DataFrame, label: str, time: str | None = None, id_col: str | 
             miss_gap = abs(col[y == 1].isna().mean() - col[y == 0].isna().mean())
         by_period, se = {}, {}
         if chunks is not None:
-            for p, rows_in in chunks.groupby(chunks, sort=False).groups.items():
+            for p, rows_in in chunks.groupby(chunks, observed=True).groups.items():
                 yy, xx = y.loc[rows_in], x.loc[rows_in]
-                pos, neg = int(yy[xx.notna()].sum()), int((1 - yy[xx.notna()]).sum())
-                if pos >= MIN_CLASS and neg >= MIN_CLASS:
-                    by_period[p] = auc(xx, yy)
-                    se[p] = auc_se(by_period[p], pos, neg)
+                if binary:
+                    pos, neg = int(yy[xx.notna()].sum()), int((1 - yy[xx.notna()]).sum())
+                    if pos >= MIN_CLASS and neg >= MIN_CLASS:
+                        by_period[p] = auc(xx, yy)
+                        se[p] = auc_se(by_period[p], pos, neg)
+                else:
+                    n_ok = int((xx.notna() & yy.notna()).sum())
+                    r = spearman(xx, yy) if n_ok >= MIN_CLASS else float("nan")
+                    if r == r:
+                        by_period[p] = r
+                        se[p] = rho_se(r, n_ok)
         spread, z = float("nan"), 0.0
         if len(by_period) >= 2:
             lo, hi = min(by_period, key=by_period.get), max(by_period, key=by_period.get)
@@ -160,7 +178,7 @@ def screen(df: pd.DataFrame, label: str, time: str | None = None, id_col: str | 
         bar = TOO_STRONG_AUC if binary else TOO_STRONG_RHO
         if s == s and s >= bar:
             flags.append(f"`{c}` alone scores {s:.3f} ({'AUC' if binary else '|rho|'}); find when its value is written relative to the prediction time.")
-        if spread == spread and spread >= PERIOD_SPREAD and z >= PERIOD_Z:
+        if spread == spread and spread >= (PERIOD_SPREAD if binary else PERIOD_SPREAD_RHO) and z >= PERIOD_Z:
             flags.append(f"`{c}` scores {by_period[hi]:.3f} from {hi} but {by_period[lo]:.3f} from {lo}; it was produced differently over time (backfill, redefinition) or leaks only in part of the data.")
         if miss_gap == miss_gap and miss_gap >= MISSING_GAP:
             flags.append(f"`{c}` is missing for {col[y == 1].isna().mean():.0%} of positives and {col[y == 0].isna().mean():.0%} of negatives; check whether it is filled in after the outcome.")
@@ -185,13 +203,13 @@ def screen(df: pd.DataFrame, label: str, time: str | None = None, id_col: str | 
             if shared:
                 flags.append(f"{shared} of {len(seen)} `{id_col}` values appear in more than one split. Fine for a time split when the product scores known entities again; a leak when it mostly scores new ones.")
         feats = [c for c in df.columns if c not in skip]
-        dup = df[feats].astype("string").agg("|".join, axis=1)
-        across = dup.groupby(dup).apply(lambda s: df.loc[s.index, split].nunique() > 1)
-        n_dup = int(across.sum())
+        # One hash per row; rows that are both empty in a column hash alike there.
+        row_key = pd.util.hash_pandas_object(df[feats], index=False)
+        n_dup = int((df.groupby(row_key)[split].nunique() > 1).sum()) if feats else 0
         if n_dup:
             flags.append(f"{n_dup} distinct feature rows appear in more than one split; duplicates let a model be tested on rows it trained on.")
 
-    stretches = list(dict.fromkeys(chunks.sort_index().tolist())) if chunks is not None else []
+    stretches = list(chunks.cat.categories) if chunks is not None else []
     return dict(rows=rows, flags=flags, split_notes=split_notes, binary=binary, n=len(df), stretches=stretches,
                 positives=int(y.sum()) if binary else None)
 
@@ -210,7 +228,7 @@ def report(result: dict) -> str:
     lines.append("|---|---|---|---|---|---|")
     for r in sorted(result["rows"], key=lambda r: -(r["strength"] if r["strength"] == r["strength"] else 0)):
         fmt = lambda v, p=3: "" if v != v else f"{v:.{p}f}"
-        stretches = " / ".join(f"{v:.2f}" for v in r["by_period"].values())
+        stretches = " / ".join(f"{r['by_period'][s]:.2f}" if s in r["by_period"] else "–" for s in result["stretches"])
         lines.append(f"| {r['feature']} | {r['kind']} | {fmt(r['strength'])} | {r['missing']:.1%} | {fmt(r['missing_gap'], 2)} | {stretches} |")
     if result["stretches"]:
         lines.append("\nStretches of time, in order: " + "; ".join(result["stretches"]) + ".")
