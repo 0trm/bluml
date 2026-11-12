@@ -4,6 +4,7 @@
     uv run --with numpy,pandas,pytest pytest tests
 """
 
+import importlib.util
 import json
 from pathlib import Path
 
@@ -65,6 +66,15 @@ def test_code_is_folded_empty_of_outputs_and_compiles(rel):
             assert c["metadata"]["jupyter"]["source_hidden"] is True
             assert c["outputs"] == [] and c["execution_count"] is None
             compile("".join(c["source"]), c["id"], "exec")
+
+
+def test_templates_are_what_the_generator_writes():
+    spec = importlib.util.spec_from_file_location("make_templates", Path(__file__).parent / "make_templates.py")
+    gen = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(gen)
+    assert sorted(gen.NOTEBOOKS) == sorted(f"skills/{rel}" for rel in TEMPLATES)
+    for rel in TEMPLATES:
+        assert (SKILLS / rel).read_text() == gen.render(f"skills/{rel}"), f"{rel}: run python3 tests/make_templates.py"
 
 
 def test_each_skill_points_at_its_notebook():
