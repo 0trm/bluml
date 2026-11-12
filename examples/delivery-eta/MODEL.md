@@ -8,7 +8,7 @@ Predicts how long an order will take to arrive, to show "arrives in 25 to 35 min
 |---|---|---|---|
 | live | Ana (ML engineer) | Marc (product manager, checkout), with operations | 2026-10-12 |
 
-Stages run framing, design, data, training, evaluation, launch, live, retired. Each section ends at a gate; a stage starts only when the gate before it is ticked, with the evidence linked. When work loops back, set the stage back and say why in the log.
+Stages run framing, design, data, training, evaluation, launch, live, retired. Each section ends at a gate. The agent marks an item whose evidence is in place with `(holds: {evidence})`; only the owner ticks it. A stage starts when the owner has ticked the gate before it and said go. From exploration to the verdict, the owner takes each decision in the stage's notebook, after writing a reading and a pick and before opening the agent's recommendation, and it is copied here in the owner's words. When work loops back, set the stage back and say why in the log.
 
 ## 1. Decision
 
@@ -39,23 +39,27 @@ Gate:
 
 ## 3. Data
 
+- **Exploration:** `eda.ipynb`, read by Ana and Marc on 2026-06-05. Train from March: a tracking fix on 2026-02-24 moved drop-off times by about 2 minutes, a step the chart puts on the release day. Delivery times have a long right tail in rain and on stacked orders, which points to a quantile loss.
+- **Table notebook:** `data.ipynb`, decided by Ana on 2026-07-30: the split below, cancelled orders counted apart in every slice, and the three post-checkout fields out (see the leak screen).
 - **Row:** one order at checkout.
 - **Label:** minutes from checkout to delivery. Known within the hour and final once recorded. Missing for cancelled orders (4%), which cluster when things go badly; they are kept as a separate count and checked in every slice.
 - **Split:** train March to July, validate August, test September, by checkout time; restaurants that joined after July are reported separately.
 
-| Feature | As of | Source | Note |
-|---|---|---|---|
-| Restaurant prep time, median of the last 14 days | Checkout, from orders already delivered | orders table | Owner: data platform |
-| Open orders at the restaurant | Checkout | live queue service | Logged at serving time |
-| Distance by road | Checkout | routing service | Kilometres |
-| Idle couriers within 2 km | Checkout | courier service | Logged at serving time |
-| Hour, weekday, rain | Checkout | calendar, weather feed | |
+| Feature | As of | Source | Note | Why in |
+|---|---|---|---|---|
+| Restaurant prep time, median of the last 14 days | Checkout, from orders already delivered | orders table | Owner: data platform | In the simple model (r02); removing the restaurant group costs 0.9 in pinball@0.8 (r08) |
+| Open orders at the restaurant | Checkout | live queue service | Logged at serving time | Live load group, with idle couriers: removing it costs 0.6 (r08) |
+| Distance by road | Checkout | routing service | Kilometres | In the simple model (r02); removing the trip group costs 1.1 (r08) |
+| Idle couriers within 2 km | Checkout | courier service | Logged at serving time | Live load group: removing it costs 0.6 (r08) |
+| Hour, weekday, rain | Checkout | calendar, weather feed | | Context group: removing it costs 0.4 (r08) |
 
 - **Leak screen:** `courier_id`, `actual_prep_minutes` and `wait_at_restaurant` dropped: all written after checkout. No other flags.
 - **What the product put in the labels:** the promise itself changes behaviour: optimistic promises bring order surges that slow couriers. Measured in the online test, not offline.
 - **Label source and quality:** checkout time from the order system, drop-off time from the courier app. 200 orders checked against courier GPS; 3 timestamps wrong, from manual completions.
 
 Gate:
+- [x] The exploration notebook has the owner's reading and an implication in every section, and every decision it led to is recorded here
+- [x] The owner decided the rows, the label and the split in data.ipynb (Ana, 2026-07-30)
 - [x] Every feature exists, with this value, at prediction time
 - [x] The leak screen ran and every flag is explained
 - [x] The split mirrors serving, and training and serving build features with the same code
@@ -63,21 +67,30 @@ Gate:
 
 ## 4. Training
 
+- **Notebook:** `train.ipynb`; MLflow experiment `delivery-eta`, each run tagged with its step and holding its charts.
+- **Candidates and the comparison rule:** linear quantile regression (assumes prep and distance add up; the cheapest to serve; fails when the queue and the weather interact) and gradient-boosted trees with a quantile loss (assumes enough orders per restaurant to learn interactions; about 20 ms to serve; fails on restaurants with little history). The rule, written by Ana on 2026-07-31 before any fit: the lowest pinball@0.8 on August wins when it beats the next by more than the spread across weekly folds; the simpler model wins a tie.
+- **Keep rule:** written by Ana on 2026-08-03 before any feature run: keep a group whose removal costs more than the spread across weekly folds (0.3 in pinball@0.8).
+
 | Run | Model | Data version | Validation result | Note |
 |---|---|---|---|---|
 | r01 | The rule | orders-0731 | pinball@0.8 6.9; on time 71% | Baseline |
 | r02 | Linear quantile regression, 5 features | orders-0731 | pinball@0.8 5.6; on time 78% | Simple model |
 | r07 | Gradient-boosted trees, quantile loss at 0.8 | orders-0731 | pinball@0.8 4.8; on time 80% | Chosen |
+| r08 | r07 without each feature group in turn | orders-0731 | pinball@0.8 worse by 0.9 (restaurant), 0.6 (live load), 1.1 (trip), 0.4 (context) | Ablation; every group clears the keep rule |
 
 - **Ceiling:** fit and scored on its own training rows, r07 is on time for 86%, well past the rule plus the 1-point break-even. Trained on the latest half of the months, it scores pinball@0.8 5.1 on validation, against 4.8 on all five: more data still helps.
-- **Chosen:** r07. It beats the linear model by more than the spread across weekly folds (0.3), and both beat the rule.
+- **Dropped:** straight-line distance, a near-duplicate of distance by road (rank correlation 0.96); road distance stayed, since the routing service already serves it.
+- **Chosen:** r07, by Ana on 2026-08-19 under the comparison rule. It beats the linear model by more than the spread across weekly folds (0.3), and both beat the rule.
 
 Gate:
+- [x] The comparison rule and the keep rule were written before the runs they judge
 - [x] Baselines are recorded next to the candidates, on the same validation rows
+- [x] Every feature in the chosen model has a Why in line backed by a run
 - [x] Every run can be rebuilt from its record (code, data version, parameters, seed)
 
 ## 5. Evaluation
 
+- **Notebook:** `eval.ipynb`
 - **Operating point:** the 80th percentile as the upper end of the window, agreed with Marc; the online test chooses between the 70th, 80th and 90th.
 - **Against the rule:** on September, on time 80% against 71% (difference +9 points, 95% interval +8 to +10); late by more than 10 minutes 3% against 9%.
 - **The case at the measured gain:** +9 points is €54,000 a month of tickets avoided (€48,000 to €60,000 across the interval) against €6,050 of monthly cost: net €47,950 (€41,950 to €53,950). The load test confirmed the 20 ms the case assumed.
@@ -89,7 +102,7 @@ Gate:
 - [x] The model beats the rule at the operating point, and the interval excludes no gain
 - [x] The measured gain clears the break-even gain (+8 points at the interval's low end, against 1)
 - [x] No slice that matters does worse than the rule, or it has its own policy
-- [x] The test window was used once, after every choice was made
+- [x] The test window was used once, after every choice was made and the owner said go
 
 ## 6. Launch
 
@@ -124,8 +137,13 @@ Gate:
 
 - 2026-05-26: the request was to rank restaurants with faster deliveries higher in the app. Asked why: late orders drive tickets. The problem is the promise at checkout, so this is a delivery estimate, not a ranking.
 - 2026-06-02: framed with Marc; late costs more than early, so the model predicts a quantile. The case breaks even at 1 point of on-time rate and pays back in under a month.
+- 2026-06-05: Ana and Marc read `eda.ipynb`; Ana decided to train from March, after the tracking fix of 2026-02-24.
 - 2026-06-16: design review passed; online serving with the rule as fallback.
-- 2026-07-30: dropped three post-checkout fields flagged by the leak screen.
-- 2026-08-20: test window used once; model beats the rule on time by 9 points.
+- 2026-07-30: Ana decided the rows, the label and the split in `data.ipynb`, and dropped three post-checkout fields flagged by the leak screen.
+- 2026-07-31: Ana wrote the comparison rule and its tie-break, before any fit.
+- 2026-08-03: Ana wrote the keep rule, before any feature run.
+- 2026-08-12: Deviation: the tuning grid's tree depth widened from 4–8 to 4–10, after the best trial sat at depth 8. Approved by Ana; depth 10 scored within 0.1 of depth 8, so r07 stayed at 8.
+- 2026-08-19: Ana chose r07 under the comparison rule; Marc agreed the 80th percentile as the operating point in `eval.ipynb`.
+- 2026-08-20: test window used once, on Ana's go; model beats the rule on time by 9 points.
 - 2026-08-25: online test design and decision rule written.
 - 2026-09-28: P80 shipped to everyone after the online test; the case rechecked with the online effects (about €100,000 a month net); stage set to live.

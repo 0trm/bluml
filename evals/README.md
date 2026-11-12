@@ -238,11 +238,25 @@ From 0.5.1 to 0.5.8, 4 of the 54 replies of `feature-choice` and its `training-m
 
 Every reply that came back named all three dropped columns beside the ones they repeat. The two `feature-choice` runs that started in `training-models` loaded `doubting-results` and `evaluating-models` at once, the first runs to test 0.5.8 without the probe's prompt; both such runs before 0.5.8 had stopped there. One run loaded no skill and still passed every criterion. The two probe runs that timed out were rerunning every stage so their run log matched the code, and still training. Ten runs and five are small samples.
 
+### Owner stops, working alone, on version 0.6.0
+
+Version 0.6.0 stops at every decision from exploration to the verdict for the model's owner, lets only the owner tick a gate, and logs a rule changed after its result as a deviation. Every eval prompt says nobody can answer until the run finishes, so these runs test the path for working alone: go through the stops without notebooks or waiting, log each decision as open in `MODEL.md`, and hand the open decisions to the owner in the reply. `feature-choice` ran ten times and `rule-first` five, on 12 November, Opus 5.5 at high effort, with bluML only; the two batches cost $26.28, judge included.
+
+| | `feature-choice` | `rule-first` |
+|---|---|---|
+| Logged its decisions as open in `MODEL.md` | 9/10 | 5/5 |
+| Handed the open decisions to the owner in the reply | 9/10 | 5/5 |
+| Ticked a gate itself | 0/10 | 0/5 |
+| **Score** | **0.95** (1.00 on 0.5.9) | **1.00** (1.00 on 0.5.7) |
+
+The `feature-choice` run that logged no decision loaded no skill, and it dropped `from_waitlist`. Every run that loaded a skill wrote its keep rule before the first feature run, built no notebook, and marked the gate items that held with `(holds: …)` instead of ticking them. One of those runs also missed `from_waitlist`: it chose a two-column logistic regression and ran the final ablation on it, so the column that matters only next to the class hour went out with its group, the trap `training-models` warns about. All 28 runs that loaded a skill on 0.5.6, 0.5.7 and 0.5.9 kept it. Six of the seven runs that started in `framing-models` went on to the later skills; the seventh stopped there and still passed every criterion, against 11 of 11 on 0.5.7. Fifteen runs are a small sample, and the owner's side of the loop (the notebooks, the readings, the go between steps) needs a person, so these runs do not measure it.
+
 ### What it still misses
 
 - Sonnet with bluML weighed the model's small gain over the keyword rule against the cost of running a model in 1 of 3 runs, and never priced the misrouting (0 of 3). Opus 5.5 at high effort weighed the gain in every run since 0.5.0 and priced the misrouting in 4 of 5 runs on 0.5.3; Sonnet has not run since 0.2.0.
-- Runs got slower. With ten runs at once on one machine, `feature-choice` on 0.5.9 took a median of 18 minutes, against 9 on 0.5.7, when the batch beside it was `rule-first` rather than the probe. The probe hit the 30-minute limit in 3 of its 10 runs on 0.5.8 and 0.5.9, and in none of 5 on 0.5.7; a run that times out scores 0 on every criterion. The machine's load and the skills are not yet told apart.
-- Opus did not load the skills in 2 of 21 runs of the main round, and in 3 of 5 runs of the ranker re-run. Opus 5.5 at high effort loaded one in 100 of its 104 runs of the suite's cases from 0.5.0 to 0.5.9.
+- The slowdown followed the batch beside it. With ten runs at once on one machine, `feature-choice` took a median of 18 minutes on 0.5.9 beside the probe, against 9 on 0.5.7 and 10 on 0.6.0 beside `rule-first`. The probe hit the 30-minute limit in 3 of its 10 runs on 0.5.8 and 0.5.9, and in none of 5 on 0.5.7; a run that times out scores 0 on every criterion.
+- A column that matters only next to another can still be dropped when the chosen model is linear: 1 of 9 runs that loaded a skill on 0.6.0, against none of 28 on 0.5.6 to 0.5.9.
+- Opus did not load the skills in 2 of 21 runs of the main round, and in 3 of 5 runs of the ranker re-run. Opus 5.5 at high effort loaded one in 114 of its 119 runs of the suite's cases from 0.5.0 to 0.6.0.
 
 ### How to read it
 
