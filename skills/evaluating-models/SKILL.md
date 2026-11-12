@@ -1,6 +1,6 @@
 ---
 name: evaluating-models
-description: Decides whether a trained model is better than what the product does today, judged the way the product will use it. Sets the operating point from error costs or capacity (never a default 0.5), compares the model with the rule on the same rows in the decision's unit with intervals, checks every slice that matters, runs error analysis to pick the next fix, uses the test window once, and checks that the measured gain pays for the model. Use when choosing a threshold or cutoff, comparing a model with a rule or another model, deciding whether a model is good enough or ready, or when a single metric such as accuracy or AUC is offered as the verdict.
+description: Decides whether a trained model is better than what the product does today, judged the way the product will use it. Sets the operating point from error costs or capacity (never a default 0.5), compares the model with the rule on the same rows in the decision's unit with intervals, checks every slice that matters, runs error analysis to pick the next fix, uses the test window once and only on the owner's go, and checks that the measured gain pays for the model. Each decision is the model owner's, taken in eval.ipynb after writing a reading and a pick and before opening the agent's folded recommendation. Use when choosing a threshold or cutoff, comparing a model with a rule or another model, deciding whether a model is good enough or ready, or when a single metric such as accuracy or AUC is offered as the verdict.
 ---
 
 # Evaluating models
@@ -8,6 +8,10 @@ description: Decides whether a trained model is better than what the product doe
 A model is good when the product makes better decisions with it than without it. Evaluation answers that at the operating point the product will use, against the rule it would replace, on every group of users that matters, with the uncertainty stated.
 
 Read `MODEL.md` first: the Decision section has the decision, the costs and the capacity; the Training section has the chosen model and the baselines. If the costs are not there, go back to `framing-models` or state the assumed costs before computing anything. Load `doubting-results` now as well: every number in the verdict goes through its checks before the reply.
+
+The model's owner takes each evaluation decision, with the threshold owner for the operating point; the agent prepares it. Copy [templates/eval.ipynb](templates/eval.ipynb) to `eval.ipynb` beside `MODEL.md`: one section per step below, in the layout of `train.ipynb` (`training-models`, "How each step ends"). Steps 1, 3, 4 and 6 end at a stop: write the question, the options and the rule before running anything, run the step, fold the agent's reading with its recommendation, and hand the notebook over (`jupyter lab eval.ipynb`), with no recommendation in chat until the owner has written their pick. The owner writes a reading and a pick, opens the folded reading, then the decision in their own words; copy it into `MODEL.md` with the date. Step 2 goes over with step 3, which reads against it. Step 5 starts only on the owner's go. One step per turn. An operating point, a slice policy or a cost changed after a result was seen is a deviation: stop, and write it in the `MODEL.md` log with what changed, from what to what, and the result that prompted it.
+
+Working alone (the request says nobody can answer until the work is done), skip the notebook and the waiting: take each decision on the agent's pick, add it to the `MODEL.md` log as an open decision with its options and evidence, score the test window once after every choice is made, and lead the reply's open questions with the decisions the owner must take, the operating point first.
 
 ```
 - [ ] 1. Operating point set from costs or capacity
@@ -68,11 +72,11 @@ Fairness checks (demographic parity, equality of opportunity) are in [reference/
 
 ## 5. Use the test window once
 
-After every choice is made (features, model, threshold), score the test window once and report that number. Record the date and the count in `MODEL.md`. If test results change a choice, the test window has become a validation window: say so, and evaluate on a newer window.
+After every choice is made (features, model, threshold) and the owner says go, score the test window once and report that number. Record the date and the count in `MODEL.md`. If test results change a choice, the test window has become a validation window: say so, and evaluate on a newer window.
 
 ## 6. Verdict
 
-Write the Evaluation section of `MODEL.md` and its gate. The model is ready for `launching-models` when:
+The stop: the case at the measured gain as a chart, and the owner's verdict. Write the Evaluation section of `MODEL.md`, with the path to `eval.ipynb`, and mark each gate item whose evidence is in place with `(holds: {evidence})`; only the owner ticks it. The model is ready for `launching-models` when the owner has ticked the gate and said go, and the evidence says:
 
 - it beats the rule at the operating point on the test window, and the interval of the difference excludes no gain;
 - no slice that matters does worse than the rule without its own policy;
@@ -89,5 +93,6 @@ Otherwise say which condition fails and what would change it. In the reply, lead
 - A threshold of 0.5 that nobody chose.
 - A comparison where the model and the rule were scored on different rows or at different operating points.
 - A slice with the model behind the rule, averaged away.
-- Test numbers that were looked at more than once.
+- Test numbers that were looked at more than once, or scored before the owner said go.
+- An operating point nobody but the agent picked, or one moved after a result was seen with no deviation in the log.
 - A verdict of "ready" with no money on either side: a gain nobody priced against the model's cost.

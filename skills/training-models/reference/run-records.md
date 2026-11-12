@@ -20,6 +20,8 @@ Every number in `MODEL.md` points to a run that can be rebuilt. The tool matters
 | Operating point | The threshold or k that turns scores into decisions, so a release can be traced to the decisions it made |
 | Validation result at the operating point, with the baseline's on the same rows | The comparison that matters |
 | Model file and its input signature | What serving loads, and the inputs it expects (names, types, units) |
+| Step | Which training step the run belongs to (baselines, debug, features, tuning, choice), so a step's runs can be listed together |
+| Charts | Every chart the owner read for this run, so the decision can be checked against the evidence later |
 | Notes | What was tried and why it was kept or dropped |
 
 ## A minimal record without a tracker
@@ -35,19 +37,23 @@ Hash the training table with `sha256sum train.parquet` or `hashlib.sha256(path.r
 
 ## The same record in MLflow
 
-MLflow 3 calls these runs, datasets and logged models. A run with its dataset, parameters, metrics and model:
+MLflow 3 calls these runs, datasets and logged models. A run with its dataset, parameters, metrics, step, charts and model:
 
 ```python
 import mlflow
 
 mlflow.set_experiment("lead-scoring")
 with mlflow.start_run(run_name="gbm-depth6") as run:
+    mlflow.set_tag("step", "tuning")
     mlflow.log_input(mlflow.data.from_pandas(train_df, name="train", targets="won"), context="training")
     mlflow.log_params({"max_depth": 6, "learning_rate": 0.05, "n_estimators": 400, "seed": 7, "operating_point": "top40/week"})
     mlflow.log_metric("val_won_deals_top40", 11.2)
     mlflow.log_metric("val_rule_won_deals_top40", 9.8)
+    mlflow.log_figure(fig, "charts/tuning/trials.png")  # the chart the owner reads in train.ipynb
     mlflow.sklearn.log_model(model, name="model", input_example=X_val.head(5))
 ```
+
+`mlflow.set_tag(key, value)` and `mlflow.log_figure(figure, artifact_file)` take a matplotlib or plotly figure ([MLflow Python API](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.html)). The setup cell of `train.ipynb` wraps both in `log_charts(step, charts)`. To list one step's runs: `mlflow.search_runs(filter_string="tags.step = 'features'")` ([search syntax](https://mlflow.org/docs/latest/ml/search/search-runs/)).
 
 Notes for MLflow users:
 

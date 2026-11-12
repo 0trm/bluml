@@ -1,6 +1,6 @@
 ---
 name: building-datasets
-description: Builds the training table for a product model so that every row looks the way the model will see the world when it predicts. Fixes the prediction time, the label, where it comes from and when it becomes known, features as they stood at prediction time, a split that mirrors serving, and the bias the product's own past decisions left in the labels; screens every feature for leaks. Use when assembling or reviewing training data, choosing a label or a split, when labels are scarce, noisy or must be collected (labelling guidelines, weak supervision, active learning), when a feature or a single column predicts suspiciously well, when labels arrive late or exist only for what the product showed or acted on (clicks on a ranked list, reviewed transactions, approved loans), or when training and serving compute features in different code.
+description: Builds the training table for a product model so that every row looks the way the model will see the world when it predicts. Fixes the prediction time, the label, where it comes from and when it becomes known, features as they stood at prediction time, a split that mirrors serving, and the bias the product's own past decisions left in the labels; screens every feature for leaks. Hands the built table to the owner in data.ipynb, where the owner decides the rows, the label and the split. Use when assembling or reviewing training data, choosing a label or a split, when labels are scarce, noisy or must be collected (labelling guidelines, weak supervision, active learning), when a feature or a single column predicts suspiciously well, when labels arrive late or exist only for what the product showed or acted on (clicks on a ranked list, reviewed transactions, approved loans), or when training and serving compute features in different code.
 ---
 
 # Building datasets
@@ -21,7 +21,8 @@ Copy this checklist into your work and tick it as you go:
 - [ ] 5. Split mirrors serving
 - [ ] 6. What the product put in the labels, named and handled
 - [ ] 7. Training and serving build features with the same code
-- [ ] 8. MODEL.md Data section written
+- [ ] 8. data.ipynb handed over; the owner decided the rows, the label and the split
+- [ ] 9. MODEL.md Data section written
 ```
 
 ## 1. Fix the row and the prediction time
@@ -83,15 +84,30 @@ Look for randomised traffic first (a random-order holdout, an exploration slice,
 
 Training and serving must compute each feature the same way: same units, windows, defaults for missing values, category maps and reference tables. The safest route is to log features at serving time and train on the log. Otherwise use one function for both, and write a parity check: the same entity at the same moment gets the same values from both paths. Compare missing rates too: a training table enriched upstream (fields filled in for reports) is fuller than what serving will see.
 
-## 8. Write it down
+## 8. Hand the table to the owner
 
-Fill the Data section of `MODEL.md`: the row, the label and its delay, the feature table with each as-of time, the split, the leak screen's result and what was dropped, what the product put in the labels, and where the labels come from and how good they are. Tick the gate items that hold, set the stage to training if all do, and log the date. Training starts with `training-models`.
+The model's owner decides the rows, the label and the split; the agent prepares the evidence. Copy [templates/data.ipynb](templates/data.ipynb) to `data.ipynb` beside `MODEL.md` and fill its header and setup from the steps above. It follows the layout of `eda.ipynb` (`exploring-data` steps 2 and 4) and has three sections on the built table:
+
+1. **The label, the rows and the split:** the label rate over prediction time, with the split boundaries and the rows whose window is still open marked, and rows, positives and rate per split. The decision: the rows, the label window and the split.
+2. **Each feature by origin and split:** the features grouped by where their value comes from, with each one's missing rate and quartiles per split, so a feature that looks different in test than in training shows before any model sees it.
+3. **The leak screen as a chart:** each feature's strength alone, against the too-strong line, and the flagged features across the stretches of time, from `scripts/leakage_screen.py`. The decision: which flagged features stay out.
+
+Write each question, its options and the rule for choosing before drawing the charts, and the agent's reading folded, ending with its recommendation where there is a decision. Run it end to end (`jupyter nbconvert --to notebook --execute --inplace data.ipynb`) and hand it over with `jupyter lab data.ipynb`; in chat, give no reading or recommendation until the owner has written their pick. The owner writes a reading and a pick, opens the folded reading, then writes the decision in their own words. Read the notes back as `exploring-data` step 5 does, copy each decision into `MODEL.md` with the date, and start training only when the owner says go.
+
+A row definition, a label window or a split changed after a model's result was seen is a deviation: stop, and write it in the `MODEL.md` log with what changed, from what to what, and the result that prompted it.
+
+Working alone (the request says nobody can answer until the work is done), skip the notebook and the waiting: take each decision on the agent's pick, add it to the `MODEL.md` log as an open decision with its options and evidence, and list the open decisions in the reply.
+
+## 9. Write it down
+
+Fill the Data section of `MODEL.md`: the path to `data.ipynb` and the decisions taken there, the row, the label and its delay, the feature table with each as-of time, the split, the leak screen's result and what was dropped, what the product put in the labels, and where the labels come from and how good they are. Mark each gate item whose evidence is in place with `(holds: {evidence})`; only the owner ticks it. Set the stage to training once the owner has ticked the gate and said go, and log the date. Training starts with `training-models`.
 
 ## Stop signs
 
 - A feature that alone nearly predicts the label.
 - A label that is only known for rows the current system acted on, with no random slice to correct it.
 - A random split over time-ordered rows, or the same entities on both sides when the product scores new ones.
+- Rows, a label or a split the owner never picked, or one changed after a model's result was seen with no deviation in the log.
 - Feature code for serving that differs from the training code.
 - A column documented as backfilled, recomputed, latest or current.
 - Evaluation labels written by a rule or a model, with no set checked by hand.
