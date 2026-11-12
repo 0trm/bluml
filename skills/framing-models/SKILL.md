@@ -13,7 +13,7 @@ With gallop installed, gallop's `routing-questions` and `building-models` run fi
 
 Look for the model's `MODEL.md`: beside its code, or under `models/<name>/`. If it exists, read it and continue with the skill for its stage (design: `writing-design-docs`, data: `building-datasets`, training: `training-models`, evaluation: `evaluating-models`, launch: `launching-models`, live: `monitoring-models`). If it doesn't, copy [templates/MODEL.md](templates/MODEL.md) next to the model's code and fill its Decision section as you work through the steps below.
 
-When the request goes on past framing (build the model, say whether it is ready), load the later stages' skills now, before the first query on the data: `building-datasets` for the split, the features and the leak checks, `training-models` for the fits and the choice of columns, `evaluating-models` for the verdict, and `doubting-results` for every model number that goes into the reply. Framing's steps still come first, and each skill's steps apply when its stage starts. That holds for a model built only to show that the rule is enough. Working alone, skip what needs the owner (the readings in `exploring-data`, the design review), and say so.
+When the request goes on past framing (build the model, say whether it is ready), load the later stages' skills now, before the first query on the data: `building-datasets` for the split, the features and the leak checks, `training-models` for the fits and the choice of columns, `evaluating-models` for the verdict, and `doubting-results` for every model number that goes into the reply. Framing's steps still come first, and each skill's steps apply when its stage starts. That holds for a model built only to show that the rule is enough. Working alone, skip what needs the owner (the readings in `exploring-data`, the design review, the notebooks of the later stages), take each later stop's decision on the agent's pick as that stage's skill says, log it as open, and say so.
 
 ## 1. Name the decision
 
@@ -95,7 +95,7 @@ Then write one of three outcomes:
 
 ## Write it down
 
-Fill the Decision section of `MODEL.md`, tick the gate items that hold, and add a dated line to the log. Leave unticked items unticked and say why.
+Fill the Decision section of `MODEL.md`, mark each gate item whose evidence is in place with `(holds: {evidence})`, and add a dated line to the log. Only the owner ticks a gate; say why any item does not hold.
 
 ## Report
 

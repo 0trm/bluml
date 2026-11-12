@@ -1,6 +1,6 @@
 ---
 name: doubting-results
-description: Checks a model result before it is reported, compared or acted on. Catches scores too good to be true, leaked features, shuffled time splits, a test set used more than once, metrics computed on training data, comparisons on different rows or at different thresholds, accuracy on rare positives, missing intervals, slices too small to judge, and labels written by a rule or by the model itself. Use before writing any model metric into an answer, a MODEL.md, a launch plan or a report; whenever a result beats expectations; and whenever someone else's offline number is offered as the reason to ship or to retrain.
+description: Checks a model result before it is reported, compared or acted on. Catches scores too good to be true, leaked features, shuffled time splits, a test set used more than once, metrics computed on training data, comparisons on different rows or at different thresholds, accuracy on rare positives, missing intervals, slices too small to judge, labels written by a rule or by the model itself, and rules changed after their result was seen. Use before writing any model metric into an answer, a MODEL.md, a launch plan or a report; whenever a result beats expectations; and whenever someone else's offline number is offered as the reason to ship or to retrain.
 ---
 
 # Doubting results
@@ -26,6 +26,8 @@ A good number is a claim, and in product ML the claims that fail are the ones no
 8. **Will it hold live?** Is each feature computed the same way in serving? Do the logged clicks or outcomes reflect what the current system chose to show? An offline result on logs the current system produced favours the current system. Have the team's past offline gains held up in online tests? If nobody has checked, or they have not, an offline win is weak evidence.
 
 9. **Who wrote the labels?** Labels written by a rule or a model (weak labels, pseudo-labels, a filter's past verdicts) agree with whatever wrote them. Scored on them, that rule looks perfect, and a model looks good for copying it. Evaluate on labels people checked.
+
+10. **Was the rule set before the result?** A comparison rule, a keep rule, a threshold, a split or a search grid changed after its result was seen is fitted to that result, like a model tuned on its test rows. Each such change needs a deviation in the `MODEL.md` log, with the owner's approval. A change with none: say so before the number, and report what the rule written first gives.
 
 ## Report the checks
 

@@ -1,6 +1,6 @@
 ---
 name: exploring-data
-description: "Looks at a product model's data before anything is designed or built, and puts it in front of the model's owner without asking them to read code. Covers five sections for any model: the grain and completeness of the rows, the target over time with its steps and seasonality, the target's shape and sparsity, the segments and outliers that carry the volume, and the spread that sets the loss and the interval width. Builds one JupyterLab notebook, eda.ipynb beside MODEL.md, where each section shows a question and a chart with its code folded away, asks the owner to write what they see before opening the agent's folded reading, states what it means for the model and records any decision; the owner's readings come back in the notebook itself. Use after framing names the decision and before the design doc, when someone asks to explore, profile or look at the data or asks for EDA, and again when a source or the tracking changes."
+description: "Looks at a product model's data before anything is designed or built, and puts it in front of the model's owner without asking them to read code. Covers five sections for any model: the grain and completeness of the rows, the target over time with its steps and seasonality, the target's shape and sparsity, the segments and outliers that carry the volume, and the spread that sets the loss and the interval width. Builds one JupyterLab notebook, eda.ipynb beside MODEL.md, where each section shows a question and a chart with its code folded away, asks the owner to write what they see, and a pick where a section ends in a decision, before opening the agent's folded reading and recommendation; the owner's readings and decisions come back in the notebook itself. Use after framing names the decision and before the design doc, when someone asks to explore, profile or look at the data or asks for EDA, and again when a source or the tracking changes."
 ---
 
 # Exploring data
@@ -28,7 +28,7 @@ Write down, from `MODEL.md`: the unit one row stands for, the window, the filter
 
 ## 2. Start the notebook from the template
 
-Copy [templates/eda.ipynb](templates/eda.ipynb) to `eda.ipynb` next to `MODEL.md` and fill its header with the scope from step 1. Its setup cell reads the extract the training table will come from; each of the five sections below it has a question, a chart cell, a box for the owner, the agent's reading and, where one is needed, a decision.
+Copy [templates/eda.ipynb](templates/eda.ipynb) to `eda.ipynb` next to `MODEL.md` and fill its header with the scope from step 1. Its setup cell reads the extract the training table will come from; each of the five sections below it has a question, a chart cell, a box for the owner, the agent's folded reading and, where one is needed, a decision.
 
 The code is the evidence behind every chart and stays in the notebook, each chart under the code that drew it, but it is folded away: the owner reads charts, not code, and a reviewer opens a cell to check one. Keep the template's cell tags (`question`, `chart`, `owner-reading`, `agent-reading`, `decision`) and its folding (`"jupyter": {"source_hidden": true}` in a cell's metadata): reading the notes back depends on the tags, and the order the owner reads in depends on the folding.
 
@@ -56,13 +56,13 @@ Outputs are saved in the file and travel with it. Print counts and draw charts; 
 
 Each section reads, top to bottom:
 
-- **The question,** in the product's words.
+- **The question,** in the product's words. Where the section ends in a decision (a cap, a period to drop, a window to train on, a slice to model apart), the question cell also names it, its options and the rule for choosing, before anything is drawn.
 - **The chart,** with the counts it rests on printed under it.
-- **The owner's box:** a Markdown cell the owner fills before opening anything below it. Writing a reading before seeing one is how it sticks, and it is the only way to tell that the owner understood the chart rather than agreed with the agent.
-- **The agent's reading,** in a folded cell under the box, written before the owner opens the notebook. Evidence first (what the chart shows, with numbers), then inference, labelled as such, then what it means for the model: the grain, the window, a feature to drop, the loss, the interval.
-- **A decision,** where one is needed: a cap, a period to drop, a window to train on, a slice to model apart. Write the question and its options; the owner writes the choice.
+- **The owner's box:** a Markdown cell the owner fills before opening anything below it: what they see and, where there is a decision, the option they pick and why. Writing a reading before seeing one is how it sticks, and it is the only way to tell that the owner understood the chart rather than agreed with the agent.
+- **The agent's reading,** in a folded cell under the box, written before the owner opens the notebook. Evidence first (what the chart shows, with numbers), then inference, labelled as such, then what it means for the model: the grain, the window, a feature to drop, the loss, the interval. Where there is a decision, it ends with the agent's recommendation: the option, and the evidence that picks it under the rule. Folded, it reaches the owner after their pick.
+- **The decision,** where one is needed: the owner writes it last, in their own words, after reading both.
 
-Fold the agent's reading before handing the notebook over. The fold asks the owner to write first; it cannot stop them opening the reading, which is why the reading back checks for it.
+Fold the agent's reading before handing the notebook over, and keep the recommendation out of the chat until the owner has written their pick. The fold asks the owner to write first; it cannot stop them opening the reading, which is why the reading back checks for it.
 
 Tell the owner to open it with `jupyter lab eda.ipynb` (`uvx --from jupyterlab jupyter lab eda.ipynb` where JupyterLab is not installed). Reading needs no kernel and no access to the data: the charts are in the file. The owner writes in each box (double-click, then Shift+Enter), opens the folded reading, takes any decision and saves.
 
@@ -70,13 +70,17 @@ Follow-up questions can go to Claude inside JupyterLab, once the owner has writt
 
 ## 5. Read the owner's notes back
 
-When the owner says they are done, read the cells tagged `owner-reading` and `decision` from `eda.ipynb`. A box that still holds the template's placeholder has no reading; an `agent-reading` cell saved unfolded above an empty box means the owner read the agent's reading before writing their own. Where the owner's reading and the agent's disagree, say so and look again: one of them missed something. A decision taken in the notebook applies to every later step that uses the data.
+When the owner says they are done, read the cells tagged `owner-reading` and `decision` from `eda.ipynb`. A box that still holds the template's placeholder has no reading; an `agent-reading` cell saved unfolded above an empty box means the owner read the agent's reading before writing their own. Where the owner's reading and the agent's disagree, or their pick and the recommendation, say so and look again: one of them missed something. The owner's decision stands; copy it into `MODEL.md` in their words, with the date. A decision taken in the notebook applies to every later step that uses the data, and the next stage starts only when the owner says go.
+
+A decision taken here and changed later, once a model's numbers came in (a window moved, a cap raised), is a deviation: stop, and write it in the `MODEL.md` log with what changed, from what to what, and the result that prompted it.
+
+Working alone (the request says nobody can answer until the work is done), `framing-models` says what to skip: take each decision on the agent's recommendation, add it to the `MODEL.md` log as an open decision with its options and evidence, and list the open decisions in the reply.
 
 When a source or the tracking changes, run the notebook again. The owner's text survives a run, so clear the box, the reading and the decision of every section whose chart changed, fold the new reading and hand it over again.
 
 ## Write it down
 
-Fill the Exploration bullet at the top of the Data section of `MODEL.md`, although exploration runs before the design: the path to `eda.ipynb` and one line per decision it led to, each with its evidence. Tick the exploration gate item if every section has the owner's reading and an implication, and add a dated line to the log. If a section has no owner's reading, leave the item unticked and say which.
+Fill the Exploration bullet at the top of the Data section of `MODEL.md`, although exploration runs before the design: the path to `eda.ipynb` and one line per decision it led to, each with its evidence. Mark the exploration gate item `(holds: {evidence})` if every section has the owner's reading and an implication, and add a dated line to the log; only the owner ticks it. If a section has no owner's reading, say which.
 
 ## Report
 
@@ -86,7 +90,7 @@ Lead with what the data allows, in one line: the grain, the window and the loss 
 
 - Exploring before the decision is framed.
 - A section whose only reading is the agent's.
-- An agent's reading left unfolded when the notebook is handed over.
+- An agent's reading left unfolded when the notebook is handed over, or a recommendation given in chat before the owner's pick.
 - Rows or row-level identifiers in a saved output.
 - A summary number with no chart behind it.
 - A decision taken from a chart nobody looked at.

@@ -7,7 +7,7 @@ description: Writes the design doc for a product ML system after framing and bef
 
 A design doc is where an ML system is cheapest to change. Writing it forces the thinking; reviewing it finds the flaw that would otherwise surface in week six, or after launch. It is written for reviewers who will challenge it, not to record what was already decided.
 
-Read `MODEL.md` first. The design doc starts from its Decision section (what the product does with each prediction, what each error costs, the rule to beat): link to it, don't restate it. If the Decision gate is not ticked, run `framing-models` first.
+Read `MODEL.md` first. The design doc starts from its Decision section (what the product does with each prediction, what each error costs, the rule to beat): link to it, don't restate it. If the Decision gate is not ticked, or, working alone, has an item that does not hold, run `framing-models` first.
 
 ## 1. Decide how much doc the work needs
 

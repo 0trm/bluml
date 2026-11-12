@@ -6,7 +6,7 @@
 |---|---|---|---|
 | framing | {who builds and runs it} | {who answers for the cost of each error} | {YYYY-MM-DD} |
 
-Stages run framing, design, data, training, evaluation, launch, live, retired. Each section ends at a gate; a stage starts only when the gate before it is ticked, with the evidence linked. When work loops back, set the stage back and say why in the log.
+Stages run framing, design, data, training, evaluation, launch, live, retired. Each section ends at a gate. The agent marks an item whose evidence is in place with `(holds: {evidence})`; only the owner ticks it. A stage starts when the owner has ticked the gate before it and said go. From exploration to the verdict, the owner takes each decision in the stage's notebook, after writing a reading and a pick and before opening the agent's recommendation, and it is copied here in the owner's words. When work loops back, set the stage back and say why in the log.
 
 ## 1. Decision
 
@@ -38,6 +38,7 @@ Gate:
 ## 3. Data
 
 - **Exploration:** {path to eda.ipynb; one line per decision it led to}
+- **Table notebook:** {path to data.ipynb; the owner's decisions on the rows, the label, the split and the leak flags, dated}
 - **Row:** {one row per entity per prediction time}
 - **Label:** {the event, its window after the prediction time, when it becomes known and when it stops changing, and the rows it is missing for}
 - **Split:** {train, validation and test windows, and why they mirror serving}
@@ -52,12 +53,17 @@ Gate:
 
 Gate:
 - [ ] The exploration notebook has the owner's reading and an implication in every section, and every decision it led to is recorded here
+- [ ] The owner decided the rows, the label and the split in data.ipynb
 - [ ] Every feature exists, with this value, at prediction time
 - [ ] The leak screen ran and every flag is explained
 - [ ] The split mirrors serving, and training and serving build features with the same code
 - [ ] Labels come from a named source, and a sample checked by hand agrees with them
 
 ## 4. Training
+
+- **Notebook:** {path to train.ipynb; MLflow experiment}
+- **Candidates and the comparison rule:** {one line per candidate card: assumption, serving cost, how it fails; the rule and tie-break the owner wrote, dated, before any fit}
+- **Keep rule:** {the owner's rule for keeping a feature group, dated, before any feature run}
 
 | Run | Model | Data version | Validation result | Note |
 |---|---|---|---|---|
@@ -67,12 +73,14 @@ Gate:
 - **Chosen:** {run id, and why it beats the simpler ones by enough to be worth it}
 
 Gate:
+- [ ] The comparison rule and the keep rule were written before the runs they judge
 - [ ] Baselines are recorded next to the candidates, on the same validation rows
 - [ ] Every feature in the chosen model has a Why in line backed by a run
 - [ ] Every run can be rebuilt from its record (code, data version, parameters, seed)
 
 ## 5. Evaluation
 
+- **Notebook:** {path to eval.ipynb}
 - **Operating point:** {threshold, top-k or quantile, and how the costs set it}
 - **Against the rule:** {difference in the product's unit, with its interval, on the test window}
 - **The case at the measured gain:** {net value per month at the gain and at both ends of its interval, against the break-even gain; any cost the build changed}
@@ -84,7 +92,7 @@ Gate:
 - [ ] The model beats the rule at the operating point, and the interval excludes no gain
 - [ ] The measured gain clears the break-even gain
 - [ ] No slice that matters does worse than the rule, or it has its own policy
-- [ ] The test window was used once, after every choice was made
+- [ ] The test window was used once, after every choice was made and the owner said go
 
 ## 6. Launch
 
@@ -114,3 +122,5 @@ Gate:
 ## Log
 
 - {YYYY-MM-DD}: {what was decided, by whom, and the evidence}
+- {YYYY-MM-DD}: Deviation: {the rule, decision or setting changed, from what to what, the result seen before the change, and whether the owner approved it}
+- {YYYY-MM-DD}: Open: {a decision taken working alone: the question, the options, the rule, the agent's pick and its evidence; for the owner to take}
