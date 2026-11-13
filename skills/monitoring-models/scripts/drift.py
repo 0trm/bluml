@@ -68,8 +68,19 @@ def numeric_profile(ref: pd.Series, cur: pd.Series) -> dict:
                 cur_median=float(c.median()) if len(c) else float("nan"))
 
 
+def as_category(s: pd.Series) -> pd.Series:
+    """Values as text, with whole floats written as integers: pandas reads a whole-number
+    column as float when it has an empty value and as int when it has none, and 1.0 and 1
+    must count as one category."""
+    if pd.api.types.is_float_dtype(s):
+        v = s.dropna()
+        if np.isfinite(v).all() and (v == np.floor(v)).all() and (v.abs() < 2 ** 53).all():
+            s = s.astype("Int64")
+    return s.astype("string").fillna("<missing>")
+
+
 def category_profile(ref: pd.Series, cur: pd.Series) -> dict:
-    r, c = ref.astype("string").fillna("<missing>"), cur.astype("string").fillna("<missing>")
+    r, c = as_category(ref), as_category(cur)
     cats = sorted(set(r.unique()) | set(c.unique()))
     rs = r.value_counts(normalize=True).reindex(cats, fill_value=0).to_numpy()
     cs = c.value_counts(normalize=True).reindex(cats, fill_value=0).to_numpy()

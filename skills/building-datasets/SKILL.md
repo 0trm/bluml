@@ -54,7 +54,7 @@ For each feature, write down the moment its value was known. The test for every 
 Run the screen on the table before training anything:
 
 ```bash
-python scripts/leakage_screen.py data.csv --label booked_demo --time scored_at --id lead_id
+python scripts/leakage_screen.py data.csv --label booked_demo --time scored_at
 ```
 
 `scripts/` is in this skill's directory: use its full path. Any Python with numpy and pandas runs it; `uv run` installs them if missing. It reports each feature's strength on its own, overall and in consecutive stretches of time, and flags features that are too strong, change strength over time, go missing for one class, or behave like identifiers, plus split overlaps and duplicates when given `--split`.
@@ -67,6 +67,7 @@ Treat every flag as a leak until the feature's source and timestamp explain it. 
 - **The product will score entities it has never seen** (new users, new items, new restaurants): also hold out whole entities, and report results on them separately.
 - **Shuffle only** when rows are independent and the link between inputs and label does not change over time, such as a product's category read from its title. Say why that holds if you do it.
 - Keep the real class rate in validation and test. Reweight or resample only the training rows, and only when the model fails to learn the minority class; recalibrate afterwards.
+- Once the split column exists, run the screen again with it and the entity column, `--split split --id lead_id`, to check splits that overlap in time, entities in more than one split and rows duplicated across splits.
 
 [reference/splits.md](reference/splits.md) covers gaps, rolling backtests and entity holdouts.
 
