@@ -174,7 +174,7 @@ data += section(3, "leaks", "The leak screen",
                 ["# 3. The leak screen: each feature's strength alone, overall and by stretch of time.\n"
                  "# Aggregates only: print counts and draw charts, never rows or row-level ids.\n"
                  "result = leakage_screen.screen(table, LABEL, time=TIME, id_col=ID, split=SPLIT)\n"
-                 '# {code: a bar per feature for its strength alone, with the too-strong line (AUC 0.90, or |rho| 0.80 for a numeric label); a line per flagged feature across result["stretches"]; then print result["flags"]}'],
+                 '# {code: a bar per feature for its strength alone, with the too-strong line (AUC 0.90, or |rho| 0.80 for a numeric label); a line per flagged feature across result["stretches"]; then print result["notes"] and result["flags"]}'],
                 "{The features that stay out, and the flags their source explains.}",
                 decision=("{Which flagged features stay out of training.}",
                           "drop it; keep it, with the explanation from its source and timestamp",

@@ -18,7 +18,8 @@ judge, stand out.
 
 Metrics: cost (lower is better; set the costs as in threshold.py), precision,
 recall, fpr (false positive rate), accuracy and flag_rate for decisions; mae, rmse and pinball:<q> for
-predictions (lower is better).
+predictions (lower is better). Rows with an empty label, decision, prediction or
+cost are left out, and counted.
 """
 
 # %%
@@ -34,6 +35,8 @@ import pandas as pd
 MIN_POSITIVES = 30
 MIN_ROWS = 100
 BOOTSTRAP = 1000
+# Resamples are drawn as one matrix of row indices, in batches of at most this many cells.
+BATCH_CELLS = 2_000_000
 LOWER_IS_BETTER = {"cost", "mae", "rmse", "pinball", "flag_rate", "fpr"}
 
 
@@ -43,43 +46,50 @@ def read_table(path: str) -> pd.DataFrame:
     return pd.read_parquet(p) if p.suffix in {".parquet", ".pq"} else pd.read_csv(p)
 
 
+def ratio(num, den):
+    with np.errstate(divide="ignore", invalid="ignore"):
+        return np.where(den > 0, num / den, np.nan)
+
+
 def metric_fn(name: str, y, cost_act=0.0, cost_fp=0.0, fn=None):
-    """Return f(pred, idx) -> metric on the rows idx."""
-    if name == "cost":
-        def f(a, idx):
-            a, t, c = a[idx], y[idx], fn[idx]
-            return float((a * cost_act + a * (1 - t) * cost_fp + (1 - a) * t * c).sum() / len(idx) * 1000)
+    """Return f(pred, idx) -> metric on the rows idx. idx is one set of rows, giving a
+    number, or a matrix with one bootstrap resample per row, giving one number per resample."""
+    def on_rows(g):
+        def f(p, idx):
+            out = g(p[idx], y[idx], idx)
+            return float(out) if np.ndim(out) == 0 else out
         return f
+    if name == "cost":
+        return on_rows(lambda a, t, idx: (a * cost_act + a * (1 - t) * cost_fp + (1 - a) * t * fn[idx]).mean(-1) * 1000)
     if name == "precision":
-        return lambda a, idx: float(y[idx][a[idx] == 1].mean()) if a[idx].sum() else float("nan")
+        return on_rows(lambda a, t, _: ratio((a * t).sum(-1), a.sum(-1)))
     if name == "recall":
-        return lambda a, idx: float(a[idx][y[idx] == 1].mean()) if y[idx].sum() else float("nan")
+        return on_rows(lambda a, t, _: ratio((a * t).sum(-1), t.sum(-1)))
     if name == "fpr":
-        return lambda a, idx: float(a[idx][y[idx] == 0].mean()) if (y[idx] == 0).any() else float("nan")
+        return on_rows(lambda a, t, _: ratio((a * (1 - t)).sum(-1), (1 - t).sum(-1)))
     if name == "accuracy":
-        return lambda a, idx: float((a[idx] == y[idx]).mean())
+        return on_rows(lambda a, t, _: (a == t).mean(-1))
     if name == "flag_rate":
-        return lambda a, idx: float(a[idx].mean())
+        return on_rows(lambda a, t, _: a.mean(-1))
     if name == "mae":
-        return lambda p, idx: float(np.abs(y[idx] - p[idx]).mean())
+        return on_rows(lambda p, t, _: np.abs(t - p).mean(-1))
     if name == "rmse":
-        return lambda p, idx: float(np.sqrt(((y[idx] - p[idx]) ** 2).mean()))
+        return on_rows(lambda p, t, _: np.sqrt(((t - p) ** 2).mean(-1)))
     if name.startswith("pinball"):
         q = float(name.split(":")[1]) if ":" in name else 0.5
-        def f(p, idx):
-            d = y[idx] - p[idx]
-            return float(np.maximum(q * d, (q - 1) * d).mean())
-        return f
+        return on_rows(lambda p, t, _: np.maximum(q * (t - p), (q - 1) * (t - p)).mean(-1))
     raise SystemExit(f"Unknown metric {name}")
 
 
 def compare(model, base, idx, f, rng, b=BOOTSTRAP):
     m, k = f(model, idx), f(base, idx)
-    diffs = np.empty(b)
-    for i in range(b):
-        s = idx[rng.integers(0, len(idx), len(idx))]
-        diffs[i] = f(model, s) - f(base, s)
-    lo, hi = np.nanpercentile(diffs, [2.5, 97.5])
+    n = len(idx)
+    step = max(1, BATCH_CELLS // n)
+    diffs = []
+    for start in range(0, b, step):
+        s = idx[rng.integers(0, n, (min(step, b - start), n))]
+        diffs.append(f(model, s) - f(base, s))
+    lo, hi = np.nanpercentile(np.concatenate(diffs), [2.5, 97.5])
     return m, k, m - k, lo, hi
 
 
@@ -87,6 +97,8 @@ def slice_table(df: pd.DataFrame, label: str, model: np.ndarray, base: np.ndarra
                 cost_act=0.0, cost_fp=0.0, fn=None, regression=False, boot=BOOTSTRAP, seed=0) -> pd.DataFrame:
     rng = np.random.default_rng(seed)
     y = df[label].to_numpy(dtype=float)
+    if np.isnan(y).any():
+        raise ValueError(f"{int(np.isnan(y).sum())} rows have no {label}; leave them out first, as main() does.")
     f = metric_fn(metric, y, cost_act, cost_fp, fn)
     lower = metric.split(":")[0] in LOWER_IS_BETTER
     groups = [("all", "all", np.arange(len(df)))]
@@ -104,6 +116,17 @@ def slice_table(df: pd.DataFrame, label: str, model: np.ndarray, base: np.ndarra
                         model=m, baseline=k, difference=d, ci_low=lo, ci_high=hi, verdict=verdict))
     t = pd.DataFrame(out)
     return t.drop(columns="positives") if regression else t
+
+
+def drop_empty(df: pd.DataFrame, cols: list) -> tuple[pd.DataFrame, str]:
+    """Leave out rows with an empty value in any column the run uses, and say how many."""
+    cols = list(dict.fromkeys(c for c in cols if c))
+    empty = df[cols].isna()
+    keep = ~empty.any(axis=1)
+    if keep.all():
+        return df.reset_index(drop=True), ""
+    per_col = ", ".join(f"`{c}` {int(n)}" for c, n in empty.sum().items() if n)
+    return df[keep].reset_index(drop=True), f"Left out {int((~keep).sum())} rows with an empty value ({per_col})."
 
 
 def fmt_table(df: pd.DataFrame) -> str:
@@ -136,7 +159,13 @@ def main(argv=None) -> int:
     ap.add_argument("--boot", type=int, default=BOOTSTRAP)
     args = ap.parse_args(argv)
 
-    df = read_table(args.data).reset_index(drop=True)
+    df = read_table(args.data)
+    used = [args.label, args.decision, args.score, args.baseline, args.pred, args.baseline_pred,
+            args.cost_fn_col if args.metric == "cost" else None]
+    missing = [c for c in [*used, *args.by] if c and c not in df.columns]
+    if missing:
+        raise SystemExit(f"Columns not found: {missing}. Columns: {', '.join(df.columns)}")
+    df, left_out = drop_empty(df, used)
     regression = args.pred is not None
     if regression:
         model, base = df[args.pred].to_numpy(float), df[args.baseline_pred].to_numpy(float)
@@ -163,6 +192,8 @@ def main(argv=None) -> int:
     direction = "lower" if args.metric.split(":")[0] in LOWER_IS_BETTER else "higher"
     print(f"# Model against baseline by slice\n\nMetric: {args.metric}{unit}, {direction} is better. "
           f"Difference is model minus baseline, with a paired 95% bootstrap interval ({args.boot} resamples).\n")
+    if left_out:
+        print(left_out + "\n")
     print(fmt_table(t))
     worse = t[t["verdict"] == "model worse"]
     small = t[t["verdict"] == "too small to judge"]

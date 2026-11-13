@@ -8,15 +8,16 @@ Cost mode: every row the product acts on costs --cost-act (a review, a call),
 acting on a negative costs --cost-fp more, and leaving a positive alone costs
 --cost-fn, or the value in --cost-fn-col when it varies by row (the amount of a
 missed fraud). The script finds the threshold with the lowest total cost, the
-range of thresholds within 1% of it, and the policy that acts row by row when
-the expected cost of acting is lower, which is right only if scores are
-calibrated (the calibration table shows whether they are).
+unbroken range of thresholds around it that cost within 1% of it, and the
+policy that acts row by row when the expected cost of acting is lower, which is
+right only if scores are calibrated (the calibration table shows whether they are).
 
 Capacity mode: the product can act on --capacity rows per --per group (40
 demos a week); the script reports precision, recall and lift of the top rows.
 
 With --rule-expr or --rule, the current rule is scored on the same rows. With
 --time, the threshold is chosen on the earlier half and costed on the later half.
+Rows with an empty value in a column the run uses are left out, and counted.
 
     uv run threshold.py claims.csv --score p --label fraudulent --cost-act 40 --cost-fn-col claim_amount
     uv run threshold.py leads.csv --score p --label won --capacity 40 --per week
@@ -43,6 +44,17 @@ def read_table(path: str) -> pd.DataFrame:
     return pd.read_parquet(p) if p.suffix in {".parquet", ".pq"} else pd.read_csv(p)
 
 
+def drop_empty(df: pd.DataFrame, cols: list) -> tuple[pd.DataFrame, str]:
+    """Leave out rows with an empty value in any column the run uses, and say how many."""
+    cols = list(dict.fromkeys(c for c in cols if c))
+    empty = df[cols].isna()
+    keep = ~empty.any(axis=1)
+    if keep.all():
+        return df.reset_index(drop=True), ""
+    per_col = ", ".join(f"`{c}` {int(n)}" for c, n in empty.sum().items() if n)
+    return df[keep].reset_index(drop=True), f"Left out {int((~keep).sum())} rows with an empty value ({per_col})."
+
+
 def costs_of(act: np.ndarray, y: np.ndarray, cost_act: float, cost_fp: float, cost_fn: np.ndarray) -> np.ndarray:
     """Cost of each row under a decision."""
     return act * cost_act + act * (1 - y) * cost_fp + (1 - act) * y * cost_fn
@@ -67,10 +79,18 @@ def cost_curve(score: np.ndarray, y: np.ndarray, cost_act: float, cost_fp: float
 
 
 def best_threshold(curve: pd.DataFrame) -> tuple[float, float, float]:
-    i = int(curve["cost"].idxmin())
-    best = curve.loc[i, "cost"]
-    flat = curve[curve["cost"] <= best * (1 + FLAT_TOLERANCE)]["threshold"]
-    return float(curve.loc[i, "threshold"]), float(flat.min()), float(flat.max())
+    """The lowest-cost threshold, and the unbroken run of thresholds around it that cost
+    within FLAT_TOLERANCE of it. A second low point elsewhere on the curve stays out of
+    the range: the thresholds between the two cost more."""
+    cost, th = curve["cost"].to_numpy(), curve["threshold"].to_numpy()
+    i = int(np.argmin(cost))
+    flat = cost <= cost[i] * (1 + FLAT_TOLERANCE)
+    lo = hi = i
+    while lo > 0 and flat[lo - 1]:
+        lo -= 1
+    while hi < len(cost) - 1 and flat[hi + 1]:
+        hi += 1
+    return float(th[i]), float(th[lo]), float(th[hi])
 
 
 def expected_cost_policy(score: np.ndarray, cost_act: float, cost_fp: float, cost_fn: np.ndarray) -> np.ndarray:
@@ -131,10 +151,12 @@ def main(argv=None) -> int:
     missing = [c for c in [args.score, args.label, args.cost_fn_col, args.per, args.rule, args.time] if c and c not in df.columns]
     if missing:
         raise SystemExit(f"Columns not found: {missing}. Columns: {', '.join(df.columns)}")
-    df = df.dropna(subset=[args.score, args.label]).reset_index(drop=True)
+    df, left_out = drop_empty(df, [args.score, args.label, args.cost_fn_col, args.per, args.rule, args.time])
     y = df[args.label].astype(int).to_numpy()
     s = df[args.score].astype(float).to_numpy()
     out = [f"# Operating point\n\n{len(df)} rows, {y.sum()} positives ({y.mean():.2%}).\n"]
+    if left_out:
+        out.append(left_out + "\n")
 
     rule = None
     if args.rule:

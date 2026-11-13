@@ -8,7 +8,9 @@ For each feature it reports how well the feature alone separates the label,
 overall and per period, and whether it goes missing for one class more than
 the other. It also checks splits for overlapping time ranges, entities on both
 sides and duplicated rows. Every flag is a question to answer from the
-feature's source and timestamp, not proof of a leak.
+feature's source and timestamp, not proof of a leak. Rows without a label are
+left out, and rows without a time are left out of the time checks; the report
+says how many.
 
     uv run leakage_screen.py data.csv --label churned --time snapshot_month
     uv run leakage_screen.py data.parquet --label clicked --split split --id user_id
@@ -19,6 +21,7 @@ Prints a Markdown report. Exits 0 when nothing is flagged and 1 otherwise.
 # %%
 import argparse
 import sys
+from itertools import combinations
 from pathlib import Path
 
 import numpy as np
@@ -36,9 +39,9 @@ PERIOD_SPREAD = 0.15
 PERIOD_Z = 3.0
 # The same bar for a numeric label, on the |rho| scale (2 * AUC - 1, as above).
 PERIOD_SPREAD_RHO = 0.30
-# Time is cut into this many consecutive stretches of equal row count, fewer when
-# a two-class label's positives are scarce, so that each stretch's strength is
-# stable enough to compare.
+# Time is cut into this many consecutive stretches of about equal row count, fewer
+# when a two-class label's positives are scarce, so that each stretch's strength is
+# stable enough to compare. Rows that share a time value stay in one stretch.
 TIME_CHUNKS = 4
 MIN_POSITIVES_PER_CHUNK = 100
 # A feature missing far more often for one class was often filled in after the outcome.
@@ -110,10 +113,34 @@ def strength(x: pd.Series, y: pd.Series, binary: bool) -> float:
     return auc(x, y) if binary else spearman(x, y)
 
 
+def time_stretches(raw: pd.Series, order: pd.Series, k: int) -> pd.Series:
+    """Cut the rows into at most k consecutive stretches of about equal row count, named
+    by their first and last time and ordered oldest first. Each time value goes to the
+    stretch that holds its middle row, so rows that share a time (one month) never sit in
+    two stretches; rows with no time belong to none."""
+    known = order.notna()
+    counts = order[known].value_counts().sort_index()
+    middle = counts.cumsum() - counts / 2
+    stretch_of = np.minimum(middle * k // known.sum(), k - 1).astype(int)
+    idx = order.map(stretch_of)
+    names = {}
+    for i in sorted(idx.dropna().unique()):
+        when = order[idx == i]
+        names[i] = f"{raw[when.idxmin()]} to {raw[when.idxmax()]}"
+    return pd.Series(pd.Categorical(idx.map(names), categories=list(names.values())), index=raw.index)
+
+
 # %%
 def screen(df: pd.DataFrame, label: str, time: str | None = None, id_col: str | None = None,
            split: str | None = None, drop: list[str] | None = None) -> dict:
     drop = set(drop or [])
+    notes = []
+    no_label = int(df[label].isna().sum())
+    if no_label:
+        notes.append(f"{no_label} rows without a label are left out.")
+    df = df[df[label].notna()].reset_index(drop=True)
+    if id_col and not split:
+        notes.append(f"Entities in more than one split were not checked: `{id_col}` needs a split column (`--split`).")
     y_raw = df[label]
     values = y_raw.dropna().unique()
     binary = len(values) == 2
@@ -126,20 +153,19 @@ def screen(df: pd.DataFrame, label: str, time: str | None = None, id_col: str | 
         raise SystemExit(f"--label {label} has {len(values)} values and is not numeric; screen one class at a time.")
 
     rng = np.random.default_rng(0)
-    if time:
-        order = pd.to_datetime(df[time], errors="coerce") if not pd.api.types.is_numeric_dtype(df[time]) else df[time]
-        folds = (order.rank(method="first") > len(df) / 2).to_numpy().astype(int)
-    else:
-        folds = rng.integers(0, 2, len(df))
-
-    chunks = None
+    chunks = order = None
     if time:
         order = df[time] if pd.api.types.is_numeric_dtype(df[time]) else pd.to_datetime(df[time], errors="coerce")
+        no_time = int(order.isna().sum())
+        if no_time:
+            notes.append(f"{no_time} rows have no readable `{time}` and are left out of the stretches of time and the split ranges.")
+        # Earlier and later halves for the out-of-fold encoding; rows with no time join the earlier half.
+        folds = (order.rank(method="first") > order.notna().sum() / 2).to_numpy().astype(int)
         k = int(min(TIME_CHUNKS, max(2, y.sum() // MIN_POSITIVES_PER_CHUNK))) if binary else TIME_CHUNKS
-        idx = pd.Series(np.minimum((order.rank(method="first") - 1) * k // len(df), k - 1).astype(int), index=df.index)
-        names = {i: f"{df.loc[idx == i, time].min()} to {df.loc[idx == i, time].max()}" for i in range(k)}
-        # Categories in time order, so stretches are compared and printed oldest first.
-        chunks = pd.Series(pd.Categorical(idx.map(names), categories=list(dict.fromkeys(names.values()))), index=df.index)
+        if order.notna().any():
+            chunks = time_stretches(df[time], order, k)
+    else:
+        folds = rng.integers(0, 2, len(df))
 
     skip = {label, time, id_col, split} | drop
     rows, flags = [], []
@@ -189,14 +215,13 @@ def screen(df: pd.DataFrame, label: str, time: str | None = None, id_col: str | 
     if split:
         groups = df.groupby(split)
         if time:
-            t = pd.to_datetime(df[time], errors="coerce") if not pd.api.types.is_numeric_dtype(df[time]) else df[time]
-            ranges = t.groupby(df[split]).agg(["min", "max"])
+            ranges = order.groupby(df[split]).agg(["min", "max"])
             split_notes.append("| Split | Rows | From | To |\n|---|---|---|---|\n" + "\n".join(
                 f"| {k} | {len(groups.get_group(k))} | {r['min']} | {r['max']} |" for k, r in ranges.iterrows()))
-            ordered = ranges.sort_values("min")
-            for (a, ra), (b, rb) in zip(ordered.iterrows(), list(ordered.iterrows())[1:]):
+            # Every pair, not only neighbours: a long train range can reach past the split after the next.
+            for (a, ra), (b, rb) in combinations(ranges.sort_values("min").iterrows(), 2):
                 if rb["min"] <= ra["max"]:
-                    flags.append(f"Splits `{a}` and `{b}` overlap in time ({rb['min']} to {ra['max']}); a model can learn from the period it is tested on.")
+                    flags.append(f"Splits `{a}` and `{b}` overlap in time ({rb['min']} to {min(ra['max'], rb['max'])}); a model can learn from the period it is tested on.")
         if id_col:
             seen = df.groupby(id_col)[split].nunique()
             shared = int((seen > 1).sum())
@@ -210,8 +235,8 @@ def screen(df: pd.DataFrame, label: str, time: str | None = None, id_col: str | 
             flags.append(f"{n_dup} distinct feature rows appear in more than one split; duplicates let a model be tested on rows it trained on.")
 
     stretches = list(chunks.cat.categories) if chunks is not None else []
-    return dict(rows=rows, flags=flags, split_notes=split_notes, binary=binary, n=len(df), stretches=stretches,
-                positives=int(y.sum()) if binary else None)
+    return dict(rows=rows, flags=flags, notes=notes, split_notes=split_notes, binary=binary, n=len(df),
+                stretches=stretches, positives=int(y.sum()) if binary else None)
 
 
 # %%
@@ -220,7 +245,10 @@ def report(result: dict) -> str:
     head = f"# Leak screen\n\n{result['n']} rows"
     if binary:
         head += f", {result['positives']} positives ({result['positives'] / result['n']:.1%})"
-    lines = [head + ".\n", "## Flags\n"]
+    lines = [head + ".\n"]
+    if result["notes"]:
+        lines.append(" ".join(result["notes"]) + "\n")
+    lines.append("## Flags\n")
     lines += [f"- {f}" for f in result["flags"]] or ["- None."]
     lines.append("\n## Features, strongest first\n")
     metric = "AUC alone" if binary else r"\|rho\| alone"  # escaped: a bare | starts a new table cell
