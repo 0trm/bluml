@@ -17,7 +17,7 @@ Read `MODEL.md` first. The Evaluation section must show the model beats the rule
 - [ ] 5. Rollout ladder with pass and stop conditions
 - [ ] 6. Online test designed, decision rule written
 - [ ] 7. Runbook written, rollback rehearsed, monitors live
-- [ ] 8. MODEL.md Launch section written
+- [ ] 8. MODEL.md Launch section and model card written
 ```
 
 ## 1. Choose the serving shape
@@ -84,6 +84,8 @@ Write the runbook, so anyone on the team can release a version the same way: who
 ## 8. Write it down
 
 Fill the Launch section of `MODEL.md`: serving shape and fallback, the latency measured on the serving path and the compute bill, input contract, parity evidence, rollout steps with dates and results, the online test design (with gallop installed, the link to the plan filed by `designing-experiments`) and its result next to the offline gain that predicted it, the rollback and its rehearsal, and the runbook. Mark each gate item whose evidence is in place with `(holds: {evidence})`; only the owner ticks it. When the decision rule says ship and rollout completes, write the case with the online effect in the Live section (replacing the latency estimate, which the effect now contains) and set the stage to live.
+
+Then copy [templates/MODEL_CARD.html](templates/MODEL_CARD.html) to `MODEL_CARD.html` beside `MODEL.md` and fill it from `MODEL.md`; the comment above each block names the section it comes from. It is the model's one-page label: its ID with the live run, the offline and online tests against the rule, what it is worth a month, its use, how it was judged and trained, and its risks. It adds no number that `MODEL.md` does not hold, and it keeps their intervals. Open it to check it renders before handing it over.
 
 When other engineers will maintain the model, `MODEL.md`, the design doc and the runbook are the handover: why the model and its features are what they are, how it is released and what is watched. Add the data's quirks a newcomer would trip on (a backfilled column, a source that lags) to the notes of the Data section's feature table.
 

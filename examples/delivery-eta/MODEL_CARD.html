@@ -1,0 +1,154 @@
+<!doctype html>
+<!--
+  A worked example: the model card for the delivery estimate, filled from MODEL.md in this
+  folder with launching-models/templates/MODEL_CARD.html. Every number is illustrative.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>checkout/delivery-eta@r07 · Model card</title>
+<style>
+:root{--page:#ffffff;--band:#f4f4f4;--frame:#1f1f1f;--ink:#1f1f1f;--fill:#ffffff;--sub:#3a3a3a;--muted:#5f5f5f;--rule:#8a8a8a;--hair:#dcdcdc;
+  --sans:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --mono:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;color-scheme:light dark}
+@media (prefers-color-scheme: dark){:root{--page:#0d1117;--band:#161b22;--frame:#e6e6e6;--ink:#e6e6e6;--fill:#0d1117;--sub:#c4c4c4;--muted:#a6a6a6;--rule:#7d7d7d;--hair:#30363d}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--band);color:var(--ink);font:15px/1.45 var(--sans);-webkit-font-smoothing:antialiased}
+.card{position:relative;width:500px;margin:40px auto;background:var(--fill);border:2px solid var(--frame);padding:8px 14px 12px;font-size:13.5px;line-height:1.35;font-variant-numeric:tabular-nums}
+h1{font:800 42px/1 var(--sans);letter-spacing:-.02em;margin:2px 0 4px}
+.name{font-weight:800;font-size:17px}
+.what{margin:0 0 4px}
+.id{position:absolute;top:13px;right:14px;font:500 12px/1.25 var(--mono);color:var(--muted);user-select:all;-webkit-user-select:all}
+.id .ver{color:var(--rule)}
+.r5{border-top:5px solid var(--frame)}
+.r10{border-top:11px solid var(--frame)}
+.bh{display:grid;grid-template-columns:1fr;gap:8px;align-items:baseline;padding:7px 0 0}
+.bh.cols{grid-template-columns:1fr 64px 56px}
+.bh b{font-weight:800;font-size:15px}
+.bh span{text-align:right;font:700 11.5px var(--sans)}
+.bx{margin:1px 0 6px;font-size:12px;color:var(--sub)}
+.row{display:grid;grid-template-columns:1fr 64px 56px;gap:8px;padding:3px 0;border-top:1px solid var(--frame);align-items:baseline}
+.row .v,.row .w{text-align:right;white-space:nowrap}
+.row .v{font-weight:600}
+.row .w{color:var(--muted)}
+.wide{display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-top:1px solid var(--frame)}
+.wide .v{font-weight:600}
+.ind>span:first-child{padding-left:16px}
+.comp{padding:5px 0;border-top:1px solid var(--frame)}
+.comp b{font-weight:800}
+.chart{margin:0;padding:14px 0}
+.chart figcaption{font-size:11.5px;color:var(--sub);margin-bottom:12px}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.bar{fill:var(--rule)}
+.bar.chosen{fill:var(--ink)}
+.lab{fill:var(--sub);font:11px var(--sans)}
+.val{fill:var(--ink);font:600 11px var(--sans)}
+.axis{stroke:var(--hair);stroke-width:1}
+.foot{font-size:11.5px;color:var(--sub);padding-top:6px;line-height:1.5}
+.foot b{color:var(--ink);font-weight:700}
+@media (max-width:540px){.card{width:auto;margin:16px}.id{position:static;display:block;text-align:right;margin-bottom:6px}}
+</style>
+</head>
+<body>
+<div class="card">
+
+<!-- The ID from MODEL.md's header, and the run that is live. One click selects it. -->
+<span class="id" title="Click to select">checkout/delivery-eta<span class="ver">@r07</span></span>
+<h1>Model Card</h1>
+<!-- MODEL.md's title, and its one sentence on what the model predicts and when. -->
+<div class="name">Delivery estimate</div>
+<p class="what">Minutes from checkout to delivery, predicted at checkout</p>
+<div class="r10"></div>
+
+<!-- Evaluation section: the operating point's metric against the rule on the test window. -->
+<div class="bh cols"><b>Offline test</b><span>Model</span><span>Rule</span></div>
+<p class="bx">September orders kept out of training, scored once, against the rule</p>
+<div class="row"><span>On time</span><span class="v">80%</span><span class="w">71%</span></div>
+<div class="row ind"><span>Gain, 95% CI +8 to +10</span><span class="v">+9 pts</span><span class="w"></span></div>
+<div class="row"><span>Late by more than 10 min</span><span class="v">3%</span><span class="w">9%</span></div>
+<div class="r5"></div>
+
+<!-- Launch section: the online test's result against the rule. -->
+<div class="bh cols"><b>Online test</b><span>Model</span><span>Rule</span></div>
+<p class="bx">4 weeks with real customers, split at random by customer</p>
+<div class="row"><span>On time</span><span class="v">79%</span><span class="w">71%</span></div>
+<div class="row"><span>Repeat orders, 95% CI +0.6 to +3.6</span><span class="v">+2.1%</span><span class="w"></span></div>
+<div class="r5"></div>
+
+<!-- Live section: the latest check of the case (Evaluation's case at the measured gain until there is one). -->
+<div class="bh"><b>Value a month</b></div>
+<p class="bx">Repeat orders and tickets, less lost checkouts, minus running costs</p>
+<div class="wide"><b>Net value</b><span class="v"><b>about €100,000</b></span></div>
+<div class="wide ind"><span>Cost</span><span class="v">€4,850</span></div>
+<div class="wide ind"><span>Break-even gain</span><span class="v">1 pt</span></div>
+<div class="r10"></div>
+
+<!-- Decision section. -->
+<div class="bh"><b>Use</b></div>
+<p class="bx">What the product does with the prediction, and where not to use it</p>
+<div class="comp"><b>Intended use:</b> a 10-minute window at checkout; its upper end, P80, is the promise.</div>
+<div class="comp"><b>Out of scope:</b> new cities and restaurants under 2 weeks of orders (they get the rule's estimate); ranking restaurants.</div>
+<div class="r5"></div>
+
+<!-- Decision section's metric ladder; Evaluation section's test set and slices. -->
+<div class="bh"><b>Evaluation</b></div>
+<p class="bx">Which rows it was judged on, by which measure, and for which groups</p>
+<div class="comp"><b>Evaluation data:</b> September orders by checkout time, used once.</div>
+<div class="comp"><b>Metrics:</b> repeat orders at 30 days → orders inside the promise → tickets, conversion → pinball@0.8.</div>
+<div class="comp"><b>Factors:</b> peak hours and rain hold the gain; restaurants under 2 weeks 74% vs 70%, interval crosses zero; trips over 6 km too few to judge.</div>
+<div class="r5"></div>
+
+<!-- Data section; Training section's runs on the validation rows. -->
+<div class="bh"><b>Training</b></div>
+<p class="bx">The data it learned from, and the runs it beat on August orders</p>
+<div class="comp"><b>Training data:</b> orders March to July, one per checkout; labels 197 of 200 match courier GPS; 3 post-checkout fields dropped.</div>
+<figure class="chart" id="chart"></figure>
+<div class="r5"></div>
+
+<!-- Data section's product bias; Design's open risks; Evaluation's errors left; Live's freshness. -->
+<div class="bh"><b>Risks</b></div>
+<p class="bx">Who the model can harm, and the errors it still makes</p>
+<div class="comp"><b>Ethical considerations:</b> the promise shapes demand and courier load; new cities get a less accurate promise; no customer attributes in the inputs.</div>
+<div class="comp"><b>Caveats:</b> late orders left come from queues that jump after checkout and stacked orders; decays about 1 point a month, retrained monthly.</div>
+<div class="r10"></div>
+
+<div class="foot"><div><b>Owner</b> Ana, who builds and runs it · <b>Threshold owner</b> Marc, who answers for each error's cost</div>
+<div>Live since 2026-09-28 · retrained 2026-10-12</div>
+<div>Components after Mitchell et al. (2019). Every number from MODEL.md.</div></div>
+</div>
+
+<!-- Training section's run table: the rule, the simple baselines and the chosen run, on the validation rows.
+     "text" is how the value prints; "chosen" draws that run's bar in black. -->
+<script type="application/json" id="runs">
+{"caption": "Pinball loss at P80, lower is better; black is the chosen run",
+ "runs": [
+  {"label": "Rule r01", "value": 6.9},
+  {"label": "Linear r02", "value": 5.6},
+  {"label": "Trees r07", "value": 4.8, "chosen": true}
+ ]}
+</script>
+<script>
+(function () {
+  var data = JSON.parse(document.getElementById("runs").textContent);
+  var W = 468, L = 80, BH = 12, GAP = 11, TOP = 4, PW = W - L - 46;
+  var max = Math.max.apply(null, data.runs.map(function (r) { return r.value; })) * 1.16 || 1;
+  var H = TOP + data.runs.length * (BH + GAP);
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) { return {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]; });
+  }
+  var out = ['<line class="axis" x1="' + L + '" x2="' + L + '" y1="0" y2="' + (H - GAP + 4) + '"/>'];
+  data.runs.forEach(function (r, i) {
+    var y = TOP + i * (BH + GAP), w = Math.max(PW * r.value / max, 2), q = Math.min(4, w / 2), ty = y + BH / 2 + 4;
+    var text = esc(r.text || r.value);
+    out.push('<text class="lab" x="' + (L - 8) + '" y="' + ty + '" text-anchor="end">' + esc(r.label) + '</text>');
+    out.push('<path class="bar' + (r.chosen ? ' chosen' : '') + '" d="M' + L + ',' + y + ' h' + (w - q) + ' a' + q + ',' + q + ' 0 0 1 ' + q + ',' + q +
+             ' v' + (BH - 2 * q) + ' a' + q + ',' + q + ' 0 0 1 -' + q + ',' + q + ' h-' + (w - q) + ' z"><title>' + esc(r.label) + ': ' + text + '</title></path>');
+    out.push('<text class="val" x="' + (L + w + 6) + '" y="' + ty + '">' + text + '</text>');
+  });
+  document.getElementById("chart").innerHTML = '<figcaption>' + esc(data.caption) + '</figcaption><svg viewBox="0 0 ' + W + ' ' + H +
+    '" role="img" aria-label="' + esc(data.caption) + '">' + out.join("") + '</svg>';
+})();
+</script>
+</body>
+</html>
