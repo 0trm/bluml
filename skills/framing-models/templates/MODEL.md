@@ -2,11 +2,11 @@
 
 {One sentence: what the model predicts, and the product decision it serves.}
 
-| Stage | Owner | Threshold owner | Updated |
-|---|---|---|---|
-| framing | {who builds and runs it} | {who answers for the cost of each error} | {YYYY-MM-DD} |
+| ID | Stage | Owner | Threshold owner | Updated |
+|---|---|---|---|---|
+| {project}/{model} | framing | {who builds and runs it} | {who answers for the cost of each error} | {YYYY-MM-DD} |
 
-Stages run framing, design, data, training, evaluation, launch, live, retired. Each section ends at a gate. The agent marks an item whose evidence is in place with `(holds: {evidence})`; only the owner ticks it. A stage starts when the owner has ticked the gate before it and said go. From exploration to the verdict, the owner takes each decision in the stage's notebook, after writing a reading and a pick and before opening the agent's recommendation, and it is copied here in the owner's words. When work loops back, set the stage back and say why in the log.
+The ID is `{project}/{model}`: the repo or product area, then the model's short name, the same as its folder. It stays the same across versions; the model card adds the live run after `@`. Stages run framing, design, data, training, evaluation, launch, live, retired. Each section ends at a gate. The agent marks an item whose evidence is in place with `(holds: {evidence})`; only the owner ticks it. A stage starts when the owner has ticked the gate before it and said go. From exploration to the verdict, the owner takes each decision in the stage's notebook, after writing a reading and a pick and before opening the agent's recommendation, and it is copied here in the owner's words. When work loops back, set the stage back and say why in the log.
 
 ## 1. Decision
 

@@ -4,11 +4,11 @@ Predicts how long an order will take to arrive, to show "arrives in 25 to 35 min
 
 > A worked example: a made-up food delivery startup, written the way the bluML skills fill `MODEL.md`. Every number is illustrative.
 
-| Stage | Owner | Threshold owner | Updated |
-|---|---|---|---|
-| live | Ana (ML engineer) | Marc (product manager, checkout), with operations | 2026-10-12 |
+| ID | Stage | Owner | Threshold owner | Updated |
+|---|---|---|---|---|
+| checkout/delivery-eta | live | Ana (ML engineer) | Marc (product manager, checkout), with operations | 2026-10-12 |
 
-Stages run framing, design, data, training, evaluation, launch, live, retired. Each section ends at a gate. The agent marks an item whose evidence is in place with `(holds: {evidence})`; only the owner ticks it. A stage starts when the owner has ticked the gate before it and said go. From exploration to the verdict, the owner takes each decision in the stage's notebook, after writing a reading and a pick and before opening the agent's recommendation, and it is copied here in the owner's words. When work loops back, set the stage back and say why in the log.
+The ID is `{project}/{model}`: the repo or product area, then the model's short name, the same as its folder. It stays the same across versions; the model card adds the live run after `@`. Stages run framing, design, data, training, evaluation, launch, live, retired. Each section ends at a gate. The agent marks an item whose evidence is in place with `(holds: {evidence})`; only the owner ticks it. A stage starts when the owner has ticked the gate before it and said go. From exploration to the verdict, the owner takes each decision in the stage's notebook, after writing a reading and a pick and before opening the agent's recommendation, and it is copied here in the owner's words. When work loops back, set the stage back and say why in the log.
 
 ## 1. Decision
 

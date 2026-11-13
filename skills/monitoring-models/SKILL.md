@@ -42,7 +42,7 @@ Every retrained version passes a gate before it replaces the live one:
 4. Re-choose the operating point from the owner's requirement (the cost ratio, the recall floor, the capacity). A threshold set on the old version's scores does not carry over to the new one.
 5. Any failed check stops the release, and the live model stays: a stale model beats a misbehaving one. A failed check also alerts the owner: a new version worse than the live one can come from a broken data or validation job, not only from the world.
 
-If the recipe then retrains on all rows, the held-out days included, compare that version's predictions with the live model's again before it ships. Shadow it before it takes traffic.
+If the recipe then retrains on all rows, the held-out days included, compare that version's predictions with the live model's again before it ships. Shadow it before it takes traffic. When it replaces the live one, update `MODEL_CARD.html` beside `MODEL.md`: the run after `@`, the retrain date, and every number the new version changed.
 
 ## 3. When a number moves, find the cause first
 
@@ -77,7 +77,7 @@ When the model's actions shape its next training data (rankings decide what gets
 
 ## 6. Keep the case current
 
-A model that paid at launch can stop paying: traffic falls, the bill grows, the rule gets better, the gain decays. Rerun the case in `MODEL.md` every quarter, and whenever the serving bill, the traffic or the rule changes, with live numbers: the online test's effect or a small holdout kept on the rule for the gain, the actual bill for compute, the latency measured on the serving path. Record the date and the result in the Live section. When net value turns negative (the live gain has fallen below the break-even gain), propose retiring the model to the rule: say so with the numbers, and on the owner's agreement set the stage to retired and write why in the log. The same check prunes features: one that adds nothing on the newest window (permutation importance) still costs a pipeline, a monitor and a way to fail.
+A model that paid at launch can stop paying: traffic falls, the bill grows, the rule gets better, the gain decays. Rerun the case in `MODEL.md` every quarter, and whenever the serving bill, the traffic or the rule changes, with live numbers: the online test's effect or a small holdout kept on the rule for the gain, the actual bill for compute, the latency measured on the serving path. Record the date and the result in the Live section, and copy them to the Value block of `MODEL_CARD.html`. When net value turns negative (the live gain has fallen below the break-even gain), propose retiring the model to the rule: say so with the numbers, and on the owner's agreement set the stage to retired and write why in the log. The same check prunes features: one that adds nothing on the newest window (permutation importance) still costs a pipeline, a monitor and a way to fail.
 
 ## 7. Write the incident down
 

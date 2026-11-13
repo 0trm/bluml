@@ -1,0 +1,156 @@
+<!doctype html>
+<!--
+  Model card: a one-page label for a live model, filled from its MODEL.md.
+  Copy to MODEL_CARD.html beside MODEL.md and replace every {placeholder}; the comment above
+  each block names the MODEL.md section it comes from. Keep it in black and grey, keep each
+  component to one or two lines, and copy numbers as MODEL.md states them, with their intervals.
+  The chart draws itself from the runs block near the end: edit the data, not the drawing.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{project}/{model}@{run} · Model card</title>
+<style>
+:root{--page:#ffffff;--band:#f4f4f4;--frame:#1f1f1f;--ink:#1f1f1f;--fill:#ffffff;--sub:#3a3a3a;--muted:#5f5f5f;--rule:#8a8a8a;--hair:#dcdcdc;
+  --sans:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --mono:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;color-scheme:light dark}
+@media (prefers-color-scheme: dark){:root{--page:#0d1117;--band:#161b22;--frame:#e6e6e6;--ink:#e6e6e6;--fill:#0d1117;--sub:#c4c4c4;--muted:#a6a6a6;--rule:#7d7d7d;--hair:#30363d}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--band);color:var(--ink);font:15px/1.45 var(--sans);-webkit-font-smoothing:antialiased}
+.card{position:relative;width:500px;margin:40px auto;background:var(--fill);border:2px solid var(--frame);padding:8px 14px 12px;font-size:13.5px;line-height:1.35;font-variant-numeric:tabular-nums}
+h1{font:800 42px/1 var(--sans);letter-spacing:-.02em;margin:2px 0 4px}
+.name{font-weight:800;font-size:17px}
+.what{margin:0 0 4px}
+.id{position:absolute;top:13px;right:14px;font:500 12px/1.25 var(--mono);color:var(--muted);user-select:all;-webkit-user-select:all}
+.id .ver{color:var(--rule)}
+.r5{border-top:5px solid var(--frame)}
+.r10{border-top:11px solid var(--frame)}
+.bh{display:grid;grid-template-columns:1fr;gap:8px;align-items:baseline;padding:7px 0 0}
+.bh.cols{grid-template-columns:1fr 64px 56px}
+.bh b{font-weight:800;font-size:15px}
+.bh span{text-align:right;font:700 11.5px var(--sans)}
+.bx{margin:1px 0 6px;font-size:12px;color:var(--sub)}
+.row{display:grid;grid-template-columns:1fr 64px 56px;gap:8px;padding:3px 0;border-top:1px solid var(--frame);align-items:baseline}
+.row .v,.row .w{text-align:right;white-space:nowrap}
+.row .v{font-weight:600}
+.row .w{color:var(--muted)}
+.wide{display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-top:1px solid var(--frame)}
+.wide .v{font-weight:600}
+.ind>span:first-child{padding-left:16px}
+.comp{padding:5px 0;border-top:1px solid var(--frame)}
+.comp b{font-weight:800}
+.chart{margin:0;padding:14px 0}
+.chart figcaption{font-size:11.5px;color:var(--sub);margin-bottom:12px}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.bar{fill:var(--rule)}
+.bar.chosen{fill:var(--ink)}
+.lab{fill:var(--sub);font:11px var(--sans)}
+.val{fill:var(--ink);font:600 11px var(--sans)}
+.axis{stroke:var(--hair);stroke-width:1}
+.foot{font-size:11.5px;color:var(--sub);padding-top:6px;line-height:1.5}
+.foot b{color:var(--ink);font-weight:700}
+@media (max-width:540px){.card{width:auto;margin:16px}.id{position:static;display:block;text-align:right;margin-bottom:6px}}
+</style>
+</head>
+<body>
+<div class="card">
+
+<!-- The ID from MODEL.md's header, and the run that is live. One click selects it. -->
+<span class="id" title="Click to select">{project}/{model}<span class="ver">@{run}</span></span>
+<h1>Model Card</h1>
+<!-- MODEL.md's title, and its one sentence on what the model predicts and when. -->
+<div class="name">{model name}</div>
+<p class="what">{what it predicts, and when}</p>
+<div class="r10"></div>
+
+<!-- Evaluation section: the operating point's metric against the rule on the test window. -->
+<div class="bh cols"><b>Offline test</b><span>Model</span><span>Rule</span></div>
+<p class="bx">{test window} kept out of training, scored once, against the rule</p>
+<div class="row"><span>{metric at the operating point}</span><span class="v">{model}</span><span class="w">{rule}</span></div>
+<div class="row ind"><span>Gain, 95% CI {low} to {high}</span><span class="v">{gain}</span><span class="w"></span></div>
+<div class="row"><span>{a second metric the product watches}</span><span class="v">{model}</span><span class="w">{rule}</span></div>
+<div class="r5"></div>
+
+<!-- Launch section: the online test's result against the rule. -->
+<div class="bh cols"><b>Online test</b><span>Model</span><span>Rule</span></div>
+<p class="bx">{duration} with real users, split at random by {unit}</p>
+<div class="row"><span>{primary metric}</span><span class="v">{model}</span><span class="w">{rule}</span></div>
+<div class="row"><span>{business metric}, 95% CI {low} to {high}</span><span class="v">{effect}</span><span class="w"></span></div>
+<div class="r5"></div>
+
+<!-- Live section: the latest check of the case (Evaluation's case at the measured gain until there is one). -->
+<div class="bh"><b>Value a month</b></div>
+<p class="bx">{what the model's effect is worth}, minus running costs</p>
+<div class="wide"><b>Net value</b><span class="v"><b>{net value a month}</b></span></div>
+<div class="wide ind"><span>Cost</span><span class="v">{cost a month}</span></div>
+<div class="wide ind"><span>Break-even gain</span><span class="v">{break-even gain}</span></div>
+<div class="r10"></div>
+
+<!-- Decision section. -->
+<div class="bh"><b>Use</b></div>
+<p class="bx">What the product does with the prediction, and where not to use it</p>
+<div class="comp"><b>Intended use:</b> {what the product does with the prediction, and the operating point}</div>
+<div class="comp"><b>Out of scope:</b> {the cases that keep the rule, and uses the model must not be put to}</div>
+<div class="r5"></div>
+
+<!-- Decision section's metric ladder; Evaluation section's test set and slices. -->
+<div class="bh"><b>Evaluation</b></div>
+<p class="bx">Which rows it was judged on, by which measure, and for which groups</p>
+<div class="comp"><b>Evaluation data:</b> {the test window, how it was split, and how many times it was used}</div>
+<div class="comp"><b>Metrics:</b> {the metric ladder, from the business metric to the offline metric}</div>
+<div class="comp"><b>Factors:</b> {the slices where it holds, those that keep the rule, and those too small to judge}</div>
+<div class="r5"></div>
+
+<!-- Data section; Training section's runs on the validation rows. -->
+<div class="bh"><b>Training</b></div>
+<p class="bx">The data it learned from, and the runs it beat on {validation window}</p>
+<div class="comp"><b>Training data:</b> {the rows and their window, the label and its hand check, and what the leak screen dropped}</div>
+<figure class="chart" id="chart"></figure>
+<div class="r5"></div>
+
+<!-- Data section's product bias; Design's open risks; Evaluation's errors left; Live's freshness. -->
+<div class="bh"><b>Risks</b></div>
+<p class="bx">Who the model can harm, and the errors it still makes</p>
+<div class="comp"><b>Ethical considerations:</b> {who the predictions fall on, the feedback the product puts in its labels, and the fairness checks run}</div>
+<div class="comp"><b>Caveats:</b> {the errors left, how fast it decays, and how often it is retrained}</div>
+<div class="r10"></div>
+
+<div class="foot"><div><b>Owner</b> {name}, who builds and runs it · <b>Threshold owner</b> {name}, who answers for each error's cost</div>
+<div>Live since {date} · retrained {date}</div>
+<div>Components after Mitchell et al. (2019). Every number from MODEL.md.</div></div>
+</div>
+
+<!-- Training section's run table: the rule, the simple baselines and the chosen run, on the validation rows.
+     "text" is how the value prints; "chosen" draws that run's bar in black. -->
+<script type="application/json" id="runs">
+{"caption": "{validation metric}, {lower or higher} is better; black is the chosen run",
+ "runs": [
+  {"label": "Rule {run}", "value": 0, "text": "{value}"},
+  {"label": "{model} {run}", "value": 0, "text": "{value}", "chosen": true}
+ ]}
+</script>
+<script>
+(function () {
+  var data = JSON.parse(document.getElementById("runs").textContent);
+  var W = 468, L = 80, BH = 12, GAP = 11, TOP = 4, PW = W - L - 46;
+  var max = Math.max.apply(null, data.runs.map(function (r) { return r.value; })) * 1.16 || 1;
+  var H = TOP + data.runs.length * (BH + GAP);
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) { return {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]; });
+  }
+  var out = ['<line class="axis" x1="' + L + '" x2="' + L + '" y1="0" y2="' + (H - GAP + 4) + '"/>'];
+  data.runs.forEach(function (r, i) {
+    var y = TOP + i * (BH + GAP), w = Math.max(PW * r.value / max, 2), q = Math.min(4, w / 2), ty = y + BH / 2 + 4;
+    var text = esc(r.text || r.value);
+    out.push('<text class="lab" x="' + (L - 8) + '" y="' + ty + '" text-anchor="end">' + esc(r.label) + '</text>');
+    out.push('<path class="bar' + (r.chosen ? ' chosen' : '') + '" d="M' + L + ',' + y + ' h' + (w - q) + ' a' + q + ',' + q + ' 0 0 1 ' + q + ',' + q +
+             ' v' + (BH - 2 * q) + ' a' + q + ',' + q + ' 0 0 1 -' + q + ',' + q + ' h-' + (w - q) + ' z"><title>' + esc(r.label) + ': ' + text + '</title></path>');
+    out.push('<text class="val" x="' + (L + w + 6) + '" y="' + ty + '">' + text + '</text>');
+  });
+  document.getElementById("chart").innerHTML = '<figcaption>' + esc(data.caption) + '</figcaption><svg viewBox="0 0 ' + W + ' ' + H +
+    '" role="img" aria-label="' + esc(data.caption) + '">' + out.join("") + '</svg>';
+})();
+</script>
+</body>
+</html>
